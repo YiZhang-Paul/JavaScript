@@ -27,6 +27,7 @@ class ResultTab {
 	 * load all addresses
 	 */
 	loadAddress(records) {
+		let start = new Date().getTime();
 		//update address on record page
 		let refreshAddr = results => results.forEach(result => {
 			result.record.address = result.addr[0].formatted_address;
@@ -54,7 +55,10 @@ class ResultTab {
 							refreshAddr(results);	
 							//pass rejected promises to resolve again
 							let unResolved = records.slice(index);
-							this.loadAddress(unResolved);
+							let end = new Date().getTime();
+							setTimeout(() => {
+								this.loadAddress(unResolved);
+							}, 200 - (end - start));
 						});
 				}
 			});

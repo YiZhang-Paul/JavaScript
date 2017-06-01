@@ -4,6 +4,7 @@ html, body {
 	font-family: Arial, "Times NewRoman";
 	color: black;
 	width: 100%;
+	height: 100%;
 	margin: 0;
 }
 
@@ -159,10 +160,11 @@ button {
 	cursor: pointer;
 	width: 100%;
 	height: 100%;
-	margin: 0;
 	top: 0;
 	left: 0;
-	position: absolute;
+	right: 0;
+	bottom: 0;
+	position: fixed;
 	z-index: 1;
 }
 
@@ -178,4 +180,5 @@ button {
 	right: 0;
 	position: absolute;
 	z-index: 2;
+	overflow: scroll;
 }
