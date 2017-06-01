@@ -21,7 +21,7 @@ class ResultTab {
 		//load table
 		this.makeTable();
 		//load addresses
-		this.loadAddress(this.tracker.slice());
+		//this.loadAddress(this.tracker.slice());
 	}
 	/**
 	 * load all addresses
@@ -50,21 +50,11 @@ class ResultTab {
 					Promise.all(promises.slice(0, index))
 						.then(results => {
 							refreshAddr(results);	
+							let unResolved = records.slice(index);
+							//this.loadAddress(unResolved);
 						});
-					let unResolved = records.slice(index);
-					this.loadAddress(unResolved);
 				}
 			});
-
-		// if(records.length) {
-		// 	let record = records.shift();
-		// 	record.getAddress(record.lat, record.lon)
-		// 		.then(results => {
-		// 			record.address = results[0].formatted_address;
-		// 			this.updateData(record, "address");
-		// 			this.loadAddress(records);				
-		// 		}).catch(error => console.log(error));
-		// }
 	} 
 	/**
 	 * clear all records
@@ -224,11 +214,20 @@ class ResultTab {
 				let result = this.searchRecord(currentText);
 				if(result.length > 0) {
 					this.sortOrder = null;
-					this.attachRecords(table, result);
+					let recordRows = document.getElementsByClassName("recordRow");
+					for(let i = 0; i < this.currentRecords.length; i++) {
+						if(result.indexOf(this.currentRecords[i]) != -1) {
+							continue;
+						}
+						recordRows[i].className += " notResult";
+					}
 				}
-			} else if(document.getElementsByClassName("recordRow").length != this.tracker.length) {
+			} else {
 				this.sortOrder = null;
-				this.attachRecords(table);
+				let recordRows = document.getElementsByClassName("recordRow");
+				for(let i = 0; i < this.tracker.length; i++) {
+					recordRows[i].className = "recordRow";
+				}
 			}
 		};
 		//add change event to search box

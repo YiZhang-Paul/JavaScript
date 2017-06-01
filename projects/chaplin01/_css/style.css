@@ -59,6 +59,10 @@ h1 {
 	box-shadow: 0 0 1px 1.5px steelblue;
 }
 
+.notResult {
+	display: none;
+}
+
 table {
 	width: 98%;
 	margin-left: 1%;
