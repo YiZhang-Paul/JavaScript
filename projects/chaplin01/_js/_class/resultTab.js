@@ -21,37 +21,40 @@ class ResultTab {
 		//load table
 		this.makeTable();
 		//load addresses
-		//this.loadAddress(this.tracker.slice());
+		this.loadAddress(this.tracker.slice());
 	}
 	/**
 	 * load all addresses
 	 */
 	loadAddress(records) {
-
+		//update address on record page
 		let refreshAddr = results => results.forEach(result => {
 			result.record.address = result.addr[0].formatted_address;
 			this.updateData(result.record, "address");
 		});
-
+		//promises to get all addresses
 		let promises = [];
 		records.forEach(record => {
 			promises.push(record.getAddress(record.lat, record.lon));
 		});
-
 		Promise.all(promises)
-			.then(results => { 
+			//when all promises are resolved
+			.then(results => {
 				refreshAddr(results);	
 			})
-			.catch(error => {
-				return records.indexOf(error)	;	
+			//find index of the first rejected promise
+			.catch(rejectedItem => {
+				return records.indexOf(rejectedItem)	;	
 			})
 			.then(index => {
 				if(index >= 0) {
+					//update resolved promises results
 					Promise.all(promises.slice(0, index))
 						.then(results => {
 							refreshAddr(results);	
+							//pass rejected promises to resolve again
 							let unResolved = records.slice(index);
-							//this.loadAddress(unResolved);
+							this.loadAddress(unResolved);
 						});
 				}
 			});
