@@ -42,6 +42,7 @@ function getAllRecord() {
 			$result = array();
 			while($row = $resultSet->fetch_assoc()) {
 				array_push($result, $row);
+				array_push($result, $row);
 			}
 			echo json_encode($result);
 		}
