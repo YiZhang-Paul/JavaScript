@@ -18,14 +18,54 @@ class ResultTab {
 		});
 		//initialize search box
 		this.initSearchBox();
+		//load table
+		this.makeTable();
+		//load addresses
+		this.loadAddress(this.tracker.slice());
 	}
 	/**
-	 * check if all address are loaded 
-	 * before attempting to load table
+	 * load all addresses
 	 */
-	loadTable() {
-		if(this.addrRetrieved == this.tracker.length) this.makeTable();
-	}
+	loadAddress(records) {
+
+		let refreshAddr = results => results.forEach(result => {
+			result.record.address = result.addr[0].formatted_address;
+			this.updateData(result.record, "address");
+		});
+
+		let promises = [];
+		records.forEach(record => {
+			promises.push(record.getAddress(record.lat, record.lon));
+		});
+
+		Promise.all(promises)
+			.then(results => { 
+				refreshAddr(results);	
+			})
+			.catch(error => {
+				return records.indexOf(error)	;	
+			})
+			.then(index => {
+				if(index >= 0) {
+					Promise.all(promises.slice(0, index))
+						.then(results => {
+							refreshAddr(results);	
+						});
+					let unResolved = records.slice(index);
+					this.loadAddress(unResolved);
+				}
+			});
+
+		// if(records.length) {
+		// 	let record = records.shift();
+		// 	record.getAddress(record.lat, record.lon)
+		// 		.then(results => {
+		// 			record.address = results[0].formatted_address;
+		// 			this.updateData(record, "address");
+		// 			this.loadAddress(records);				
+		// 		}).catch(error => console.log(error));
+		// }
+	} 
 	/**
 	 * clear all records
 	 * @param obj {}
