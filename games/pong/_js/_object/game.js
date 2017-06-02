@@ -15,6 +15,8 @@ let game = {
 	loadAsset() {
 		//create game board
 		this.board = new Board(this.monitor.width, this.monitor.height, 0.2, 0.01);
+		//create game manager
+		this.manager = new Manager();
 	}, 
 	/**
 	 * initialize game

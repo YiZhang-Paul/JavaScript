@@ -53,12 +53,11 @@ class Board {
 		//draw dotted line in between
 		let dots = Math.floor(this.height / this.hBorder - 2);
 		dots += dots % 2 ? 0 : 1;
-		let dotWidth = this.hBorder;
-		let dotHeight = (this.height - this.hBorder * 2) / dots;
+		let dotWidth = (this.height - this.hBorder * 2) / dots;
 		let center = (this.width - dotWidth) * 0.5;
 		for(let i = 0; i < dots; i++) {
 			if(i % 2 === 0) {
-				this.backCtx.rect(center, (i + 1) * dotHeight, dotWidth, dotHeight);
+				this.backCtx.rect(center, (i + 1) * dotWidth, dotWidth, dotWidth);
 			}
 		}
 		this.backCtx.fillStyle = "white";
