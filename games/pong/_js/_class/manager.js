@@ -23,6 +23,8 @@ class Manager {
 		this.user = new User();
 		this.ai = new AI();
 		this.ball = new Ball(this.starter == "user" ? this.user : this.ai);
+		//score board
+		this.scoreBoard = new ScoreBoard();
 		//game ready
 		this.state = "ready";
 	} 
@@ -34,6 +36,8 @@ class Manager {
 		this.user.reset();
 		this.ai.reset();
 		this.ball.reset();
+		//update score board
+		this.scoreBoard.draw();
 		//game ready
 		this.state = "ready";
 	}
@@ -54,6 +58,19 @@ class Manager {
 		}
 	} 
 	/**
+	 * check game end
+	 */
+	checkGameEnd() {
+		if(this.ball.xCord < game.board.vBorder * 0.5 || 
+			 this.ball.xCord > game.board.width - game.board.vBorder * 0.5) {
+			//update score
+			if(this.ball.direction == "left") this.user.score++;
+			else this.ai.score++;
+			//reset game
+			this.resetGame();
+		}
+	} 
+	/**
 	 * update game assets
 	 * @param float
 	 *
@@ -71,6 +88,8 @@ class Manager {
 		if(this.state == "started") {
 			//check if ball is capture range
 			this.ball.inCaptureRange = this.checkCaptureRange();
+			//check game end
+			this.checkGameEnd();
 		}
 	}
 	/**
