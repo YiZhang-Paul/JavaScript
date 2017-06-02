@@ -27,39 +27,23 @@ class ResultTab {
 	 * load all addresses
 	 */
 	loadAddress(records) {
-		let start = new Date().getTime();
-		//update address on record page
-		let refreshAddr = results => results.forEach(result => {
-			result.record.address = result.addr[0].formatted_address;
-			this.updateData(result.record, "address");
-		});
 		//promises to get all addresses
-		let promises = [];
+		let promises = [], unresolved = [];
 		records.forEach(record => {
 			promises.push(record.getAddress(record.lat, record.lon));
 		});
 		Promise.all(promises)
-			//when all promises are resolved
 			.then(results => {
-				refreshAddr(results);	
-			})
-			//find index of the first rejected promise
-			.catch(rejectedItem => {
-				return records.indexOf(rejectedItem)	;	
-			})
-			.then(index => {
-				if(index >= 0) {
-					//update resolved promises results
-					Promise.all(promises.slice(0, index))
-						.then(results => {
-							refreshAddr(results);	
-							//pass rejected promises to resolve again
-							let unResolved = records.slice(index);
-							let end = new Date().getTime();
-							setTimeout(() => {
-								this.loadAddress(unResolved);
-							}, 200 - (end - start));
-						});
+				results.forEach(result => {
+					if(result.status == "good") {
+						result.record.address = result.addr[0].formatted_address;
+						this.updateData(result.record, "address");
+					} else {
+						unresolved.push(result.record);
+					}
+				});	
+				if(unresolved.length > 0) {
+					this.loadAddress(unresolved);	
 				}
 			});
 	} 

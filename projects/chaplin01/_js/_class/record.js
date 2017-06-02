@@ -32,14 +32,12 @@ class Record {
 	 */
 	getAddress(lat, lon) {
 		if(window.navigator.geolocation) {
+			let geocoder = new google.maps.Geocoder();
 			return new Promise((resolve, reject) => {
 				let position = new google.maps.LatLng(lat, lon);
-				let geocoder = new google.maps.Geocoder();
 				geocoder.geocode({'latLng': position}, (results, status) => {
-					if(status == "OK") resolve({record : this, addr : results});	
-					else {
-						reject(this);	
-					}
+					if(status == "OK") resolve({record : this, addr : results, status : "good"});	
+					else resolve({record : this, addr : "", status : "bad"});
 			  });
 			});
 		}
