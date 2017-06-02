@@ -19,17 +19,6 @@ class AI extends Player {
 		this.direction = null;
 	} 
 	/**
-	 * move AI
-	 * @param float
-	 *
-	 * timeStep : game loop time step
-	 */
-	move(timeStep) {
-		if(game.manager.state == "started") {
-			this.followBall(timeStep);
-		}
-	} 
-	/**
 	 * follow ball movement 
 	 * @param float
 	 *
@@ -59,13 +48,46 @@ class AI extends Player {
 
 	} 
 	/**
+	 * move AI
+	 * @param float
+	 *
+	 * timeStep : game loop time step
+	 */
+	move(timeStep) {
+		if(game.manager.state == "started") {
+			this.followBall(timeStep);
+		}
+	} 
+	/**
+	 * randomize moving direction when ball approaches 
+	 */
+	randomDirection() {
+		let chance = Math.floor(Math.random() * 10);
+		//30% chance for no movement
+		if(chance < 3) {
+			return;
+		}
+		if(this.yCord < game.board.height * 0.5) {
+			this.direction = chance < 7 ? "down" : "up"; 
+		} else {
+			this.direction = chance < 7 ? "up" : "down";
+		}
+	} 
+	/**
 	 * update AI data
 	 * @param float
 	 *
 	 * timeStep : game loop time step
 	 */
 	update(timeStep) {
-		//check movement
-		this.move(timeStep);
+		let ball = game.manager.ball;
+		let playerDist = game.manager.user.xCord - this.xCord - this.width;
+		if(!this.direction && ball.xCord - ball.minX < ball.radius) {
+			//randomize moving direction to change ball direction on contact
+			this.randomDirection();
+		} else {
+			//check movement
+			this.move(timeStep);
+		}
 	} 
 }
