@@ -13,7 +13,8 @@ let game = {
 	 * load game assets
 	 */
 	loadAsset() {
-
+		//create game board
+		this.board = new Board(this.monitor.width, this.monitor.height, 0.2, 0.01);
 	}, 
 	/**
 	 * initialize game
@@ -69,6 +70,7 @@ let game = {
 		mainLoop = timestamp => {
 			if(timestamp < lastFrameRender + this.timeStep) {
 				requestAnimationFrame(mainLoop);
+				return;
 			}
 			//update delta time and record most recent render
 			delta += timestamp - lastFrameRender;
