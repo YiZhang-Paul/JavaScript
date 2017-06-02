@@ -6,6 +6,8 @@
  */
 class Manager {
 	constructor() {
+		//assets and participants
+		this.user = null;
 		this.ctx = game.board.playerCtx;
 		//current frame state
 		this.state = null;
@@ -16,6 +18,8 @@ class Manager {
 	 * set up new game
 	 */
 	newGame() {
+		//create assets and participants
+		this.user = new User();
 		//game ready
 		this.state = "ready";
 	} 
@@ -23,7 +27,10 @@ class Manager {
 	 * reset game
 	 */
 	resetGame() {
-
+		//reset assets and participants
+		this.user.reset();
+		//game ready
+		this.state = "ready";
 	}
 	/**
 	 * update game assets
@@ -36,6 +43,8 @@ class Manager {
 		if(control.keyReleased == control.SPACE) {
 			this.state = "started";
 		}
+		//update assets and participants
+		this.user.update(timeStep);
 	} 
 	/**
 	 * draw game assets
@@ -43,5 +52,7 @@ class Manager {
 	draw() {
 		//clear canvas
 		this.ctx.clearRect(0, 0, game.board.width, game.board.height);
+		//draw assets and participants
+		this.user.draw();
 	} 
 } 

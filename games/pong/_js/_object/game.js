@@ -106,12 +106,13 @@ let game = {
 	 * update game
 	 */ 
 	update() {
+		this.manager.update(this.timeStep);
 		control.keyReleased = null;
 	},
 	/**
 	 * draw game
 	 */ 
 	draw() {
-
+		this.manager.draw();
 	} 
 };
