@@ -123,47 +123,29 @@ class Ball {
 	 */
 	endLocation() {
 		let destinationY;
-		if(this.vVelocity) {
+		if(!this.vVelocity) {
+			destinationY = this.yCord;
+		} else {
 			let board = game.board;
-			let ai = game.manager.ai;
-			let user = game.manager.user;
 			let distToPlayer = this.hDirection == "left" ? 
 				this.xCord - this.minX : this.maxX - this.xCord;
-			//find horizontal travel distance before first bounce
-			let firstBounce = 0;
-			if(this.vDirection == "up") {
-				firstBounce = (this.yCord - board.hBorder) / this.vVelocity * this.hVelocity;
-			} else {
-				firstBounce = (board.height - board.hBorder - this.yCord) / this.vVelocity * this.hVelocity;
-			}	
+			//find horizontal travel distance before first vertical bounce
+			let vBounce1 = this.vDirection == "up" ? this.yCord - board.hBorder : board.height - this.yCord - board.hBorder;
+			let hBounce1 = vBounce1 /	this.vVelocity * this.hVelocity;
 			//check if a bounce will happen within game board area
-			if(firstBounce >= distToPlayer) {
-				if(this.vDirection == "up") {
-					destinationY = this.yCord / firstBounce * (firstBounce - distToPlayer);
-				} else {
-					destinationY = this.yCord / (firstBounce - distToPlayer) * firstBounce;
-				}
+			if(hBounce1 >= distToPlayer) {
+				let scale = hBounce1 / (hBounce1 - distToPlayer);
+				destinationY = this.vDirection == "up" ? this.yCord / scale : this.yCord * scale;
 			} else {
-				//find horizontal travel distance for a full bounce
+				//horizontal travel distance for a full bounce
 				let fullBounce = (board.height - board.hBorder * 2) / this.vVelocity * this.hVelocity;
-				//find total remaining horizontal travel distance
-				let remainingDist = distToPlayer - firstBounce;
-				//find total bounce time
-				let totalBounce = Math.floor(remainingDist / fullBounce) + 1;
-				//find final vertical direction
-				let oppositeDirection = this.vDirection == "up" ? "down" : "up";
-				let finalDirect = totalBounce % 2 ? oppositeDirection : this.vDirection;
+				let totalBounce = Math.floor((distToPlayer - hBounce1) / fullBounce) + 1;
 				//remaining vertical travel distance before going out of game board area
-				let vDistance = remainingDist % fullBounce / this.hVelocity * this.vVelocity;
-				//find destination Y-Coordinate
-				if(finalDirect == "up") {
-					destinationY = board.height - board.hBorder - vDistance;
-				} else {
-					destinationY = board.hBorder + vDistance;
-				}
+				let vDistance = (distToPlayer - hBounce1) % fullBounce / this.hVelocity * this.vVelocity;
+				//final direction after all bounces
+				let finalDir = totalBounce % 2 ? (this.vDirection == "up" ? "down" : "up") : this.vDirection;
+				destinationY = finalDir == "up" ? board.height - board.hBorder - vDistance : board.hBorder + vDistance;
 			}
-		} else {
-			destinationY = this.yCord;
 		}
 		return destinationY;
 	} 

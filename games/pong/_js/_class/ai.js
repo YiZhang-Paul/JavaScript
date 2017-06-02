@@ -77,7 +77,7 @@ class AI extends Player {
 		if(!this.direction && ball.xCord - ball.minX < ball.radius) {
 			//randomize moving direction to change ball direction on contact
 			this.randomDirection();
-		} else if(ball.xCord - ball.minX < playerDist * 0.95 && 
+		} else if(ball.xCord - ball.minX < playerDist * 0.25 && 
 			        ball.hDirection == "left") {
 			this.moveToEndY(timeStep);
 		} else {
@@ -94,9 +94,9 @@ class AI extends Player {
 			return;
 		}
 		if(this.yCord < game.board.height * 0.5) {
-			this.direction = chance < 7 ? "down" : "up"; 
+			this.direction = chance < 6 ? "down" : "up"; 
 		} else {
-			this.direction = chance < 7 ? "up" : "down";
+			this.direction = chance < 6 ? "up" : "down";
 		}
 	} 
 	/**
