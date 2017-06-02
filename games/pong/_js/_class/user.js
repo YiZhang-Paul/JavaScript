@@ -5,10 +5,7 @@
 class User extends Player {
 	constructor() {
 		super();
-		//initialize location
-		this.xCord = game.board.width - game.board.vBorder - this.width;
-		this.yCord = (game.board.height - this.height) * 0.5;
-		//initialize/reset user
+		//initialize/reset user location and direction
 		this.reset();
 	}
 	/**
