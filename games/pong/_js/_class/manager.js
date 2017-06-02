@@ -38,6 +38,22 @@ class Manager {
 		this.state = "ready";
 	}
 	/**
+	 * check if ball is in capture range
+	 *
+	 * returns boolean
+	 */
+	checkCaptureRange() {
+		//check if the ball is at the same height of a player
+		let checkRange = player => 
+			this.ball.yCord >= player.yCord && 
+			this.ball.yCord <= player.yCord + player.height;
+		//check capture range base on ball moving direction
+		if(this.ball.xCord >= this.ball.minX && 
+			 this.ball.xCord <= this.ball.maxX) {
+			return this.ball.hDirection == "left" ? checkRange(this.ai) : checkRange(this.user);
+		}
+	} 
+	/**
 	 * update game assets
 	 * @param float
 	 *
@@ -52,7 +68,11 @@ class Manager {
 		this.user.update(timeStep);
 		this.ai.update(timeStep);
 		this.ball.update(timeStep);
-	} 
+		if(this.state == "started") {
+			//check if ball is capture range
+			this.ball.inCaptureRange = this.checkCaptureRange();
+		}
+	}
 	/**
 	 * draw game assets
 	 */

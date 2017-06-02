@@ -9,6 +9,7 @@ class Ball {
 	constructor(owner) {
 		this.owner = owner;
 		this.moving = false;
+		this.inCaptureRange = false;
 		//ball stats
 		this.radius = game.board.hBorder;
 		this.minX = game.board.vBorder + game.manager.ai.width + this.radius;
@@ -78,9 +79,30 @@ class Ball {
 		}
 		//move horizontally
 		if(this.hDirection == "left") {
-			this.xCord -= hVelocity;
+			this.xCord = this.inCaptureRange ? 
+				Math.max(this.minX, this.xCord - hVelocity) : this.xCord - hVelocity;
 		} else if(this.hDirection == "right") {
-			this.xCord += hVelocity;
+			this.xCord = this.inCaptureRange ?
+			  Math.min(this.xCord + hVelocity, this.maxX) : this.xCord + hVelocity;
+		}
+	} 
+	/**
+	 * bounce ball
+	 */
+	bounce() {
+		//check collision on horizontal direction
+		if(this.inCaptureRange) {
+			if(this.xCord == this.minX) {
+				this.hDirection = "right";
+			} else if(this.xCord == this.maxX) {
+				this.hDirection = "left";
+			}
+		}
+		//check collision on vertical direction
+		if(this.yCord == this.minY) {
+			this.vDirection = "down";
+		} else if(this.yCord == this.maxY) {
+			this.vDirection = "up";
 		}
 	} 
 	/**
@@ -98,8 +120,9 @@ class Ball {
 			if(!this.moving) {
 				this.initiateMove();
 			}
-			//move ball
+			//move ball and check for bouncing
 			this.move(timeStep);
+			this.bounce();
 		}
 	} 
 	/**
