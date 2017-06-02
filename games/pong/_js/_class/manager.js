@@ -8,11 +8,12 @@ class Manager {
 	constructor() {
 		//assets and participants
 		this.user = null;
+		this.ai = null;
+		this.ball = null;
 		this.ctx = game.board.playerCtx;
 		//current frame state
 		this.state = null;
-		//set a new game
-		this.newGame();
+		this.starter = "user";
 	}
 	/**
 	 * set up new game
@@ -20,6 +21,8 @@ class Manager {
 	newGame() {
 		//create assets and participants
 		this.user = new User();
+		this.ai = new AI();
+		this.ball = new Ball(this.starter == "user" ? this.user : this.ai);
 		//game ready
 		this.state = "ready";
 	} 
@@ -29,6 +32,8 @@ class Manager {
 	resetGame() {
 		//reset assets and participants
 		this.user.reset();
+		this.ai.reset();
+		this.ball.reset();
 		//game ready
 		this.state = "ready";
 	}
@@ -45,6 +50,8 @@ class Manager {
 		}
 		//update assets and participants
 		this.user.update(timeStep);
+		this.ai.update(timeStep);
+		this.ball.update(timeStep);
 	} 
 	/**
 	 * draw game assets
@@ -54,5 +61,7 @@ class Manager {
 		this.ctx.clearRect(0, 0, game.board.width, game.board.height);
 		//draw assets and participants
 		this.user.draw();
+		this.ai.draw();
+		this.ball.draw();
 	} 
 } 

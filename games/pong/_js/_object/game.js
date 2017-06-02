@@ -17,6 +17,8 @@ let game = {
 		this.board = new Board(this.monitor.width, this.monitor.height, 0.2, 0.01);
 		//create game manager
 		this.manager = new Manager();
+		//set a new game
+		this.manager.newGame();
 	}, 
 	/**
 	 * initialize game
@@ -49,9 +51,9 @@ let game = {
 				case control.S :
 				case control.DOWN :
 				case control.SPACE :
+					control.keyReleased = keyCode;
 					if(control.isDown(keyCode)) {
 						control.keyPressed.splice(control.keyPressed.indexOf(keyCode), 1);
-						control.keyReleased = keyCode;
 					}
 					break;
 			}
