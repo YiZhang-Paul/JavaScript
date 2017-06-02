@@ -77,6 +77,6 @@ class User extends Player {
 	update(timeStep) {
 		//check movement
 		this.changeDirection();
-		if(this.direction) this.move(timeStep); 
+		if(this.direction) this.move(timeStep);
 	} 
 } 

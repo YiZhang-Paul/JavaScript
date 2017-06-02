@@ -23,9 +23,9 @@ class Ball {
 		this.hVelocity = 0;
 		this.xCord = null;
 		this.yCord = null;
+		this.ctx = game.board.playerCtx;
 		//initialize/reset ball location and movement
 		this.reset();
-		this.ctx = game.board.playerCtx;
 	}
 	/**
 	 * reset ball
@@ -92,17 +92,13 @@ class Ball {
 	bounce() {
 		//check collision on horizontal direction
 		if(this.inCaptureRange) {
-			if(this.xCord == this.minX) {
-				this.hDirection = "right";
-			} else if(this.xCord == this.maxX) {
-				this.hDirection = "left";
+			if(this.xCord == this.minX || this.xCord == this.maxX) {
+				this.hDirection = this.xCord == this.minX ? "right" : "left";
 			}
 		}
 		//check collision on vertical direction
-		if(this.yCord == this.minY) {
-			this.vDirection = "down";
-		} else if(this.yCord == this.maxY) {
-			this.vDirection = "up";
+		if(this.yCord == this.minY || this.yCord == this.maxY) {
+			this.vDirection = this.yCord == this.minY ? "down" : "up";
 		}
 	} 
 	/**

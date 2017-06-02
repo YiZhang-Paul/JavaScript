@@ -24,8 +24,33 @@ class AI extends Player {
 	 *
 	 * timeStep : game loop time step
 	 */
-	move() {
-
+	move(timeStep) {
+		if(game.manager.state == "started") {
+			this.followBall(timeStep);
+		}
+	} 
+	/**
+	 * follow ball movement 
+	 * @param float
+	 *
+	 * timeStep : game loop time step
+	 */
+	followBall(timeStep) {
+		let speed = this.speed * timeStep;
+		let centerY = this.yCord + this.height * 0.5;
+		let ballY = game.manager.ball.yCord;
+		//check ball Y-Coordinate
+		if(ballY > centerY) {
+			this.direction = "down";
+			//move down 
+			let endY = centerY + speed > ballY ? ballY - this.height * 0.5 : this.yCord + speed;
+			this.yCord = Math.min(endY, this.maxY);
+		} else if(ballY < centerY) {
+			this.direction = "up";
+			//move up
+			let endY = centerY - speed < ballY ? ballY - this.height * 0.5 : this.yCord - speed; 
+			this.yCord = Math.max(this.minY, endY);
+		}
 	} 
 	/**
 	 * set AI direction
