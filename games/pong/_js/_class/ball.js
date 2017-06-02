@@ -88,6 +88,10 @@ class Ball {
 			this.xCord = this.inCaptureRange ?
 			  Math.min(this.xCord + hVelocity, this.maxX) : this.xCord + hVelocity;
 		}
+		//calculate Y-Coordinate of end location
+		if(this.hDirection == "left") {
+			this.destinationY = this.endLocation();
+		}
 	} 
 	/**
 	 * bounce ball
@@ -104,19 +108,11 @@ class Ball {
 					Math.min(this.vVelocity * 1.5, this.speed * 3) : Math.max(this.speed * 0.2, this.vVelocity * 0.67);
 				//change vertical moving direction 
 				this.vDirection = finalDirect;
-				//calculate ending Y-Coordinate 
-				if(this.hDirection == "left") {
-					this.destinationY = this.endLocation();
-				}
 			}
 		}
 		//check collision on vertical direction
 		if(this.yCord == this.minY || this.yCord == this.maxY) {
 			this.vDirection = this.yCord == this.minY ? "down" : "up";
-			//re-calculate ending Y-Coordinate if speed and direction changed
-			if(this.hDirection == "left") {
-				this.destinationY = this.endLocation();
-			}
 		}
 	} 
 	/**

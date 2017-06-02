@@ -42,10 +42,28 @@ class AI extends Player {
 		}
 	} 
 	/**
-	 * set AI direction
+	 * move to ball ending location
+	 * @param float
+	 *
+	 * timeStep : game loop time step
 	 */
-	setDiretcion() {
-
+	moveToEndY(timeStep) {
+		let speed = this.speed * timeStep;
+		let centerY = this.yCord + this.height * 0.5;
+		let destinationY = game.manager.ball.destinationY;
+		if(destinationY > centerY) {
+			this.direction = "down";
+			//move down
+			let endY = centerY + speed > destinationY ? destinationY - this.height * 0.5 : this.yCord + speed;
+			this.yCord = Math.min(endY, this.maxY);
+		} else if(destinationY < centerY) {
+			this.direction = "up";
+			//move up
+			let endY = centerY - speed < destinationY ? destinationY - this.height * 0.5 : this.yCord - speed;
+			this.yCord = Math.max(this.minY, endY);
+		} else {
+			this.direction = null;
+		}
 	} 
 	/**
 	 * move AI
@@ -54,7 +72,15 @@ class AI extends Player {
 	 * timeStep : game loop time step
 	 */
 	move(timeStep) {
-		if(game.manager.state == "started") {
+		let ball = game.manager.ball;
+		let playerDist = game.manager.user.xCord - this.xCord - this.width;
+		if(!this.direction && ball.xCord - ball.minX < ball.radius) {
+			//randomize moving direction to change ball direction on contact
+			this.randomDirection();
+		} else if(ball.xCord - ball.minX < playerDist * 0.95 && 
+			        ball.hDirection == "left") {
+			this.moveToEndY(timeStep);
+		} else {
 			this.followBall(timeStep);
 		}
 	} 
@@ -80,14 +106,7 @@ class AI extends Player {
 	 * timeStep : game loop time step
 	 */
 	update(timeStep) {
-		let ball = game.manager.ball;
-		let playerDist = game.manager.user.xCord - this.xCord - this.width;
-		if(!this.direction && ball.xCord - ball.minX < ball.radius) {
-			//randomize moving direction to change ball direction on contact
-			this.randomDirection();
-		} else {
-			//check movement
-			this.move(timeStep);
-		}
+		//check movement
+		if(game.manager.state == "started") this.move(timeStep);
 	} 
 }
