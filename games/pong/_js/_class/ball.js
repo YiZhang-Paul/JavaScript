@@ -40,6 +40,8 @@ class Ball {
 		this.hDirection = null;
 		this.vVelocity = 0;
 		this.hVelocity = 0;
+		//indicate ball stop
+		this.moving = false;
 	} 
 	/**
 	 * stick to owner
@@ -94,6 +96,13 @@ class Ball {
 		if(this.inCaptureRange) {
 			if(this.xCord == this.minX || this.xCord == this.maxX) {
 				this.hDirection = this.xCord == this.minX ? "right" : "left";
+				//check moving direction of player collided with ball
+				let finalDirect = this.hDirection == "right" ? game.manager.ai.direction : game.manager.user.direction; 
+				//change ball speed base on its verical direction relative to player direction
+				this.vVelocity = this.vDirection == finalDirect ? 
+					Math.min(this.vVelocity * 1.5, this.speed * 3) : Math.max(this.speed * 0.2, this.vVelocity * 0.67);
+				//change vertical moving direction 
+				this.vDirection = finalDirect;
 			}
 		}
 		//check collision on vertical direction

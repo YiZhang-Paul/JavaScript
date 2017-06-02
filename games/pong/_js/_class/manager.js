@@ -64,7 +64,7 @@ class Manager {
 		if(this.ball.xCord < game.board.vBorder * 0.5 || 
 			 this.ball.xCord > game.board.width - game.board.vBorder * 0.5) {
 			//update score
-			if(this.ball.direction == "left") this.user.score++;
+			if(this.ball.hDirection == "left") this.user.score++;
 			else this.ai.score++;
 			//reset game
 			this.resetGame();
