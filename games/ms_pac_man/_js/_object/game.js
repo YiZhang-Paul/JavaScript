@@ -13,7 +13,8 @@ let game = {
 	 * load game assets
 	 */
 	loadAsset() {
-		
+		//create maze
+		this.maze = new Maze();
 	}, 
 	/**
 	 * initialize game
