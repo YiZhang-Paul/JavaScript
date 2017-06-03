@@ -89,5 +89,4 @@ let grid = {
 	getGrid(layer, row, column) {
 		return this.maze[layer][row][column];
 	} 
-
 };

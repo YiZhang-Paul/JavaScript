@@ -30,14 +30,10 @@ let game = {
 			let keyCode = event.keyCode;
 			//track movement key pressed
 			switch(keyCode) {
-				case control.W :
-				case control.UP :
-				case control.S :
-				case control.DOWN :
-				case control.A :
-				case control.LEFT :
-				case control.D :
-				case control.RIGHT :
+				case control.W : case control.UP :
+				case control.S : case control.DOWN :
+				case control.A : case control.LEFT :
+				case control.D : case control.RIGHT :
 					if(!control.isDown(keyCode)) {
 						control.keyPressed.push(keyCode);
 					}
@@ -48,14 +44,10 @@ let game = {
 			let keyCode = event.keyCode;
 			//track movement key released
 			switch(keyCode) {
-				case control.W :
-				case control.UP :
-				case control.S :
-				case control.DOWN :
-				case control.A :
-				case control.LEFT :
-				case control.D :
-				case control.RIGHT :
+				case control.W : case control.UP :
+				case control.S : case control.DOWN :
+				case control.A : case control.LEFT :
+				case control.D : case control.RIGHT :
 				case control.SPACE :
 					control.keyReleased = keyCode;
 					if(control.isDown(keyCode)) {

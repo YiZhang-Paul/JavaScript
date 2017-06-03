@@ -39,6 +39,27 @@ class Player {
 		return [(column + 0.5) * game.maze.gridWidth, (row + 0.5) * game.maze.gridWidth];
 	} 
 	/**
+	 * check if player is on center
+	 * of current grid 
+	 *
+	 * returns boolean
+	 */
+	onCenter() {
+		let [centerX, centerY] = this.centerCord(this.row, this.column);
+		return centerX == this.xCord && centerY == this.yCord;
+	} 
+	/**
+	 * find distance to a grid
+	 * @param int, int
+	 *
+	 * row    : row of target grid
+	 * column : column of target grid
+	 */
+	distToTile(row, column) {
+		let [centerX, centerY] = this.centerCord(row, column);
+		return Math.hypot((centerX - this.xCord), (centerY - this.yCord));
+	} 
+	/**
 	 * find opposite direction
 	 * @param String
 	 *
@@ -83,5 +104,15 @@ class Player {
 			return [null, null, null];	
 		} 
 		return [grid.getGrid(layer, row, column), row, column]; 
+	} 
+	/**
+	 * detect wall existence on given direction
+	 * @param String
+	 *
+	 * direction : direction to check
+	 */
+	hasWall(direction) {
+		let adjacentTile = this.adjacentTile(1, direction)[0];
+		return adjacentTile && adjacentTile.w;
 	} 
 } 

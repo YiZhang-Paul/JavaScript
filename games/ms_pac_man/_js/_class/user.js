@@ -42,44 +42,41 @@ class User extends Player {
 	keyCodeToDirection(keyCode) {
 		let direction;
 		switch(keyCode) {
-			case control.W :
-			case control.UP :
-				direction = "up";
+			case control.W : case control.UP :
+			case control.S : case control.DOWN :
+				direction = keyCode == control.W || keyCode == control.UP ? "up" : "down";
 				break;
-			case control.S :
-			case control.DOWN :
-				direction = "down";
-				break;
-			case control.A :
-			case control.LEFT :
-				direction = "left";
-				break;
-			case control.D :
-			case control.RIGHT :
-				direction = "right";
+			case control.A : case control.LEFT :
+			case control.D : case control.RIGHT :
+				direction = keyCode == control.A || keyCode == control.LEFT ? "left" : "right";
 				break;
 		}
 		return direction;
 	} 
 	/**
-	 * change moving direction
+	 * change direction
+	 * @param String
+	 * 
+	 * direction : new direction
 	 */
-	changeDirection() {
+	changeDirection(direction) {
+		this.direction = direction;
+		//update crop XY location
+		this.cropXY();
+	} 
+	/**
+	 * check movement controls
+	 */
+	checkMoveKey() {
 		if(control.keyPressed.length) {
 			let keyCode = control.keyPressed[control.keyPressed.length - 1];
 			//change direction
 			let direction = this.keyCodeToDirection(keyCode);
 			if(direction == this.findOpposite(this.direction)) {
-				this.direction = direction;
-				this.cropXY();
+				this.changeDirection(direction);
 			} else {
-				let adjacentTile = this.adjacentTile(1, direction)[0];
-				let [curCenterX, curCenterY] = this.centerCord(this.row, this.column);
-				let notWall = !adjacentTile || !adjacentTile.w;
-				let onCenter = this.xCord == curCenterX && this.yCord == curCenterY; 
-				if(notWall && onCenter) {
-					this.direction = direction;
-					this.cropXY();
+				if(!this.hasWall(direction) && this.onCenter()) {
+					this.changeDirection(direction);
 				}
 			}
 		}
@@ -92,13 +89,10 @@ class User extends Player {
 	 */
 	collideDist() {
 		//check adjacent tile
-		let [adjacentTile, row, column] = this.adjacentTile(1);
-		if(adjacentTile && adjacentTile.w) {
+		let [, row, column] = this.adjacentTile(1);
+		if(this.hasWall(this.direction)) {
 			//get adjacent tile's center coordinate
-			let [centerX, centerY] = this.centerCord(row, column);
-			let tileDistance = centerX == this.xCord ? 
-				Math.abs(centerY - this.yCord) : Math.abs(centerX - this.xCord);
-			return tileDistance - game.maze.gridWidth;
+			return this.distToTile(row, column) - game.maze.gridWidth;
 		}
 	} 
 	/**
@@ -109,16 +103,16 @@ class User extends Player {
 	 * returns float
 	 */ 
 	centerDist() {
-		//check current location relative to current grid
-		let [curCenterX, curCenterY] = this.centerCord(this.row, this.column);
-		if(this.xCord == curCenterX && this.yCord == curCenterY) {
+		if(this.onCenter()) {
 			return;	
 		}
+		//check current location relative to current grid
+		let [curCenterX, curCenterY] = this.centerCord(this.row, this.column);
 		let locationToGrid;
 		if(this.xCord == curCenterX) {
-			locationToGrid = this.yCord - curCenterY > 0 ? "down" : "up";
+			locationToGrid = this.yCord > curCenterY ? "down" : "up";
 		} else {
-			locationToGrid = this.xCord - curCenterX > 0 ? "right" : "left";
+			locationToGrid = this.xCord > curCenterX ? "right" : "left";
 		}
 		//find distance to grid center
 		let centerDist;
@@ -126,11 +120,10 @@ class User extends Player {
 			 locationToGrid == "up" && this.direction == "down" ||
 			 locationToGrid == "left" && this.direction == "right"||
 			 locationToGrid == "right" && this.direction == "left") {
-			centerDist = Math.hypot((this.xCord - curCenterX), (this.yCord - curCenterY));
+			centerDist = this.distToTile(this.row, this.column);
 		} else {
 			let [, row, column] = this.adjacentTile(1);
-			let [centerX, centerY] = this.centerCord(row, column);
-			centerDist = Math.hypot((this.xCord - centerX), (this.yCord - centerY));
+			centerDist = this.distToTile(row, column);
 		}
 		return centerDist;
 	} 
@@ -141,11 +134,11 @@ class User extends Player {
 	 * timeStep : game loop time step
 	 */
 	move(timeStep) {
+		//calculate speed
 		let speed = this.speed * timeStep;
 		//check for collision
 		let collideDist = this.collideDist();
 		if(collideDist !== undefined) {
-			let [curCenterX, curCenterY] = this.centerCord(this.row, this.column);
 			speed = Math.min(speed, collideDist);
 		} else {
 			let centerDist = this.centerDist();
@@ -154,9 +147,9 @@ class User extends Player {
 		//indicate current movement
 		this.moving = speed !== 0;
 		if(this.direction == "up" || this.direction == "down") {
-			this.yCord = this.direction == "up" ? this.yCord - speed : this.yCord + speed;
+			this.yCord -= (this.direction == "up" ? 1 : -1) * speed;
 		} else if(this.direction == "left" || this.direction == "right") {
-			this.xCord = this.direction == "left" ? this.xCord - speed : this.xCord + speed;
+			this.xCord -= (this.direction == "left" ? 1 : -1) * speed;
 		}
 		//update current row and column
 		this.trackGrid();
@@ -209,7 +202,7 @@ class User extends Player {
 		//animate user
 		this.animateUser();
 		//check movment
-		this.changeDirection();
+		this.checkMoveKey();
 		this.move(timeStep);
 	} 
 	/**
