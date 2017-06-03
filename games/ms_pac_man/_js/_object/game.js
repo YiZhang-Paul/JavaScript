@@ -15,6 +15,8 @@ let game = {
 	loadAsset() {
 		//create maze
 		this.maze = new Maze();
+		//create game manager
+		this.manager = new Manager();
 	}, 
 	/**
 	 * initialize game

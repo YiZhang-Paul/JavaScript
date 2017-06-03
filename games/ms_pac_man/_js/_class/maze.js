@@ -13,6 +13,7 @@ class Maze {
 			this.width = game.monitor.width * 0.8;
 			this.height = this.width / 450 * 499;
 		}
+		this.gridWidth = this.width / grid.column;
 		//create game canvases
 		this.backCtx = this.makeCanvase(this.width, this.height, 1);
 		this.playerCtx = this.makeCanvase(this.width, this.height, 2);

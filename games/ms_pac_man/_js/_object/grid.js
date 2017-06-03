@@ -73,5 +73,19 @@ let grid = {
 	[   null,{f:"s"},   null,   null,   null,   null,{f:"s"},   null,   null,{f:"s"},   null,   null,   null,   null,   null,   null,   null,   null,{f:"s"},   null,   null,{f:"s"},   null,   null,   null,   null,{f:"s"},   null],
 	[   null,{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},   null],
 	[   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null]
-	]]  
+	]],
+	/**
+	 * retrieve grid value
+	 * @param int, int, int
+	 *
+	 * layer  :
+	 * row    : 
+	 * column :
+	 *
+	 * returns obj {}
+	 */  
+	getGrid(layer, row, column) {
+		return this.maze[layer][row][column];
+	} 
+
 };
