@@ -4,16 +4,14 @@
  */
 class Maze {
 	constructor() {
-		this.width = null;
-		this.height = null;
+		this.gridWidth = null;
 		if(game.monitor.width > game.monitor.height) {
-			this.height = game.monitor.height * 0.8;
-			this.width = this.height / 499 * 450; 
+			this.gridWidth = Math.floor(game.monitor.height * 0.9 / grid.row);
 		} else {
-			this.width = game.monitor.width * 0.8;
-			this.height = this.width / 450 * 499;
+			this.gridWidth = Math.floor(game.monitor.width * 0.9 / grid.column);
 		}
-		this.gridWidth = this.width / grid.column;
+		this.width = this.gridWidth * grid.column;
+		this.height = this.gridWidth * grid.row;
 		//create game canvases
 		this.backCtx = this.makeCanvase(this.width, this.height, 1);
 		this.playerCtx = this.makeCanvase(this.width, this.height, 2);

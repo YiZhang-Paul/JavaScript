@@ -27,13 +27,25 @@ class Player {
 		return grid.getGrid(0, this.row, this.column);		
 	} 
 	/**
+	 * retrieve center coordinate of 
+	 * a given tile
+	 *
+	 * row    : row of given tile
+	 * column : column of given tile
+	 *
+	 * returns array []
+	 */
+	centerCord(row, column) {
+		return [(column + 0.5) * game.maze.gridWidth, (row + 0.5) * game.maze.gridWidth];
+	} 
+	/**
 	 * check adjacent tile on 
 	 * current facing direction
 	 * @param int
 	 *
 	 * layer : layer of maze 
 	 * 
-	 * returns obj {}
+	 * returns array []
 	 */
 	adjacentTile(layer) {
 		let row = this.row, column = this.column;
@@ -46,8 +58,8 @@ class Player {
 		} else if(this.direction == "right" && this.column + 1 < grid.column) {
 			column++;	
 		} else {
-			return null;	
+			return [null, null, null];	
 		} 
-		return grid.getGrid(layer, row, column); 
+		return [grid.getGrid(layer, row, column), row, column]; 
 	} 
 } 

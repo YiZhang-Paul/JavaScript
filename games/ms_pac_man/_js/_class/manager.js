@@ -8,6 +8,7 @@ class Manager {
 		this.totalFood = 0;
 		//create a new game
 		this.newGame();
+		this.ctx = game.maze.playerCtx;
 	}
 	/**
 	 * generate food
@@ -57,6 +58,7 @@ class Manager {
 	 * draw assets and players
 	 */
 	draw() {
+		this.ctx.clearRect(0, 0, game.maze.width, game.maze.height);
 		//draw players 
 		this.user.draw();
 	}

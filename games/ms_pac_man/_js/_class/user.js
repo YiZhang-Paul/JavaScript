@@ -6,18 +6,18 @@ class User extends Player {
 	constructor() {
 		super();
 		this.moving = true;
+		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
 		//user apperance
 		this.tile = document.getElementById("player");
 		this.cropX = null;
 		this.cropY = null;
 		this.cropWidth = 32;
 		//user animations
-		this.step = 0;
+		this.step = 2;
 		this.intervalHandler = null;
 		this.ctx = game.maze.playerCtx;
 		//initialize/reset user location and direction
 		this.reset();
-		this.cropXY();
 	}
 	/**
 	 * reset user location and direction
@@ -26,6 +26,51 @@ class User extends Player {
 		this.xCord = game.maze.gridWidth * (grid.spawnCol - 0.5);
 		this.yCord = game.maze.gridWidth * (grid.spawnRow - 0.5);
 		this.direction = "right";
+		//update current row and column
+		this.trackGrid();
+		//update crop XY location
+		this.cropXY();
+	} 
+	/**
+	 * collision detection
+	 * find distance before collision
+	 * 
+	 * returns float
+	 */
+	collideDist() {
+		//check adjacent tile
+		let [adjacentTile, row, column] = this.adjacentTile(1);
+		if(adjacentTile && adjacentTile.w) {
+			//get adjacent tile's center coordinate
+			let [centerX, centerY] = this.centerCord(row, column);
+			let tileDistance = centerX == this.xCord ? 
+				Math.abs(centerY - this.yCord) : Math.abs(centerX - this.xCord);
+			return tileDistance - game.maze.gridWidth;
+		}
+	} 
+	/**
+	 * grid center detection
+	 * find distance before next grid center
+	 * on current moving direction
+	 */ 
+	/**
+	 * move user
+	 * @param float
+	 * 
+	 * timeStep : game loop time step
+	 */
+	move(timeStep) {
+		let speed = this.speed * timeStep;
+		//check for collision
+		let collideDist = this.collideDist();
+		speed = collideDist !== undefined ? Math.min(speed, collideDist) : speed;
+		if(this.direction == "up" || this.direction == "down") {
+			this.yCord = this.direction == "up" ? this.yCord - speed : this.yCord + speed;
+		} else if(this.direction == "left" || this.direction == "right") {
+			this.xCord = this.direction == "left" ? this.xCord - speed : this.xCord + speed;
+		}
+		//update current row and column
+		this.trackGrid();
 	} 
 	/**
 	 * change current step
@@ -48,9 +93,8 @@ class User extends Player {
 		else if(this.direction == "left") index = 2;	
 		else if(this.direction == "right") index = 3;	
 		//determine and update crop XY location
-		let cropX = (index * 3 + this.step) * this.cropWidth % 256;
-		let cropY = Math.floor((index * 3 + this.step) * this.cropWidth / 256) * this.cropWidth;
-		[this.cropX, this.cropY] = [cropX, cropY];  
+		this.cropX = (index * 3 + this.step) * this.cropWidth % 256;
+		this.cropY = Math.floor((index * 3 + this.step) * this.cropWidth / 256) * this.cropWidth;
 	} 
 	/**
 	 * update user
@@ -60,10 +104,15 @@ class User extends Player {
 	 */
 	update(timeStep) {
 		//update step
-		if(this.moving && !this.intervalHandler) {
-			this.intervalHandler = setInterval(() => {
-				this.changeStep();
-			}, 200);
+		if(this.moving) {
+			//check movment
+			this.move(timeStep);
+			//user animation
+			if(!this.intervalHandler) {
+				this.intervalHandler = setInterval(() => {
+					this.changeStep();
+				}, 120);
+			}
 		}
 	} 
 	/**
