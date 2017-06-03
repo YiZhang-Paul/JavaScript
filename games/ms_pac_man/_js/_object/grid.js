@@ -4,8 +4,10 @@
  * contains maze information
  */
 let grid = {
-	row    : 31, //total number of rows 
-	column : 28, //total number of columns
+	row      : 31, //total number of rows 
+	column   : 28, //total number of columns
+	spawnRow : 24, //spawning row
+	spawnCol : 14, //spawning column
 	//maze layers
 	maze  : [[
 	//layer 1

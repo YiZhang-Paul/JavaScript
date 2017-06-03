@@ -18,6 +18,7 @@ class Maze {
 		this.backCtx = this.makeCanvase(this.width, this.height, 1);
 		this.playerCtx = this.makeCanvase(this.width, this.height, 2);
 		this.uiCtx = this.makeCanvase(this.width, this.height, 3);
+		this.tile = document.getElementById("maze");
 		//draw maze
 		this.draw();
 	}
@@ -44,7 +45,6 @@ class Maze {
 	 * draw maze
 	 */
 	draw() {
-		let tile = document.getElementById("maze");
-		this.backCtx.drawImage(tile, 0, 0, this.width, this.height);
+		this.backCtx.drawImage(this.tile, 0, 0, this.width, this.height);
 	} 
 } 

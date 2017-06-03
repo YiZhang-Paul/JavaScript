@@ -40,5 +40,24 @@ class Manager {
 	newGame() {
 		//create all food
 		this.makeAllFood();
+		//all players
+		this.user = new User();
 	} 
+	/**
+	 * update assets and players
+	 * @param float
+	 * 
+	 * timeStep : game loop time step
+	 */
+	update(timeStep) {
+		//update players
+		this.user.update(timeStep);
+	} 
+	/**
+	 * draw assets and players
+	 */
+	draw() {
+		//draw players 
+		this.user.draw();
+	}
 } 
