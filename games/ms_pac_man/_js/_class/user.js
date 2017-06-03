@@ -75,7 +75,7 @@ class User extends Player {
 			let direction = this.keyCodeToDirection(keyCode);
 			if(direction == this.findOpposite(this.direction)) {
 				this.changeDirection(direction);
-			} else {
+			} else if(this.xCord >= 0 && this.xCord <= game.maze.width) {
 				if(!this.hasWall(direction) && this.onCenter()) {
 					this.changeDirection(direction);
 				}
@@ -129,6 +129,17 @@ class User extends Player {
 		return centerDist;
 	} 
 	/**
+	 * warp through worm holes
+	 */
+	crossBridge() {
+		let gridWidth = game.maze.gridWidth;
+		if(this.xCord < -gridWidth) {
+			this.xCord = game.maze.width + gridWidth;
+		} else if(this.xCord > game.maze.width + gridWidth) {
+			this.xCord = -gridWidth;
+		}
+	}
+	/**
 	 * move user
 	 * @param float
 	 * 
@@ -154,6 +165,8 @@ class User extends Player {
 		} else if(this.direction == "left" || this.direction == "right") {
 			this.xCord -= (this.direction == "left" ? 1 : -1) * speed;
 		}
+		//check worm holes
+		this.crossBridge();
 		//update current row and column
 		this.trackGrid();
 	} 
@@ -165,7 +178,6 @@ class User extends Player {
 		let curGrid = this.currentTile();
 		if(curGrid instanceof Food) {
 			this.score += curGrid.score;
-			console.log(this.score);
 			curGrid.clear();
 		}
 	} 

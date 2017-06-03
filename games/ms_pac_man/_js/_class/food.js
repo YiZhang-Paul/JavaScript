@@ -47,7 +47,9 @@ class Food {
 	 */
 	clear() {
 		let gridWidth = game.maze.gridWidth;
-		this.ctx.clearRect(this.column * gridWidth, this.row * gridWidth, gridWidth, gridWidth);
+		this.ctx.clearRect(this.column * gridWidth, 
+											 this.row * gridWidth,
+											 gridWidth, gridWidth);
 		grid.maze[0][this.row][this.column] = null;
 		game.manager.totalFood--;
 	} 
