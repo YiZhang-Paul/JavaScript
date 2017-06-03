@@ -12,16 +12,14 @@ class Manager {
 	}
 	/**
 	 * generate food
-	 * @param int, int, String
+	 * @param int, int, char
 	 *
 	 * row    : row of food cell
 	 * column : column of food cell
 	 * type   : type of food
 	 */
 	makeFood(row, column, type) {
-		let xCord = game.maze.gridWidth * (column + 0.5); 
-		let yCord = game.maze.gridWidth * (row + 0.5);
-		grid.maze[0][row][column] = new Food(xCord, yCord, type);
+		grid.maze[0][row][column] = new Food(row, column, type);
 		this.totalFood++;
 	} 
 	/**

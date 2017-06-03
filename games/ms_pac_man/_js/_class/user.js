@@ -5,6 +5,7 @@
 class User extends Player {
 	constructor() {
 		super();
+		this.score = 0;
 		this.moving = false;
 		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
 		//user apperance
@@ -142,6 +143,8 @@ class User extends Player {
 			speed = Math.min(speed, collideDist);
 		} else {
 			let centerDist = this.centerDist();
+			//eat food
+			if(!centerDist) this.eatFood();
 			speed = centerDist ? Math.min(speed, centerDist) : speed;
 		}
 		//indicate current movement
@@ -153,6 +156,18 @@ class User extends Player {
 		}
 		//update current row and column
 		this.trackGrid();
+	} 
+	/**
+	 * eat food 
+	 */
+	eatFood() {
+		//check current grid
+		let curGrid = this.currentTile();
+		if(curGrid instanceof Food) {
+			this.score += curGrid.score;
+			console.log(this.score);
+			curGrid.clear();
+		}
 	} 
 	/**
 	 * change current step
@@ -209,11 +224,8 @@ class User extends Player {
 	 * draw user
 	 */
 	draw() {
-		this.ctx.drawImage(this.tile, 
-			                 this.cropX, 
-			                 this.cropY,
-			                 this.cropWidth,
-			                 this.cropWidth,
+		this.ctx.drawImage(this.tile, this.cropX, this.cropY,
+			                 this.cropWidth, this.cropWidth,
 			                 this.xCord - game.maze.gridWidth * 0.8,
 			                 this.yCord - game.maze.gridWidth * 0.8,
 			                 game.maze.gridWidth * 1.6, 

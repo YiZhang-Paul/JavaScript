@@ -1,16 +1,18 @@
 /* jslint esversion: 6 */
 /**
  * food class
- * @param float, float, char
+ * @param int, int, char
  *
- * xCord : X-Coordinate of food
- * yCord : Y-Coordinate of food
- * type : food type
+ * row    : row of food cell
+ * column : column of food cell
+ * type   : type of food
  */
 class Food {
-	constructor(xCord, yCord, type) {
-		this.xCord = xCord;
-		this.yCord = yCord;
+	constructor(row, column, type) {
+		this.row = row;
+		this.column = column;
+		this.xCord = game.maze.gridWidth * (column + 0.5); 
+		this.yCord = game.maze.gridWidth * (row + 0.5);
 		this.type = type;
 		[this.score, this.radius] = this.getFoodStat(type);
 		this.color = "pink";
@@ -27,19 +29,27 @@ class Food {
 	 * returns array []
 	 */
 	getFoodStat(type) {
-		let gridWidth = game.maze.gridWidth;
 		let score = 0, radius = 0; 
 		switch(type) {
 			case "s" :
 				score = 10;
-				radius = gridWidth * 0.2;
+				radius = game.maze.gridWidth * 0.2;
 				break;
 			case "l" :
 				score = 50;
-				radius = gridWidth * 0.35;
+				radius = game.maze.gridWidth * 0.35;
 				break;
 		}
 		return [score, radius];
+	} 
+	/**
+	 * clear food
+	 */
+	clear() {
+		let gridWidth = game.maze.gridWidth;
+		this.ctx.clearRect(this.column * gridWidth, this.row * gridWidth, gridWidth, gridWidth);
+		grid.maze[0][this.row][this.column] = null;
+		game.manager.totalFood--;
 	} 
 	/**
 	 * draw food
