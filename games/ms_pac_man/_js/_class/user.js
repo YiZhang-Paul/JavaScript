@@ -6,6 +6,7 @@ class User extends Player {
 	constructor() {
 		super();
 		this.score = 0;
+		this.life = 4;
 		this.moving = false;
 		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
 		//user apperance
@@ -24,6 +25,9 @@ class User extends Player {
 	 * reset user location and direction
 	 */
 	reset() {
+		this.score = 0;
+		this.step = 2;
+		this.intervalHandler = null;
 		this.xCord = game.maze.gridWidth * (grid.spawnCol - 0.5);
 		this.yCord = game.maze.gridWidth * (grid.spawnRow - 0.5);
 		this.direction = "right";
@@ -213,11 +217,23 @@ class User extends Player {
 			this.intervalHandler = setInterval(() => {
 				//update step
 				this.changeStep();
-			}, 120);
+			}, 100);
 		} else if(!this.moving && this.intervalHandler) {
 			clearInterval(this.intervalHandler);
 			this.intervalHandler = null;
 		}	
+	} 
+	/**
+	 * stop user animation
+	 */
+	stopAnimation() {
+		if(this.intervalHandler) {
+			clearInterval(this.intervalHandler);
+			this.intervalHandler = null;
+			//reset step 
+			this.step = 2;
+			this.cropXY();
+		}
 	} 
 	/**
 	 * update user

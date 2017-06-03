@@ -51,7 +51,10 @@ class Food {
 											 this.row * gridWidth,
 											 gridWidth, gridWidth);
 		grid.maze[0][this.row][this.column] = null;
-		game.manager.totalFood--;
+		//check game end
+		if(--game.manager.totalFood === 0) {
+			game.manager.state.swapState("buffering");
+		}
 	} 
 	/**
 	 * draw food

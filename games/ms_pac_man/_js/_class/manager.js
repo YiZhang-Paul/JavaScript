@@ -9,6 +9,8 @@ class Manager {
 		//create a new game
 		this.newGame();
 		this.ctx = game.maze.playerCtx;
+		this.timeoutHandler = null;
+		this.state = new StateMachine(this, "ready");
 	}
 	/**
 	 * generate food
@@ -43,14 +45,52 @@ class Manager {
 		this.user = new User();
 	} 
 	/**
+	 * reset game
+	 */
+	resetGame() {
+		//create all food
+		this.makeAllFood();	
+		this.user.reset();
+		this.state.reset();
+	} 
+	/**
+	 * game states
+	 */
+	//ready state
+	ready() {
+		//detect game start
+		if(control.keyPressed.length) {
+			this.state.swapState("ongoing");
+		}
+	} 
+	//ongoing state
+	ongoing(timeStep) {
+		this.user.update(timeStep);
+	}
+	//buffering state
+	buffering() {
+		//clear user animation
+		this.user.stopAnimation();
+		//start counter to reset/create new game
+		if(!this.timeoutHandler) {
+			this.timeoutHandler = setTimeout(() => {
+				if(this.totalFood === 0) this.resetGame(); 
+				else if(this.user.life === 0) this.newGame();
+				else this.user.respawn(); 
+				//clear time out
+				clearTimeout(this.timeoutHandler);
+				this.timeoutHandler = null;
+			}, 3500);
+		}
+	}
+	/**
 	 * update assets and players
 	 * @param float
 	 * 
 	 * timeStep : game loop time step
 	 */
 	update(timeStep) {
-		//update players
-		this.user.update(timeStep);
+		this.state.update(timeStep);
 	} 
 	/**
 	 * draw assets and players

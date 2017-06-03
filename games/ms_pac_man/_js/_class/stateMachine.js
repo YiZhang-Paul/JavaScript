@@ -1,15 +1,24 @@
 /* jslint esversion: 6 */
 /**
  * finite state machine class
- * @param obj {}
+ * @param obj {}, String
  *
- * owner : owner of the state machine
+ * owner     : owner of the state machine
+ * initState : initial state 
  */
 class StateMachine {
-	constructor(owner) {
+	constructor(owner, initState) {
 		this.owner = owner;
 		this.tracker = [];
+		this.initState = initState;
+		if(initState) this.pushState(initState); 
 	}
+	/**
+	 * reset state machine
+	 */
+	reset() {
+		this.tracker = this.initState ? [this.initState] : [];
+	} 
 	/**
 	 * return active state
 	 *
@@ -50,9 +59,12 @@ class StateMachine {
 	} 
 	/**
 	 * update current active state
+	 * @param float
+	 * 
+	 * timeStep : game loop time step
 	 */
-	update() {
+	update(timeStep) {
 		let activeState = this.activeState();
-		if(activeState) this.owner[activeState](); 
+		if(activeState) this.owner[activeState](timeStep); 
 	} 
 } 
