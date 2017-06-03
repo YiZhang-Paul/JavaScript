@@ -6,8 +6,8 @@
 class Manager {
 	constructor() {
 		this.totalFood = 0;
-		//make all food
-		this.makeAllFood();
+		//create a new game
+		this.newGame();
 	}
 	/**
 	 * generate food
@@ -18,9 +18,8 @@ class Manager {
 	 * type   : type of food
 	 */
 	makeFood(row, column, type) {
-		let gridWidth = game.maze.gridWidth;
-		let xCord = gridWidth * (column + 0.5); 
-		let yCord = gridWidth * (row + 0.5);
+		let xCord = game.maze.gridWidth * (column + 0.5); 
+		let yCord = game.maze.gridWidth * (row + 0.5);
 		grid.maze[0][row][column] = new Food(xCord, yCord, type);
 		this.totalFood++;
 	} 
@@ -34,5 +33,12 @@ class Manager {
 				if(curGrid && curGrid.f) this.makeFood(i, j, curGrid.f);	
 			}
 		}
+	} 
+	/**
+	 * create new game
+	 */
+	newGame() {
+		//create all food
+		this.makeAllFood();
 	} 
 } 
