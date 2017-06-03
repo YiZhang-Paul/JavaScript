@@ -5,7 +5,7 @@
 class User extends Player {
 	constructor() {
 		super();
-		this.moving = true;
+		this.moving = false;
 		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
 		//user apperance
 		this.tile = document.getElementById("player");
@@ -97,23 +97,30 @@ class User extends Player {
 		this.cropY = Math.floor((index * 3 + this.step) * this.cropWidth / 256) * this.cropWidth;
 	} 
 	/**
+	 * animate user
+	 */
+	animateUser() {
+		if(this.moving && !this.intervalHandler) {
+			this.intervalHandler = setInterval(() => {
+				//update step
+				this.changeStep();
+			}, 120);
+		} else if(!this.moving && this.intervalHandler) {
+			clearInterval(this.intervalHandler);
+			this.intervalHandler = null;
+		}	
+	} 
+	/**
 	 * update user
 	 * @param float
 	 * 
 	 * timeStep : game loop time step
 	 */
 	update(timeStep) {
-		//update step
-		if(this.moving) {
-			//check movment
-			this.move(timeStep);
-			//user animation
-			if(!this.intervalHandler) {
-				this.intervalHandler = setInterval(() => {
-					this.changeStep();
-				}, 120);
-			}
-		}
+		//animate user
+		this.animateUser();
+		//check movment
+		this.move(timeStep);
 	} 
 	/**
 	 * draw user
@@ -124,9 +131,9 @@ class User extends Player {
 			                 this.cropY,
 			                 this.cropWidth,
 			                 this.cropWidth,
-			                 this.xCord - game.maze.gridWidth * 0.5,
-			                 this.yCord - game.maze.gridWidth * 0.5,
-			                 game.maze.gridWidth, 
-			                 game.maze.gridWidth);
+			                 this.xCord - game.maze.gridWidth * 0.8,
+			                 this.yCord - game.maze.gridWidth * 0.8,
+			                 game.maze.gridWidth * 1.6, 
+			                 game.maze.gridWidth * 1.6);
 	} 
 } 
