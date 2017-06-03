@@ -6,7 +6,6 @@ class User extends Player {
 	constructor() {
 		super();
 		this.moving = false;
-		this.canTurn = false;
 		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
 		//user apperance
 		this.tile = document.getElementById("player");
@@ -73,9 +72,12 @@ class User extends Player {
 			if(direction == this.findOpposite(this.direction)) {
 				this.direction = direction;
 				this.cropXY();
-			} else if(this.canTurn) {
+			} else {
 				let adjacentTile = this.adjacentTile(1, direction)[0];
-				if(!adjacentTile || !adjacentTile.w) {
+				let [curCenterX, curCenterY] = this.centerCord(this.row, this.column);
+				let notWall = !adjacentTile || !adjacentTile.w;
+				let onCenter = this.xCord == curCenterX && this.yCord == curCenterY; 
+				if(notWall && onCenter) {
 					this.direction = direction;
 					this.cropXY();
 				}
@@ -149,7 +151,6 @@ class User extends Player {
 			let centerDist = this.centerDist();
 			speed = centerDist ? Math.min(speed, centerDist) : speed;
 		}
-		this.canTurn = speed === 0;
 		//indicate current movement
 		this.moving = speed !== 0;
 		if(this.direction == "up" || this.direction == "down") {
