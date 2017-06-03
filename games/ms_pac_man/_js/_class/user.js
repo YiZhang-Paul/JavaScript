@@ -6,6 +6,7 @@ class User extends Player {
 	constructor() {
 		super();
 		this.moving = false;
+		this.canTurn = false;
 		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
 		//user apperance
 		this.tile = document.getElementById("player");
@@ -32,6 +33,56 @@ class User extends Player {
 		this.cropXY();
 	} 
 	/**
+	 * convert key code to direction
+	 * @param int
+	 *
+	 * keyCode : key code to be converted
+	 * 
+	 * returns String
+	 */
+	keyCodeToDirection(keyCode) {
+		let direction;
+		switch(keyCode) {
+			case control.W :
+			case control.UP :
+				direction = "up";
+				break;
+			case control.S :
+			case control.DOWN :
+				direction = "down";
+				break;
+			case control.A :
+			case control.LEFT :
+				direction = "left";
+				break;
+			case control.D :
+			case control.RIGHT :
+				direction = "right";
+				break;
+		}
+		return direction;
+	} 
+	/**
+	 * change moving direction
+	 */
+	changeDirection() {
+		if(control.keyPressed.length) {
+			let keyCode = control.keyPressed[control.keyPressed.length - 1];
+			//change direction
+			let direction = this.keyCodeToDirection(keyCode);
+			if(direction == this.findOpposite(this.direction)) {
+				this.direction = direction;
+				this.cropXY();
+			} else if(this.canTurn) {
+				let adjacentTile = this.adjacentTile(1, direction)[0];
+				if(!adjacentTile || !adjacentTile.w) {
+					this.direction = direction;
+					this.cropXY();
+				}
+			}
+		}
+	} 
+	/**
 	 * collision detection
 	 * find distance before collision
 	 * 
@@ -52,7 +103,35 @@ class User extends Player {
 	 * grid center detection
 	 * find distance before next grid center
 	 * on current moving direction
+	 *
+	 * returns float
 	 */ 
+	centerDist() {
+		//check current location relative to current grid
+		let [curCenterX, curCenterY] = this.centerCord(this.row, this.column);
+		if(this.xCord == curCenterX && this.yCord == curCenterY) {
+			return;	
+		}
+		let locationToGrid;
+		if(this.xCord == curCenterX) {
+			locationToGrid = this.yCord - curCenterY > 0 ? "down" : "up";
+		} else {
+			locationToGrid = this.xCord - curCenterX > 0 ? "right" : "left";
+		}
+		//find distance to grid center
+		let centerDist;
+		if(locationToGrid == "down" && this.direction == "up" ||
+			 locationToGrid == "up" && this.direction == "down" ||
+			 locationToGrid == "left" && this.direction == "right"||
+			 locationToGrid == "right" && this.direction == "left") {
+			centerDist = Math.hypot((this.xCord - curCenterX), (this.yCord - curCenterY));
+		} else {
+			let [, row, column] = this.adjacentTile(1);
+			let [centerX, centerY] = this.centerCord(row, column);
+			centerDist = Math.hypot((this.xCord - centerX), (this.yCord - centerY));
+		}
+		return centerDist;
+	} 
 	/**
 	 * move user
 	 * @param float
@@ -63,7 +142,16 @@ class User extends Player {
 		let speed = this.speed * timeStep;
 		//check for collision
 		let collideDist = this.collideDist();
-		speed = collideDist !== undefined ? Math.min(speed, collideDist) : speed;
+		if(collideDist !== undefined) {
+			let [curCenterX, curCenterY] = this.centerCord(this.row, this.column);
+			speed = Math.min(speed, collideDist);
+		} else {
+			let centerDist = this.centerDist();
+			speed = centerDist ? Math.min(speed, centerDist) : speed;
+		}
+		this.canTurn = speed === 0;
+		//indicate current movement
+		this.moving = speed !== 0;
 		if(this.direction == "up" || this.direction == "down") {
 			this.yCord = this.direction == "up" ? this.yCord - speed : this.yCord + speed;
 		} else if(this.direction == "left" || this.direction == "right") {
@@ -120,6 +208,7 @@ class User extends Player {
 		//animate user
 		this.animateUser();
 		//check movment
+		this.changeDirection();
 		this.move(timeStep);
 	} 
 	/**

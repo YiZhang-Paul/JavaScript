@@ -39,23 +39,45 @@ class Player {
 		return [(column + 0.5) * game.maze.gridWidth, (row + 0.5) * game.maze.gridWidth];
 	} 
 	/**
+	 * find opposite direction
+	 * @param String
+	 *
+	 * direction : direction to find opposite for
+	 *
+	 * returns String
+	 */
+	findOpposite(direction) {
+		switch(direction) {
+			case "up" :
+			case "down" :
+				direction = direction == "up" ? "down" : "up";
+				break;
+			case "left" :
+			case "right" :
+				direction = direction == "left" ? "right" : "left";
+				break;	
+		}
+		return direction;
+	} 
+	/**
 	 * check adjacent tile on 
 	 * current facing direction
-	 * @param int
+	 * @param int, String
 	 *
-	 * layer : layer of maze 
+	 * layer     : layer of maze 
+	 * direction : direction of adjacent tile (optional)
 	 * 
 	 * returns array []
 	 */
-	adjacentTile(layer) {
+	adjacentTile(layer, direction = this.direction) {
 		let row = this.row, column = this.column;
-		if(this.direction == "up" && this.row > 0) {
+		if(direction == "up" && this.row > 0) {
 			row--;
-		}	else if(this.direction == "down" && this.row + 1 < grid.row) {
+		}	else if(direction == "down" && this.row + 1 < grid.row) {
 			row++;	
-		} else if(this.direction == "left" && this.column > 0) {
+		} else if(direction == "left" && this.column > 0) {
 			column--;	
-		} else if(this.direction == "right" && this.column + 1 < grid.column) {
+		} else if(direction == "right" && this.column + 1 < grid.column) {
 			column++;	
 		} else {
 			return [null, null, null];	
