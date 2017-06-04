@@ -8,22 +8,31 @@
 class AIManager {
 	constructor(nameList) {
 		//create AIs
-		this.blinky = new Blinky(this);
-		this.pinky = new Pinky(this);
-		this.inky = new Inky(this);
-		this.clyde = new Clyde(this); 
-		//all AIs
-		this.ais = [this.blinky, this.pinky, this.inky, this.clyde];
-		this.cell = new Set(this.ais.slice(1));
+		this.ais = null;
+		this.cell = null;
+		this.loadAI();
 		//cooldown to move out cell
 		this.cooldown = 3000;
 		//time stamp of last AI moving out cell
 		this.lastAIOut = 0; 
 	}
 	/**
+	 * create all AIs
+	 */
+	loadAI() {
+		this.blinky = new Blinky(this);
+		this.pinky = new Pinky(this);
+		this.inky = new Inky(this);
+		this.clyde = new Clyde(this); 
+		//store AIs
+		this.ais = [this.blinky, this.pinky, this.inky, this.clyde];
+		this.cell = new Set(this.ais.slice(1));
+	} 
+	/**
 	 * reset AIs
 	 */
 	reset() {
+		this.cell = new Set(this.ais.slice(1));
 		this.ais.forEach(ai => {
 			ai.reset();
 		});

@@ -18,10 +18,15 @@ class AI extends Player {
 	 * reset AI
 	 */
 	reset() {
+		super.reset();
 		this.moving = false;
 		this.score = 0;
 		this.step = 0;
-		super.reset();
+		this.state.swapState(this.name == "blinky" ? "outCell" : "inCell");
+		if(this.intervalHandler) {
+			clearInterval(this.intervalHandler);
+			this.intervalHandler = null;
+		}
 	} 
 	/**
 	 * move back and forth
@@ -59,18 +64,14 @@ class AI extends Player {
 		let inYRange = Math.round(Math.abs(this.yCord - cellCenterY)) < game.maze.gridWidth * 0.5;
 		//change directions to move out of cell
 		if((this.direction == "up" || this.direction == "down") && !inXRange && inYRange) {
-			//if(this.name == "clyde") console.log(1);
-			this.setDirection("right");
+			this.setDirection(this.xCord > game.maze.width * 0.5 ? "left" : "right");
 		} else if((this.direction == "left" || this.direction == "right") && inXRange) {
-			//if(this.name == "clyde") console.log(2);
 			this.setDirection("up"); 
 		} else {
-			//if(this.name == "clyde") console.log(3);
 			this.turnAround();
 		}
 		//check door position
-		let doorCordY = grid.door.spawnRow * game.maze.gridWidth;
-		if(this.yCord <= doorCordY) {
+		if(this.yCord <= grid.door.spawnRow * game.maze.gridWidth) {
 			this.state.swapState("outCell");
 			this.owner.cell.delete(this);
 			//record time moving out cell

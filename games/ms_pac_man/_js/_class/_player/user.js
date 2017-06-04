@@ -16,9 +16,9 @@ class User extends Player {
 	 * reset user
 	 */
 	reset() {
+		super.reset();
 		this.score = 0;
 		this.step = 2;
-		super.reset();
 	} 
 	/**
 	 * convert key code to direction
