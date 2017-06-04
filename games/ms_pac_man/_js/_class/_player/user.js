@@ -125,6 +125,7 @@ class User extends Player {
 	 * timeStep : game loop time step
 	 */
 	update(timeStep) {
+		this.animateOn = this.collideDist === null;
 		//animate user
 		this.animatePlayer();
 		//check movment

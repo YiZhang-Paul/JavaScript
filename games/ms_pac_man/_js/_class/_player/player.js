@@ -283,7 +283,6 @@ class Player {
 	 * speed     : animation speed
 	 */
 	animatePlayer(totalStep, speed = 100) {
-		this.animateOn = this.collideDist === null;
 		if(this.animateOn && !this.intervalHandler) {
 			this.intervalHandler = setInterval(() => {
 				//update step

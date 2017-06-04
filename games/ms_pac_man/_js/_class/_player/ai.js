@@ -93,9 +93,27 @@ class AI extends Player {
 		}
 	} 
 	/**
-	 * return to normal state from flee
+	 * initiate process to return 
+	 * to normal from flee state
 	 */
-	fleeToNormal() {
+	intiateFleeToNormal() {
+		if(!this.timeoutHandler) {
+			this.timeoutHandler = setTimeout(() => {
+				//clear time out first
+				clearTimeout(this.timeoutHandler);
+				this.timeoutHandler = null;
+				//finalize transition to normal state
+				this.cropXY = this.cropFleeS2XY;
+				this.stopAnimation(0);
+				this.animatePlayer(4);
+				this.finishFleeToNormal();
+			}, 7000);
+		}
+	} 
+	/**
+	 * final transition
+	 */
+	finishFleeToNormal() {
 		if(!this.timeoutHandler) {
 			this.timeoutHandler = setTimeout(() => {
 				this.cropXY = this.defaultCropXY;
@@ -104,7 +122,7 @@ class AI extends Player {
 				//clear time out
 				clearTimeout(this.timeoutHandler);
 				this.timeoutHandler = null;
-			}, 6000);
+			}, 3000);
 		}
 	} 
 	/**
@@ -194,9 +212,19 @@ class AI extends Player {
 	} 
 	/**
 	 * determine AI tile image crop location
-	 * on flee state 
+	 * on flee state stage 1 
 	 */
-	cropFleeXY() {
+	cropFleeS1XY() {
+		//determine and update crop XY location
+		let cropWidth = this.cropWidth + 2;
+		this.cropX = (4 + this.step) * cropWidth + 1;
+		this.cropY = cropWidth + 1;
+	}
+	/**
+	 * determine AI tile image crop location
+	 * on flee state stage 2 
+	 */
+	cropFleeS2XY() {
 		//determine and update crop XY location
 		let cropWidth = this.cropWidth + 2;
 		this.cropX = (4 + this.step) * cropWidth + 1;
@@ -252,9 +280,9 @@ class AI extends Player {
 			this.move(timeStep);
 		}
 		//animate ghost
-		this.animatePlayer(4);
+		this.animatePlayer();
 		//set timer to go back to normal state
-		this.fleeToNormal();
+		this.intiateFleeToNormal();
 	}
 	//retreat mode
 	retreat(timeStep) {
@@ -265,7 +293,7 @@ class AI extends Player {
 			this.move(timeStep);
 		}
 		//animate ghost
-		this.animatePlayer(4);
+		this.animatePlayer();
 		if(this.timeoutHandler) {
 			clearTimeout(this.timeoutHandler);
 			this.timeoutHandler = null;

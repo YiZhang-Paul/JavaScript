@@ -93,7 +93,7 @@ class AIManager {
 		this.ais.forEach(ai => {
 			if(ai.state.activeState() == "outCell") {
 				//change crop function
-				ai.cropXY = ai.cropFleeXY;
+				ai.cropXY = ai.cropFleeS1XY;
 				ai.stopAnimation(0);
 				ai.state.swapState("flee");
 			} else if(ai.state.activeState() == "flee") {
@@ -101,8 +101,11 @@ class AIManager {
 				if(ai.timeoutHandler) {
 					clearTimeout(ai.timeoutHandler);
 					ai.timeoutHandler = null;
-					ai.fleeToNormal();
 				}
+				ai.cropXY = ai.cropFleeS1XY;
+				ai.stopAnimation(0);
+				ai.animatePlayer();
+				ai.intiateFleeToNormal();
 			}
 		});
 	} 
