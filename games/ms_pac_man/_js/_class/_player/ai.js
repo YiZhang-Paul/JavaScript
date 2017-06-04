@@ -11,7 +11,9 @@ class AI extends Player {
 		this.owner = owner;
 		this.moving = false;
 		this.totalStep = 2;
-		this.speed = Math.round(game.maze.height* 0.0002 * 100) / 100;
+		this.defaultSpeed = Math.round(game.maze.height* 0.0002 * 100) / 100;
+		this.speed = this.defaultSpeed;
+		this.defaultCropXY = this.cropXY;
 		this.state = null;
 	}
 	/**
@@ -105,27 +107,54 @@ class AI extends Player {
 		else if(this.direction == "left") index = 2;	
 		else if(this.direction == "right") index = 3;	
 		//determine and update crop XY location
-		this.cropX = (index * 2 + this.step) * this.cropWidth;
-		this.cropY = startRow * this.cropWidth;
+		let cropWidth = this.cropWidth + 2;
+		this.cropX = (index * 2 + this.step) * cropWidth + 1;
+		this.cropY = startRow * cropWidth + 1;
 	} 
+	/**
+	 * determine AI tile image crop location
+	 * on flee state 
+	 */
+	cropFleeXY() {
+		let cropWidth = this.cropWidth + 2;
+		this.cropX = (4 + this.step) * cropWidth + 1;
+		this.cropY = cropWidth + 1;
+	}
 	/**
 	 * ghost states
 	 */
 	//in cell @abstract
 	inCell(timeStep) {
+		this.speed = this.defaultSpeed * 0.65;
 		//check movement in cell
 		if(this.moving) {
 			this.inCellDir();
 			this.move(timeStep);
 		}
+		//animate ghost
+		this.animatePlayer();
 	}
 	//out cell
 	outCell(timeStep) {
+		this.speed = this.defaultSpeed;
 		//check movement out cell
 		if(this.moving) {
 			this.outCellDir();
 			this.move(timeStep);
 		}
+		//animate ghost
+		this.animatePlayer();
+	}
+	//flee state
+	flee(timeStep) {
+		this.speed = this.defaultSpeed * 0.8;
+		//check movement
+		if(this.moving) {
+			this.outCellDir();
+			this.move(timeStep);
+		}
+		//animate ghost
+		this.animatePlayer(4);
 	}
 	/**
 	 * update ghost
@@ -134,8 +163,6 @@ class AI extends Player {
 	 * timeStep : game loop time step
 	 */
 	update(timeStep) {
-		//animate ghost
-		this.animatePlayer();
 		//update ghost behaviour
 		this.state.update(timeStep);
 	}

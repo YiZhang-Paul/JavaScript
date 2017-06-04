@@ -67,6 +67,9 @@ class User extends Player {
 		if(this.centerDist === null) {
 			let curGrid = this.currentTile();
 			if(curGrid instanceof Food) {
+				if(curGrid.type == "l") {
+					game.manager.aiManager.enterFlee();
+				}
 				this.score += curGrid.score;
 				curGrid.clear();
 			}
@@ -84,8 +87,9 @@ class User extends Player {
 		else if(this.direction == "left") index = 2;	
 		else if(this.direction == "right") index = 3;	
 		//determine and update crop XY location
-		this.cropX = (index * 3 + this.step) * this.cropWidth % 256;
-		this.cropY = Math.floor((index * 3 + this.step) * this.cropWidth / 256) * this.cropWidth;
+		let cropWidth = this.cropWidth + 2;
+		this.cropX = (index * 3 + this.step) * cropWidth % 256 + 1;
+		this.cropY = Math.floor((index * 3 + this.step) * cropWidth / 256) * cropWidth + 1;
 	} 
 	/**
 	 * update user

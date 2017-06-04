@@ -37,7 +37,7 @@ class Food {
 				break;
 			case "l" :
 				score = 50;
-				radius = game.maze.gridWidth * 0.35;
+				radius = game.maze.gridWidth * 0.45;
 				break;
 		}
 		return [score, radius];

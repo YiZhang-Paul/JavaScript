@@ -20,7 +20,7 @@ class Player {
 		this.tile = document.getElementById("player");
 		this.cropX = null;
 		this.cropY = null;
-		this.cropWidth = 32;
+		this.cropWidth = 30;
 		//player animation
 		this.step = 0;
 		this.totalStep = 0;
@@ -264,25 +264,29 @@ class Player {
 	} 
 	/**
 	 * change current step
+	 * @param int
+	 *
+	 * totalStep : total step of current player state
 	 */
-	changeStep() {
+	changeStep(totalStep = this.totalStep) {
 		//loop step from 0 to 2 and repeat
-		this.step = (this.step + 1) % this.totalStep;
+		this.step = (this.step + 1) % totalStep;
 		//update crop XY location
 		this.cropXY();
 	} 
 	/**
 	 * animate player
-	 * @param int
+	 * @param int, int
 	 *
+	 * totalStep : total step of player current state
 	 * speed     : animation speed
 	 */
-	animatePlayer(speed = 100) {
+	animatePlayer(totalStep, speed = 100) {
 		this.animateOn = this.collideDist === null;
 		if(this.animateOn && !this.intervalHandler) {
 			this.intervalHandler = setInterval(() => {
 				//update step
-				this.changeStep();
+				this.changeStep(totalStep);
 			}, speed);
 		} else if(!this.animateOn && this.intervalHandler) {
 			clearInterval(this.intervalHandler);
@@ -293,14 +297,14 @@ class Player {
 	 * stop user animation
 	 * @param int
 	 *
-	 * defaultStep : player default step
+	 * step : player step
 	 */
-	stopAnimation(defaultStep) {
+	stopAnimation(step) {
 		if(this.intervalHandler) {
 			clearInterval(this.intervalHandler);
 			this.intervalHandler = null;
 			//reset step 
-			this.step = defaultStep;
+			this.step = step;
 			this.cropXY();
 		}
 	} 

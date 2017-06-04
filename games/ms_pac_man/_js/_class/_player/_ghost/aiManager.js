@@ -87,6 +87,19 @@ class AIManager {
 		});
 	} 
 	/**
+	 * enter flee mode
+	 */
+	enterFlee() {
+		this.ais.forEach(ai => {
+			if(ai.state.activeState() == "outCell") {
+				//change crop function
+				ai.cropXY = ai.cropFleeXY;
+				ai.stopAnimation(0);
+				ai.state.swapState("flee");
+			}
+		});
+	} 
+	/**
 	 * update AIs
 	 * @param float
 	 * 
