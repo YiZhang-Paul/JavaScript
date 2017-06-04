@@ -13,4 +13,15 @@ class Inky extends AI {
 		//initialize/reset AI
 		super.reset();
 	}
+	/**
+	 * change moving direction inside of cell
+	 */
+	inCellDir() {
+		if(this.owner.cell.size > 1 ||
+			 this.owner.onCooldown()) {
+			this.turnAround();
+		} else if(!this.owner.onCooldown()) {
+			this.moveOutCell();
+		}
+	} 
 }

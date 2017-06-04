@@ -13,4 +13,14 @@ class Blinky extends AI {
 		//initialize/reset AI
 		super.reset();
 	}
+	/**
+	 * change moving direction inside of cell
+	 */
+	inCellDir() {
+		if(this.owner.onCooldown()) {
+			this.turnAround();
+		} else {
+			this.moveOutCell();
+		}
+	} 
 }

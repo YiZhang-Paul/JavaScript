@@ -8,8 +8,13 @@
 class AIManager {
 	constructor(nameList) {
 		//create AIs
-		this.ais = [new Blinky(this), new Pinky(this), new Inky(this), new Clyde(this)];
-		this.cell = new Set(this.ais);
+		this.blinky = new Blinky(this);
+		this.pinky = new Pinky(this);
+		this.inky = new Inky(this);
+		this.clyde = new Clyde(this); 
+		//all AIs
+		this.ais = [this.blinky, this.pinky, this.inky, this.clyde];
+		this.cell = new Set(this.ais.slice(1));
 		//cooldown to move out cell
 		this.cooldown = 3000;
 		//time stamp of last AI moving out cell
