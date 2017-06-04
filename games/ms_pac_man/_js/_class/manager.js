@@ -6,12 +6,12 @@
 class Manager {
 	constructor() {
 		this.totalFood = 0;
-		//create a new game
-		this.newGame();
 		this.ctx = game.maze.playerCtx;
 		this.timeoutHandler = null;
 		this.intervalHandler = null;
 		this.state = new StateMachine(this, "ready");
+		//create a new game
+		this.newGame();
 	}
 	/**
 	 * generate food
@@ -45,6 +45,7 @@ class Manager {
 		//all players
 		this.user = new User();
 		this.aiManager = new AIManager(["blinky", "pinky", "inky", "clyde"]);
+		this.state.reset();
 	} 
 	/**
 	 * reset game
@@ -132,7 +133,7 @@ class Manager {
 			this.bufferAnimation([[game.maze, "blink"]], 550);
 			this.bufferEnd([[this, "resetGame"]]);
 		} else if(!this.user.life) {
-			this.bufferEnd(this.newGame);
+			this.bufferEnd([[this, "newGame"]]);
 		} else {
 			this.bufferEnd(this.user.respawn);
 		}

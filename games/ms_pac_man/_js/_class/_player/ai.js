@@ -194,6 +194,17 @@ class AI extends Player {
 		}
 	} 
 	/**
+	 * ghost eat user
+	 */
+	eatUser() {
+		//check distance to user
+		let distance = game.manager.user.distToGhost(this.xCord, this.yCord);
+		if(distance < game.maze.gridWidth) {
+			game.manager.user.life--;
+			game.manager.state.swapState("buffering");
+		}
+	} 
+	/**
 	 * determine AI tile image crop location
 	 * base on current direction and step 
 	 */
@@ -272,6 +283,8 @@ class AI extends Player {
 		if(this.moving) {
 			this.outCellDir();
 			this.move(timeStep);
+			//eat user
+			this.eatUser();
 		}
 		//animate ghost
 		this.animatePlayer();

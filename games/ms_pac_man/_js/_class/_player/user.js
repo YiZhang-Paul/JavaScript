@@ -6,7 +6,7 @@ class User extends Player {
 	constructor() {
 		super();
 		this.name = "user";
-		this.life = 4;
+		this.life = 1;
 		this.totalStep = 3;
 		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
 		//initialize/reset user
