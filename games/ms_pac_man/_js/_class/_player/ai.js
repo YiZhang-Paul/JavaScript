@@ -46,8 +46,15 @@ class AI extends Player {
 	 */
 	randomDirection(availableDir) {
 		if(this.collideDist === 0) {
-			let finalDir = availableDir[Math.floor(Math.random() * availableDir.length)];
-			this.setDirection(finalDir);
+			//pick random direction other than turning around
+			if(Math.random() > 0.9) {
+				availableDir.splice(availableDir.indexOf(this.findOpposite()), 1);
+				let finalDir = availableDir[Math.floor(Math.random() * availableDir.length)];
+				this.setDirection(finalDir);
+				//10% chance to turn around
+			} else {
+				this.turnAround();
+			}
 		}
 	} 
 	/**
