@@ -31,6 +31,16 @@ class AI extends Player {
 		}
 	} 
 	/**
+	 * find available moving direction
+	 *
+	 * returns array []
+	 */
+	availableDir() {
+		let allDir = this.allDirect.slice();
+		return allDir.filter(direction => 
+			!this.hasWall(direction) && !this.hasDoor(direction));
+	} 
+	/**
 	 * move back and forth
 	 */
 	turnAround() {
@@ -46,22 +56,17 @@ class AI extends Player {
 	 */
 	randomDirection(availableDir) {
 		if(this.collideDist === 0) {
-			//pick random direction other than turning around
-			if(Math.random() > 0.9) {
-				availableDir.splice(availableDir.indexOf(this.findOpposite()), 1);
-				let finalDir = availableDir[Math.floor(Math.random() * availableDir.length)];
+			let finalDir = availableDir[Math.floor(Math.random() * availableDir.length)];
+			let oppositeDir = this.findOpposite();
+			if(finalDir != oppositeDir) {
 				this.setDirection(finalDir);
-				//10% chance to turn around
+			} else if(finalDir == oppositeDir && Math.random() < 0.4) {
+				this.setDirection(finalDir);
 			} else {
-				this.turnAround();
+				this.randomDirection(availableDir);
 			}
 		}
 	} 
-	/**
-	 * @abstract
-	 * change moving direction inside of cell
-	 */
-	inCellDir() {} 
 	/**
 	 * move out cell
 	 */
@@ -88,13 +93,24 @@ class AI extends Player {
 		}
 	} 
 	/**
+	 * @abstract
+	 * change moving direction inside of cell
+	 */
+	inCellDir() {} 
+	/**
 	 * change moving direction outside of cell
 	 */
 	outCellDir() {
-		let availableDir = this.allDirect.slice().filter(direction => {
-			return !this.hasWall(direction) && !this.hasDoor(direction);
-		});
-		this.randomDirection(availableDir);
+		this.randomDirection(this.availableDir());
+	} 
+	/**
+	 * move away from user
+	 */
+	fleeDir() {
+		let gridWidth = game.maze.gridWidth;
+		if(game.manager.user.distToGhost(this.xCord, this.yCord) < 8 * gridWidth) {
+
+		}
 	} 
 	/**
 	 * determine AI tile image crop location
@@ -174,7 +190,7 @@ class AI extends Player {
 		this.speed = this.defaultSpeed * 0.8;
 		//check movement
 		if(this.moving) {
-			this.outCellDir();
+			this.fleeDir();
 			this.move(timeStep);
 		}
 		//animate ghost
