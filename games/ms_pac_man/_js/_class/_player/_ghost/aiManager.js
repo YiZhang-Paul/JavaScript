@@ -96,6 +96,13 @@ class AIManager {
 				ai.cropXY = ai.cropFleeXY;
 				ai.stopAnimation(0);
 				ai.state.swapState("flee");
+			} else if(ai.state.activeState() == "flee") {
+				//reset flee timer
+				if(ai.timeoutHandler) {
+					clearTimeout(ai.timeoutHandler);
+					ai.timeoutHandler = null;
+					ai.fleeToNormal();
+				}
 			}
 		});
 	} 

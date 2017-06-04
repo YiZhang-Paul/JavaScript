@@ -93,6 +93,21 @@ class AI extends Player {
 		}
 	} 
 	/**
+	 * return to normal state from flee
+	 */
+	fleeToNormal() {
+		if(!this.timeoutHandler) {
+			this.timeoutHandler = setTimeout(() => {
+				this.cropXY = this.defaultCropXY;
+				this.stopAnimation(0);
+				this.state.swapState("outCell");
+				//clear time out
+				clearTimeout(this.timeoutHandler);
+				this.timeoutHandler = null;
+			}, 6000);
+		}
+	} 
+	/**
 	 * @abstract
 	 * change moving direction inside of cell
 	 */
@@ -130,6 +145,29 @@ class AI extends Player {
 			} else {
 				this.randomDirection(availableDir);
 			}
+		}
+	} 
+	/**
+	 * retreat to cell
+	 */
+	retreatDir() {
+		let availableDir = this.availableDir();
+		if((this.collideDist === 0 || this.centerDist === null) && availableDir.length >= 3) {
+			let cellCenterX = game.maze.width * 0.5;
+			let cellCenterY =	(grid.door.spawnRow + 2) * game.maze.gridWidth;
+			//find route back to cell
+			let retreatDir = [];
+			if(this.xCord != cellCenterX) {
+				retreatDir.push(this.xCord > cellCenterX ? "left" : "right");
+			}	
+			if(this.yCord != cellCenterY) {
+				retreatDir.push(this.yCord > cellCenterY ? "up" : "down");
+			}
+			retreatDir = retreatDir.filter(direction => availableDir.indexOf(direction) != -1);
+			this.setDirection(retreatDir[Math.floor(Math.random() * retreatDir.length)]);
+		} else if(this.collideDist === 0) {
+			availableDir.splice(availableDir.indexOf(this.findOpposite()), 1);
+			this.randomDirection(availableDir);	
 		}
 	} 
 	/**
@@ -216,23 +254,14 @@ class AI extends Player {
 		//animate ghost
 		this.animatePlayer(4);
 		//set timer to go back to normal state
-		if(!this.timeoutHandler) {
-			this.timeoutHandler = setTimeout(() => {
-				this.cropXY = this.defaultCropXY;
-				this.stopAnimation(0);
-				this.state.swapState("outCell");
-				//clear time out
-				clearTimeout(this.timeoutHandler);
-				this.timeoutHandler = null;
-			}, 6000);
-		}
+		this.fleeToNormal();
 	}
 	//retreat mode
 	retreat(timeStep) {
 		this.speed = this.defaultSpeed * 1.4;
 		//check movement
 		if(this.moving) {
-			this.outCellDir();
+			this.retreatDir();
 			this.move(timeStep);
 		}
 		//animate ghost
