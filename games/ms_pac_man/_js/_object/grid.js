@@ -6,8 +6,26 @@
 let grid = {
 	row      : 31, //total number of rows 
 	column   : 28, //total number of columns
-	spawnRow : 24, //spawning row
-	spawnCol : 14, //spawning column
+	user     : {
+		spawnRow : 24, //spawning row
+		spawnCol : 14, //spawning column
+	},
+	blinky   : {
+		spawnRow : 24, //spawning row
+		spawnCol : 14, //spawning column
+	},
+	pinky    : {
+		spawnRow : 24, //spawning row
+		spawnCol : 14, //spawning column
+	},
+	inky     : {
+		spawnRow : 24, //spawning row
+		spawnCol : 14, //spawning column
+	},
+	clyde    : {
+		spawnRow : 24, //spawning row
+		spawnCol : 14, //spawning column
+	},
 	//maze layers
 	maze  : [[
 	//layer 1

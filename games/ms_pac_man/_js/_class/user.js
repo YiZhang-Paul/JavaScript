@@ -27,9 +27,8 @@ class User extends Player {
 	reset() {
 		this.score = 0;
 		this.step = 2;
-		this.intervalHandler = null;
-		this.xCord = game.maze.gridWidth * (grid.spawnCol - 0.5);
-		this.yCord = game.maze.gridWidth * (grid.spawnRow - 0.5);
+		this.xCord = game.maze.gridWidth * (grid.user.spawnCol - 0.5);
+		this.yCord = game.maze.gridWidth * (grid.user.spawnRow - 0.5);
 		this.direction = "right";
 		//update current row and column
 		this.trackGrid();
@@ -195,7 +194,7 @@ class User extends Player {
 		this.cropXY();
 	} 
 	/**
-	 * determine player tile image crop location
+	 * determine user tile image crop location
 	 * base on current direction and step 
 	 */
 	cropXY() {
