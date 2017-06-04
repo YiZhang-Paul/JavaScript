@@ -5,7 +5,7 @@
  *
  * name : ghost name
  */
-class AI {
+class AI extends Player {
 	constructor(name) {
 		super();
 		this.name = name;
@@ -29,9 +29,9 @@ class AI {
 	 */
 	reset() {
 		this.step = 0;
-		this.xCord = game.maze.gridWidth * (grid[this.name].spawnCol - 0.5);
+		this.xCord = game.maze.gridWidth * (grid[this.name].spawnCol - 0.1);
 		this.yCord = game.maze.gridWidth * (grid[this.name].spawnRow - 0.5);
-		this.direction = null;
+		this.direction = grid[this.name].direction;
 		//update current row and column
 		this.trackGrid();
 		//update crop XY location
@@ -42,6 +42,8 @@ class AI {
 	 */
 	changeStep() {
 		this.step = this.step ? 0 : 1;
+		//update crop XY location
+		this.cropXY();
 	}  
 	/**
 	 * determine AI tile image crop location
@@ -64,10 +66,39 @@ class AI {
 		this.cropX = (index * 2 + this.step) * this.cropWidth;
 		this.cropY = startRow * this.cropWidth;
 	} 
+	/**
+	 * animate user
+	 */
+	animateGhost() {
+		if(this.moving && !this.intervalHandler) {
+			this.intervalHandler = setInterval(() => {
+				//update step
+				this.changeStep();
+			}, 100);
+		} else if(!this.moving && this.intervalHandler) {
+			clearInterval(this.intervalHandler);
+			this.intervalHandler = null;
+		}	
+	} 
+	/**
+	 * update ghost
+	 * @param float
+	 * 
+	 * timeStep : game loop time step
+	 */
+	update(timeStep) {
+		//animate user
+		this.animateGhost();
+	}
 	/** 
 	 * draw ghost
 	 */
 	draw() {
-		game.maze.user.draw.call(this);
+		this.ctx.drawImage(this.tile, this.cropX, this.cropY,
+			                 this.cropWidth, this.cropWidth,
+			                 this.xCord - game.maze.gridWidth * 0.8,
+			                 this.yCord - game.maze.gridWidth * 0.8,
+			                 game.maze.gridWidth * 1.6, 
+			                 game.maze.gridWidth * 1.6);
 	} 
 } 

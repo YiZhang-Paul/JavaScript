@@ -44,6 +44,7 @@ class Manager {
 		this.makeAllFood();
 		//all players
 		this.user = new User();
+		this.aiManager = new AIManager(["blinky", "pinky", "inky", "clyde"]);
 	} 
 	/**
 	 * reset game
@@ -112,10 +113,12 @@ class Manager {
 		//detect game start
 		if(control.keyPressed.length) {
 			this.state.swapState("ongoing");
+			this.aiManager.initiateMove();
 		}
 	} 
 	//ongoing state
 	ongoing(timeStep) {
+		this.aiManager.update(timeStep);
 		this.user.update(timeStep);
 	}
 	//buffering state
@@ -148,5 +151,6 @@ class Manager {
 		this.ctx.clearRect(0, 0, game.maze.width, game.maze.height);
 		//draw players 
 		this.user.draw();
+		this.aiManager.draw();
 	}
 } 

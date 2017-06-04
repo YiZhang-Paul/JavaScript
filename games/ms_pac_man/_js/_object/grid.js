@@ -11,20 +11,24 @@ let grid = {
 		spawnCol : 14, //spawning column
 	},
 	blinky   : {
-		spawnRow : 24, //spawning row
-		spawnCol : 14, //spawning column
+		spawnRow  : 12, //spawning row
+		spawnCol  : 14, //spawning column
+		direction : "left"
 	},
 	pinky    : {
-		spawnRow : 24, //spawning row
-		spawnCol : 14, //spawning column
+		spawnRow  : 15, //spawning row
+		spawnCol  : 14, //spawning column
+		direction : "down"
 	},
 	inky     : {
-		spawnRow : 24, //spawning row
-		spawnCol : 14, //spawning column
+		spawnRow  : 15, //spawning row
+		spawnCol  : 12, //spawning column
+		direction : "up"
 	},
 	clyde    : {
-		spawnRow : 24, //spawning row
-		spawnCol : 14, //spawning column
+		spawnRow  : 15, //spawning row
+		spawnCol  : 16, //spawning column
+		direction : "right"
 	},
 	//maze layers
 	maze  : [[
