@@ -20,15 +20,20 @@ class AI extends Player {
 	 * reset AI
 	 */
 	reset() {
-		super.reset();
 		this.moving = false;
 		this.score = 0;
 		this.step = 0;
+		this.cropXY = this.defaultCropXY;
 		this.state.swapState(this.name == "blinky" ? "outCell" : "inCell");
 		if(this.intervalHandler) {
 			clearInterval(this.intervalHandler);
 			this.intervalHandler = null;
 		}
+		if(this.timeoutHandler) {
+			clearTimeout(this.timeoutHandler);
+			this.timeoutHandler = null; 
+		}
+		super.reset();
 	} 
 	/**
 	 * find available moving direction
