@@ -10,6 +10,7 @@ class Player {
 		this.row = null;
 		this.column = null;
 		this.direction = null;
+		this.allDirect = ["up", "down", "left", "right"];
 		this.speed = null;
 		this.score = 0;
 		this.animateOn = false;
@@ -22,6 +23,7 @@ class Player {
 		this.cropWidth = 32;
 		//player animation
 		this.step = 0;
+		this.totalStep = 0;
 		this.intervalHandler = null;
 		this.ctx = game.maze.playerCtx;
 	}
@@ -86,7 +88,8 @@ class Player {
 	 */
 	distToTile(row, column) {
 		let [centerX, centerY] = this.centerCord(row, column);
-		return Math.hypot((centerX - this.xCord), (centerY - this.yCord));
+		return this.direction == "up" || this.direction == "down" ? 
+			Math.abs(this.yCord - centerY) : Math.abs(this.xCord - centerX);
 	} 
 	/**
 	 * check adjacent tile on 
@@ -124,6 +127,16 @@ class Player {
 		return adjacentTile && adjacentTile.w;
 	} 
 	/**
+	 * detect door existence on given direction
+	 * @param String
+	 *
+	 * direction : direction to check
+	 */
+	hasDoor(direction) {
+		let adjacentTile = this.adjacentTile(1, direction)[0];
+		return adjacentTile && adjacentTile.d;
+	} 
+	/**
 	 * find opposite direction
 	 * @param String
 	 *
@@ -131,7 +144,7 @@ class Player {
 	 *
 	 * returns String
 	 */
-	findOpposite(direction) {
+	findOpposite(direction = this.direction) {
 		switch(direction) {
 			case "up" :
 			case "down" :
@@ -239,41 +252,37 @@ class Player {
 	 */
 	cropXY() {}
 	/**
-	 * change direction
+	 * set new direction
 	 * @param String
 	 * 
 	 * direction : new direction
 	 */
-	changeDirection(direction) {
+	setDirection(direction) {
 		this.direction = direction;
 		//update crop XY location
 		this.cropXY();
 	} 
 	/**
 	 * change current step
-	 * @param int
-	 *
-	 * totalStep : total number of steps
 	 */
-	changeStep(totalStep) {
+	changeStep() {
 		//loop step from 0 to 2 and repeat
-		this.step = (this.step + 1) % totalStep;
+		this.step = (this.step + 1) % this.totalStep;
 		//update crop XY location
 		this.cropXY();
 	} 
 	/**
 	 * animate player
-	 * @param int, int
+	 * @param int
 	 *
-	 * totalStep : total number of steps
 	 * speed     : animation speed
 	 */
-	animatePlayer(totalStep, speed = 100) {
+	animatePlayer(speed = 100) {
 		this.animateOn = this.collideDist === null;
 		if(this.animateOn && !this.intervalHandler) {
 			this.intervalHandler = setInterval(() => {
 				//update step
-				this.changeStep(totalStep);
+				this.changeStep();
 			}, speed);
 		} else if(!this.animateOn && this.intervalHandler) {
 			clearInterval(this.intervalHandler);

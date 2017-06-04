@@ -8,10 +8,12 @@
 class AIManager {
 	constructor(nameList) {
 		//create AIs
-		this.ais = [];
-		nameList.forEach(name => {
-			this.ais.push(new AI(name));
-		});
+		this.ais = [new Blinky(this), new Pinky(this), new Inky(this), new Clyde(this)];
+		this.cell = new Set(this.ais);
+		//cooldown to move out cell
+		this.cooldown = 3000;
+		//time stamp of last AI moving out cell
+		this.lastAIOut = 0; 
 	}
 	/**
 	 * reset AIs
@@ -22,11 +24,36 @@ class AIManager {
 		});
 	} 
 	/**
+	 * reset cooldown
+	 */
+	resetCooldown() {
+		this.lastAIOut = new Date();
+	} 
+	/**
+	 * check cooldown for moving out cell
+	 * @param int 
+	 *
+	 * cooldown : cooldown to move out cell (ms)
+	 *
+	 * returns boolean
+	 */
+	onCooldown(cooldown = this.cooldown) {
+		return new Date() - this.lastAIOut < cooldown;
+	}
+	/**
 	 * initiate move
 	 */
 	initiateMove() {
 		this.ais.forEach(ai => {
-			ai.moving = true;
+			if(ai.state.activeState() == "outCell") {
+				setTimeout(() => {
+					ai.moving = true;
+				}, 1000);
+			} else {
+				setTimeout(() => {
+					ai.moving = true;
+				}, this.cooldown);
+			}
 		});
 	} 
 	/**

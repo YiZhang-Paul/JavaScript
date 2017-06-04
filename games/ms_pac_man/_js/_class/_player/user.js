@@ -7,12 +7,13 @@ class User extends Player {
 		super();
 		this.name = "user";
 		this.life = 4;
+		this.totalStep = 3;
 		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
-		//initialize/reset user location and direction
+		//initialize/reset user
 		this.reset();
 	}
 	/**
-	 * reset user location and direction
+	 * reset user
 	 */
 	reset() {
 		this.score = 0;
@@ -49,11 +50,11 @@ class User extends Player {
 			let keyCode = control.keyPressed[control.keyPressed.length - 1];
 			//change direction
 			let direction = this.keyCodeToDirection(keyCode);
-			if(direction == this.findOpposite(this.direction)) {
-				this.changeDirection(direction);
+			if(direction == this.findOpposite()) {
+				this.setDirection(direction);
 			} else if(this.xCord >= 0 && this.xCord <= game.maze.width) {
 				if(!this.hasWall(direction) && this.onCenter()) {
-					this.changeDirection(direction);
+					this.setDirection(direction);
 				}
 			}
 		}
@@ -94,7 +95,7 @@ class User extends Player {
 	 */
 	update(timeStep) {
 		//animate user
-		this.animatePlayer(3);
+		this.animatePlayer();
 		//check movment
 		this.checkMoveKey();
 		this.move(timeStep);
