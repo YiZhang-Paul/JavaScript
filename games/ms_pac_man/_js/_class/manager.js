@@ -10,6 +10,7 @@ class Manager {
 		this.newGame();
 		this.ctx = game.maze.playerCtx;
 		this.timeoutHandler = null;
+		this.intervalHandler = null;
 		this.state = new StateMachine(this, "ready");
 	}
 	/**
@@ -51,7 +52,57 @@ class Manager {
 		//create all food
 		this.makeAllFood();	
 		this.user.reset();
+		game.maze.reset();
 		this.state.reset();
+	} 
+	/**
+	 * clear time out and interval
+	 */
+	clearHandler() {
+		if(this.timeoutHandler) {
+			clearTimeout(this.timeoutHandler);
+			this.timeoutHandler = null;
+		}
+		if(this.intervalHandler) {
+			clearInterval(this.intervalHandler);
+			this.intervalHandler = null;
+		}
+	} 
+	/**
+	 * play buffering animation
+	 * @param array [], int
+	 *
+	 * callBackList : list containing caller and call back name 
+	 * interval     : interval between each function call (ms)
+	 */
+	bufferAnimation(callBackList, interval) {
+		if(!this.intervalHandler) {
+			this.intervalHandler = setInterval(() => {
+				callBackList.forEach(set => {
+					let caller = set[0];
+					caller[set[1]]();
+				});
+			}, interval);
+		}
+	} 
+	/**
+	 * action after buffer ends
+	 * @param array [], int
+	 *
+	 * callBackList : list containing caller and call back name 
+	 * timeout      : timeout to execute call back function (ms)
+	 */
+	bufferEnd(callBackList, timeout = 3500) {
+		if(!this.timeoutHandler) {
+			this.timeoutHandler = setTimeout(() => {
+				callBackList.forEach(set => {
+					let caller = set[0];
+					caller[set[1]]();
+				});
+				//clear time out and interval
+				this.clearHandler();
+			}, timeout);
+		}
 	} 
 	/**
 	 * game states
@@ -71,16 +122,14 @@ class Manager {
 	buffering() {
 		//clear user animation
 		this.user.stopAnimation();
-		//start counter to reset/create new game
-		if(!this.timeoutHandler) {
-			this.timeoutHandler = setTimeout(() => {
-				if(this.totalFood === 0) this.resetGame(); 
-				else if(this.user.life === 0) this.newGame();
-				else this.user.respawn(); 
-				//clear time out
-				clearTimeout(this.timeoutHandler);
-				this.timeoutHandler = null;
-			}, 3500);
+		//reset/create new game
+		if(!this.totalFood) {
+			this.bufferAnimation([[game.maze, "blink"]], 550);
+			this.bufferEnd([[this, "resetGame"]]);
+		} else if(!this.user.life) {
+			this.bufferEnd(this.newGame);
+		} else {
+			this.bufferEnd(this.user.respawn);
 		}
 	}
 	/**

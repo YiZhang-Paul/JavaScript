@@ -16,7 +16,7 @@ class Food {
 		this.type = type;
 		[this.score, this.radius] = this.getFoodStat(type);
 		this.color = "pink";
-		this.ctx = game.maze.backCtx;
+		this.ctx = game.maze.foodCtx;
 		//draw food
 		this.draw();
 	}
