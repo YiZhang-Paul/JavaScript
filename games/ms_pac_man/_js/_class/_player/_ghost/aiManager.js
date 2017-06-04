@@ -91,22 +91,18 @@ class AIManager {
 	 */
 	enterFlee() {
 		this.ais.forEach(ai => {
-			if(ai.state.activeState() == "outCell") {
+			let activeState = ai.state.activeState();
+			if(activeState == "outCell" || activeState == "flee") {
 				//change crop function
 				ai.cropXY = ai.cropFleeS1XY;
 				ai.stopAnimation(0);
 				ai.state.swapState("flee");
-			} else if(ai.state.activeState() == "flee") {
-				//reset flee timer
-				if(ai.timeoutHandler) {
+				if(activeState == "flee" && ai.timeoutHandler) {
+					//reset flee timer
 					clearTimeout(ai.timeoutHandler);
 					ai.timeoutHandler = null;
 				}
-				ai.cropXY = ai.cropFleeS1XY;
-				ai.stopAnimation(0);
-				ai.animatePlayer();
-				ai.intiateFleeToNormal();
-			}
+			} 
 		});
 	} 
 	/**
