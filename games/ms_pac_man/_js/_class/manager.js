@@ -53,6 +53,7 @@ class Manager {
 		//create all food
 		this.makeAllFood();	
 		this.user.reset();
+		this.aiManager.reset();
 		game.maze.reset();
 		this.state.reset();
 	} 
@@ -114,6 +115,7 @@ class Manager {
 		if(control.keyPressed.length) {
 			this.state.swapState("ongoing");
 			this.aiManager.initiateMove();
+			this.aiManager.startAnimate();
 		}
 	} 
 	//ongoing state
@@ -124,7 +126,7 @@ class Manager {
 	//buffering state
 	buffering() {
 		//clear user animation
-		this.user.stopAnimation();
+		this.user.stopAnimation(2);
 		//reset/create new game
 		if(!this.totalFood) {
 			this.bufferAnimation([[game.maze, "blink"]], 550);

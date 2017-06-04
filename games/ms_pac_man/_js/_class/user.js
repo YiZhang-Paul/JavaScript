@@ -5,19 +5,9 @@
 class User extends Player {
 	constructor() {
 		super();
-		this.score = 0;
+		this.name = "user";
 		this.life = 4;
-		this.moving = false;
 		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
-		//user apperance
-		this.tile = document.getElementById("player");
-		this.cropX = null;
-		this.cropY = null;
-		this.cropWidth = 32;
-		//user animations
-		this.step = 2;
-		this.intervalHandler = null;
-		this.ctx = game.maze.playerCtx;
 		//initialize/reset user location and direction
 		this.reset();
 	}
@@ -27,13 +17,7 @@ class User extends Player {
 	reset() {
 		this.score = 0;
 		this.step = 2;
-		this.xCord = game.maze.gridWidth * (grid.user.spawnCol - 0.5);
-		this.yCord = game.maze.gridWidth * (grid.user.spawnRow - 0.5);
-		this.direction = "right";
-		//update current row and column
-		this.trackGrid();
-		//update crop XY location
-		this.cropXY();
+		super.reset();
 	} 
 	/**
 	 * convert key code to direction
@@ -58,17 +42,6 @@ class User extends Player {
 		return direction;
 	} 
 	/**
-	 * change direction
-	 * @param String
-	 * 
-	 * direction : new direction
-	 */
-	changeDirection(direction) {
-		this.direction = direction;
-		//update crop XY location
-		this.cropXY();
-	} 
-	/**
 	 * check movement controls
 	 */
 	checkMoveKey() {
@@ -86,112 +59,17 @@ class User extends Player {
 		}
 	} 
 	/**
-	 * collision detection
-	 * find distance before collision
-	 * 
-	 * returns float
-	 */
-	collideDist() {
-		//check adjacent tile
-		let [, row, column] = this.adjacentTile(1);
-		if(this.hasWall(this.direction)) {
-			//get adjacent tile's center coordinate
-			return this.distToTile(row, column) - game.maze.gridWidth;
-		}
-	} 
-	/**
-	 * grid center detection
-	 * find distance before next grid center
-	 * on current moving direction
-	 *
-	 * returns float
-	 */ 
-	centerDist() {
-		if(this.onCenter()) {
-			return;	
-		}
-		//check current location relative to current grid
-		let [curCenterX, curCenterY] = this.centerCord(this.row, this.column);
-		let locationToGrid;
-		if(this.xCord == curCenterX) {
-			locationToGrid = this.yCord > curCenterY ? "down" : "up";
-		} else {
-			locationToGrid = this.xCord > curCenterX ? "right" : "left";
-		}
-		//find distance to grid center
-		let centerDist;
-		if(locationToGrid == "down" && this.direction == "up" ||
-			 locationToGrid == "up" && this.direction == "down" ||
-			 locationToGrid == "left" && this.direction == "right"||
-			 locationToGrid == "right" && this.direction == "left") {
-			centerDist = this.distToTile(this.row, this.column);
-		} else {
-			let [, row, column] = this.adjacentTile(1);
-			centerDist = this.distToTile(row, column);
-		}
-		return centerDist;
-	} 
-	/**
-	 * warp through worm holes
-	 */
-	crossBridge() {
-		let gridWidth = game.maze.gridWidth;
-		if(this.xCord < -gridWidth) {
-			this.xCord = game.maze.width + gridWidth;
-		} else if(this.xCord > game.maze.width + gridWidth) {
-			this.xCord = -gridWidth;
-		}
-	}
-	/**
-	 * move user
-	 * @param float
-	 * 
-	 * timeStep : game loop time step
-	 */
-	move(timeStep) {
-		//calculate speed
-		let speed = this.speed * timeStep;
-		//check for collision
-		let collideDist = this.collideDist();
-		if(collideDist !== undefined) {
-			speed = Math.min(speed, collideDist);
-		} else {
-			let centerDist = this.centerDist();
-			//eat food
-			if(!centerDist) this.eatFood();
-			speed = centerDist ? Math.min(speed, centerDist) : speed;
-		}
-		//indicate current movement
-		this.moving = speed !== 0;
-		if(this.direction == "up" || this.direction == "down") {
-			this.yCord -= (this.direction == "up" ? 1 : -1) * speed;
-		} else if(this.direction == "left" || this.direction == "right") {
-			this.xCord -= (this.direction == "left" ? 1 : -1) * speed;
-		}
-		//check worm holes
-		this.crossBridge();
-		//update current row and column
-		this.trackGrid();
-	} 
-	/**
 	 * eat food 
 	 */
 	eatFood() {
 		//check current grid
-		let curGrid = this.currentTile();
-		if(curGrid instanceof Food) {
-			this.score += curGrid.score;
-			curGrid.clear();
+		if(this.centerDist === null) {
+			let curGrid = this.currentTile();
+			if(curGrid instanceof Food) {
+				this.score += curGrid.score;
+				curGrid.clear();
+			}
 		}
-	} 
-	/**
-	 * change current step
-	 */
-	changeStep() {
-		//loop step from 0 to 2 and repeat
-		this.step = (this.step + 1) % 3;
-		//update crop XY location
-		this.cropXY();
 	} 
 	/**
 	 * determine user tile image crop location
@@ -209,32 +87,6 @@ class User extends Player {
 		this.cropY = Math.floor((index * 3 + this.step) * this.cropWidth / 256) * this.cropWidth;
 	} 
 	/**
-	 * animate user
-	 */
-	animateUser() {
-		if(this.moving && !this.intervalHandler) {
-			this.intervalHandler = setInterval(() => {
-				//update step
-				this.changeStep();
-			}, 100);
-		} else if(!this.moving && this.intervalHandler) {
-			clearInterval(this.intervalHandler);
-			this.intervalHandler = null;
-		}	
-	} 
-	/**
-	 * stop user animation
-	 */
-	stopAnimation() {
-		if(this.intervalHandler) {
-			clearInterval(this.intervalHandler);
-			this.intervalHandler = null;
-			//reset step 
-			this.step = 2;
-			this.cropXY();
-		}
-	} 
-	/**
 	 * update user
 	 * @param float
 	 * 
@@ -242,20 +94,11 @@ class User extends Player {
 	 */
 	update(timeStep) {
 		//animate user
-		this.animateUser();
+		this.animatePlayer(3);
 		//check movment
 		this.checkMoveKey();
 		this.move(timeStep);
-	} 
-	/**
-	 * draw user
-	 */
-	draw() {
-		this.ctx.drawImage(this.tile, this.cropX, this.cropY,
-			                 this.cropWidth, this.cropWidth,
-			                 this.xCord - game.maze.gridWidth * 0.8,
-			                 this.yCord - game.maze.gridWidth * 0.8,
-			                 game.maze.gridWidth * 1.6, 
-			                 game.maze.gridWidth * 1.6);
+		//eat food
+		this.eatFood();
 	} 
 } 

@@ -30,11 +30,30 @@ class AIManager {
 		});
 	} 
 	/**
-	 * update AIs
+	 * stop movement
 	 */
-	update() {
+	stopMove() {
 		this.ais.forEach(ai => {
-			ai.update();
+			ai.moving = false;
+		});
+	} 
+	/**
+	 * start animation
+	 */
+	startAnimate() {
+		this.ais.forEach(ai => {
+			ai.animateOn = true;
+		});
+	} 
+	/**
+	 * update AIs
+	 * @param float
+	 * 
+	 * timeStep : game loop time step
+	 */
+	update(timeStep) {
+		this.ais.forEach(ai => {
+			ai.update(timeStep);
 		});
 	} 
 	/**

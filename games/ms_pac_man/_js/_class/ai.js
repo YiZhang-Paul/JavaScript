@@ -9,18 +9,8 @@ class AI extends Player {
 	constructor(name) {
 		super();
 		this.name = name;
-		this.score = 0;
 		this.moving = false;
 		this.speed = Math.round(game.maze.height* 0.0002 * 100) / 100;
-		//AI apperance
-		this.tile = document.getElementById("player");
-		this.cropX = null;
-		this.cropY = null;
-		this.cropWidth = 32;
-		//AI animations
-		this.step = 0;
-		this.intervalHandler = null;
-		this.ctx = game.maze.playerCtx;
 		//initialize/reset AI location and direction
 		this.reset();
 	}
@@ -28,23 +18,11 @@ class AI extends Player {
 	 * reset AI location and direction
 	 */
 	reset() {
+		this.moving = false;
+		this.score = 0;
 		this.step = 0;
-		this.xCord = game.maze.gridWidth * (grid[this.name].spawnCol - 0.1);
-		this.yCord = game.maze.gridWidth * (grid[this.name].spawnRow - 0.5);
-		this.direction = grid[this.name].direction;
-		//update current row and column
-		this.trackGrid();
-		//update crop XY location
-		this.cropXY();
+		super.reset();
 	} 
-	/**
-	 * change steps
-	 */
-	changeStep() {
-		this.step = this.step ? 0 : 1;
-		//update crop XY location
-		this.cropXY();
-	}  
 	/**
 	 * determine AI tile image crop location
 	 * base on current direction and step 
@@ -67,38 +45,15 @@ class AI extends Player {
 		this.cropY = startRow * this.cropWidth;
 	} 
 	/**
-	 * animate user
-	 */
-	animateGhost() {
-		if(this.moving && !this.intervalHandler) {
-			this.intervalHandler = setInterval(() => {
-				//update step
-				this.changeStep();
-			}, 100);
-		} else if(!this.moving && this.intervalHandler) {
-			clearInterval(this.intervalHandler);
-			this.intervalHandler = null;
-		}	
-	} 
-	/**
 	 * update ghost
 	 * @param float
 	 * 
 	 * timeStep : game loop time step
 	 */
 	update(timeStep) {
-		//animate user
-		this.animateGhost();
+		//animate ghost
+		this.animatePlayer(2);
+		//check movement
+		this.move(timeStep);
 	}
-	/** 
-	 * draw ghost
-	 */
-	draw() {
-		this.ctx.drawImage(this.tile, this.cropX, this.cropY,
-			                 this.cropWidth, this.cropWidth,
-			                 this.xCord - game.maze.gridWidth * 0.8,
-			                 this.yCord - game.maze.gridWidth * 0.8,
-			                 game.maze.gridWidth * 1.6, 
-			                 game.maze.gridWidth * 1.6);
-	} 
 } 
