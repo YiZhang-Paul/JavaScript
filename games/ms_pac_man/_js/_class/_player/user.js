@@ -76,6 +76,33 @@ class User extends Player {
 		}
 	} 
 	/**
+	 * find distance to a ghost
+	 * @param float, float
+	 *
+	 * xCord : X-Coordinate of target ghost
+	 * yCord : Y-Coordinate of target ghost
+	 */
+	distToGhost(xCord, yCord) {
+		return Math.hypot((this.xCord - xCord), (this.yCord - yCord));
+	} 
+	/**
+	 * eat ghost
+	 */
+	eatGhost() {
+		let gridWidth = game.maze.gridWidth;
+		//check distance to a ghost
+		game.manager.aiManager.ais.forEach(ghost => {
+			let distance = this.distToGhost(ghost.xCord, ghost.yCord);
+			if(ghost.state.activeState() == "flee" && distance < gridWidth * 0.5) {
+				this.score += ghost.score;
+				//change crop function
+				ghost.cropXY = ghost.cropRetreatXY;
+				ghost.stopAnimation(0);
+				ghost.state.swapState("retreat");
+			} 
+		});
+	} 
+	/**
 	 * determine user tile image crop location
 	 * base on current direction and step 
 	 */
@@ -105,5 +132,7 @@ class User extends Player {
 		this.move(timeStep);
 		//eat food
 		this.eatFood();
+		//eat ghost
+		this.eatGhost();
 	} 
 } 
