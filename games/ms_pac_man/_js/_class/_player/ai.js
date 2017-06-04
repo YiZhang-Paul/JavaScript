@@ -116,6 +116,7 @@ class AI extends Player {
 	 * on flee state 
 	 */
 	cropFleeXY() {
+		//determine and update crop XY location
 		let cropWidth = this.cropWidth + 2;
 		this.cropX = (4 + this.step) * cropWidth + 1;
 		this.cropY = cropWidth + 1;
@@ -125,8 +126,15 @@ class AI extends Player {
 	 * on retreat state  
 	 */
 	cropRetreatXY() {
+		//determine crop index base on current direction
+		let index;
+		if(this.direction == "up") index = 0;	
+		else if(this.direction == "down") index = 1;	
+		else if(this.direction == "left") index = 2;	
+		else if(this.direction == "right") index = 3;	
+		//determine and update crop XY location
 		let cropWidth = this.cropWidth + 2;
-		this.cropX = (4 + this.step) * cropWidth + 1;
+		this.cropX = (4 + index) * cropWidth + 1;
 		this.cropY = 7 * cropWidth + 1;
 	} 
 	/**
