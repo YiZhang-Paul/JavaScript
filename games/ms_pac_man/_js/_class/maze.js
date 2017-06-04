@@ -15,11 +15,12 @@ class Maze {
 		//create game canvases
 		this.backCtx = this.makeCanvase(this.width, this.height, 1);
 		this.foodCtx = this.makeCanvase(this.width, this.height, 2);
-		this.playerCtx = this.makeCanvase(this.width, this.height, 3);
-		this.uiCtx = this.makeCanvase(this.width, this.height, 4);
-		this.pinkTile = document.getElementById("maze");
-		this.tealTile = document.getElementById("maze_teal");
-		this.whiteTile = document.getElementById("maze_white");
+		this.beanCtx = this.makeCanvase(this.width, this.height, 3);
+		this.fruitCtx = this.makeCanvase(this.width, this.height, 4);
+		this.playerCtx = this.makeCanvase(this.width, this.height, 5);
+		this.uiCtx = this.makeCanvase(this.width, this.height, 6);
+		this.tanTile = document.getElementById("maze");
+		this.transparentTile = document.getElementById("maze_transparent");
 		this.step = 0;
 		//draw maze
 		this.draw();
@@ -54,7 +55,7 @@ class Maze {
 	 * change step
 	 */
 	changeStep() {
-		this.step = (this.step + 1) % 3;
+		this.step = this.step ? 0 : 1;
 	} 
 	/**
 	 * blink maze
@@ -69,11 +70,9 @@ class Maze {
 	draw() {
 		this.backCtx.clearRect(0, 0, this.width, this.height);
 		if(this.step === 0) {
-			this.backCtx.drawImage(this.pinkTile, 0, 0, this.width, this.height);
-		} else if(this.step == 1) {
-			this.backCtx.drawImage(this.tealTile, 0, 0, this.width, this.height);
+			this.backCtx.drawImage(this.tanTile, 0, 0, this.width, this.height);
 		} else {
-			this.backCtx.drawImage(this.whiteTile, 0, 0, this.width, this.height);
+			this.backCtx.drawImage(this.transparentTile, 0, 0, this.width, this.height);
 		}
 	} 
 } 

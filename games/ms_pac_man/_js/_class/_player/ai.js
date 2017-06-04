@@ -284,7 +284,7 @@ class AI extends Player {
 			this.outCellDir();
 			this.move(timeStep);
 			//eat user
-			this.eatUser();
+			//this.eatUser();
 		}
 		//animate ghost
 		this.animatePlayer();

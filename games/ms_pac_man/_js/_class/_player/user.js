@@ -68,10 +68,15 @@ class User extends Player {
 			let curGrid = this.currentTile();
 			if(curGrid instanceof Food) {
 				if(curGrid.type == "l") {
+					game.manager.beans.delete(curGrid);
 					game.manager.aiManager.enterFlee();
 				}
 				this.score += curGrid.score;
 				curGrid.clear();
+				//check game end
+				if(--game.manager.totalFood === 0) {
+					game.manager.state.swapState("buffering");
+				}
 			}
 		}
 	} 

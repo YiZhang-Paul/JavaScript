@@ -17,7 +17,8 @@ class Inky extends AI {
 	 * change moving direction inside of cell
 	 */
 	inCellDir() {
-		if(this.owner.cell.size > 1 ||
+		if(this.owner.cell.has(this.owner.blinky) ||
+			 this.owner.cell.has(this.owner.pinky) ||
 			 this.owner.onCooldown()) {
 			this.turnAround();
 		} else if(!this.owner.onCooldown()) {

@@ -6,9 +6,12 @@
 class Manager {
 	constructor() {
 		this.totalFood = 0;
+		this.beans = new Set();
+		this.step = 0;
 		this.ctx = game.maze.playerCtx;
 		this.timeoutHandler = null;
 		this.intervalHandler = null;
+		this.beanInterval = null;
 		this.state = new StateMachine(this, "ready");
 		//create a new game
 		this.newGame();
@@ -22,18 +25,40 @@ class Manager {
 	 * type   : type of food
 	 */
 	makeFood(row, column, type) {
-		grid.maze[0][row][column] = new Food(row, column, type);
+		let food = new Food(row, column, type);
+		grid.maze[0][row][column] = food;
 		this.totalFood++;
+		if(type == "l") {
+			this.beans.add(food);	
+		}
 	} 
 	/**
 	 * generate all food on game start
 	 */
 	makeAllFood() {
+		this.totalFood = 0;
 		for(let i = 0; i < grid.row; i++) {
 			for(let j = 0; j < grid.column; j++) {
 				let curGrid = grid.getGrid(1, i, j);
 				if(curGrid && curGrid.f) this.makeFood(i, j, curGrid.f);	
 			}
+		}
+	} 
+	/**
+	 * blink all beans
+	 */
+	blinkBean() {
+		if(!this.beanInterval) {
+			this.beanInterval = setInterval(() => {
+				this.step = this.step ? 0 : 1;
+				if(this.step) {
+					this.beans.forEach(bean => {
+						bean.draw();
+					});
+				} else {
+					game.maze.beanCtx.clearRect(0, 0, game.maze.width, game.maze.height);
+				}
+			}, 220);
 		}
 	} 
 	/**
@@ -70,6 +95,10 @@ class Manager {
 			clearInterval(this.intervalHandler);
 			this.intervalHandler = null;
 		}
+		if(this.beanInterval) {
+			clearInterval(this.beanInterval);
+			this.beanInterval = null;
+		}
 	} 
 	/**
 	 * play buffering animation
@@ -95,7 +124,7 @@ class Manager {
 	 * callBackList : list containing caller and call back name 
 	 * timeout      : timeout to execute call back function (ms)
 	 */
-	bufferEnd(callBackList, timeout = 3500) {
+	bufferEnd(callBackList, timeout = 3000) {
 		if(!this.timeoutHandler) {
 			this.timeoutHandler = setTimeout(() => {
 				callBackList.forEach(set => {
@@ -112,6 +141,7 @@ class Manager {
 	 */
 	//ready state
 	ready() {
+		this.blinkBean();
 		//detect game start
 		if(control.keyPressed.length) {
 			this.state.swapState("ongoing");
@@ -130,7 +160,7 @@ class Manager {
 		this.user.stopAnimation(2);
 		//reset/create new game
 		if(!this.totalFood) {
-			this.bufferAnimation([[game.maze, "blink"]], 550);
+			this.bufferAnimation([[game.maze, "blink"]], 225);
 			this.bufferEnd([[this, "resetGame"]]);
 		} else if(!this.user.life) {
 			this.bufferEnd([[this, "newGame"]]);

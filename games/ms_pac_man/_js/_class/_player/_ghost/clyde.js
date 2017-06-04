@@ -17,8 +17,7 @@ class Clyde extends AI {
 	 * change moving direction inside of cell
 	 */
 	inCellDir() {
-		if(this.owner.cell.has(this.owner.blinky) ||
-			 this.owner.cell.has(this.owner.pinky) ||
+		if(this.owner.cell.size > 1 ||
 			 this.owner.onCooldown()) {
 			this.turnAround();
 		} else if(!this.owner.onCooldown()) {
