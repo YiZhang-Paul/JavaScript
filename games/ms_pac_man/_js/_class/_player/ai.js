@@ -215,6 +215,17 @@ class AI extends Player {
 		}
 		//animate ghost
 		this.animatePlayer(4);
+		//set timer to go back to normal state
+		if(!this.timeoutHandler) {
+			this.timeoutHandler = setTimeout(() => {
+				this.cropXY = this.defaultCropXY;
+				this.stopAnimation(0);
+				this.state.swapState("outCell");
+				//clear time out
+				clearTimeout(this.timeoutHandler);
+				this.timeoutHandler = null;
+			}, 6000);
+		}
 	}
 	//retreat mode
 	retreat(timeStep) {
@@ -226,6 +237,10 @@ class AI extends Player {
 		}
 		//animate ghost
 		this.animatePlayer(4);
+		if(this.timeoutHandler) {
+			clearTimeout(this.timeoutHandler);
+			this.timeoutHandler = null;
+		}
 	}
 	/**
 	 * update ghost

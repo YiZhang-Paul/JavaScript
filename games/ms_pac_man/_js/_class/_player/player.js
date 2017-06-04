@@ -24,6 +24,7 @@ class Player {
 		//player animation
 		this.step = 0;
 		this.totalStep = 0;
+		this.timeoutHandler = null;
 		this.intervalHandler = null;
 		this.ctx = game.maze.playerCtx;
 	}
