@@ -107,9 +107,29 @@ class AI extends Player {
 	 * move away from user
 	 */
 	fleeDir() {
-		let gridWidth = game.maze.gridWidth;
-		if(game.manager.user.distToGhost(this.xCord, this.yCord) < 8 * gridWidth) {
-
+		if(this.collideDist === 0 || this.centerDist === null) {
+			let user = game.manager.user;
+			let distToUser = user.distToGhost(this.xCord, this.yCord);
+			let availableDir = this.availableDir();
+			if(distToUser < grid.row * 0.25 * game.maze.gridWidth) {
+				//get all available directions to flee
+				let fleeDir = [];
+				if(this.xCord != user.xCord) {
+					fleeDir.push(user.xCord > this.xCord ? "left" : "right");
+				}
+				if(this.yCord != user.yCord) {
+					fleeDir.push(user.yCord > this.yCord ? "up" : "down");
+				}
+				fleeDir = fleeDir.filter(direction => availableDir.indexOf(direction) != -1);
+				if(fleeDir.length) {
+					this.setDirection(fleeDir[Math.floor(Math.random() * fleeDir.length)]);
+				} else {
+					availableDir.splice(availableDir.indexOf(this.findOpposite()), 1);
+					this.randomDirection(availableDir);
+				}
+			} else {
+				this.randomDirection(availableDir);
+			}
 		}
 	} 
 	/**
