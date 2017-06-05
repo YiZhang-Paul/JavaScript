@@ -28,9 +28,11 @@ class ScoreBoard {
 									["HIGH SCORE", this.owner.highestScore]];
 		for(let i = 0; i < scores.length; i++) {
 			for(let j = 0; j < scores[i].length; j++) {
-				this.ctx.fillText(scores[i][j], 
-					                this.width * (0.2 + i * 0.4), 
-					                this.height * (0.05 + j * 0.05));
+				this.ctx.fillText(
+					scores[i][j], 
+					this.width * (0.2 + i * 0.4), 
+					this.height * (0.05 + j * 0.05)
+				);
 			}
 		}
 	} 

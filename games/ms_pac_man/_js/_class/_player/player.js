@@ -165,14 +165,13 @@ class Player {
 	 * returns float
 	 */
 	getCollideDist() {
-		//check adjacent tile
-		let [, row, column] = this.adjacentTile(1);
 		if(this.hasWall(this.direction)) {
-			//get adjacent tile's center coordinate
+			//check adjacent tile
+			let [, row, column] = this.adjacentTile(1);
 			this.collideDist = this.distToTile(row, column) - game.maze.gridWidth;
-			return;
+		} else {
+			this.collideDist = null;
 		}
-		this.collideDist = null;
 	} 
 	/**
 	 * grid center detection
@@ -195,17 +194,12 @@ class Player {
 			locationToGrid = this.xCord > curCenterX ? "right" : "left";
 		}
 		//find distance to grid center
-		let centerDist;
-		if(locationToGrid == "down" && this.direction == "up" ||
-			 locationToGrid == "up" && this.direction == "down" ||
-			 locationToGrid == "left" && this.direction == "right"||
-			 locationToGrid == "right" && this.direction == "left") {
-			centerDist = this.distToTile(this.row, this.column);
+		if(locationToGrid == this.findOpposite()) {
+			this.centerDist = this.distToTile(this.row, this.column);
 		} else {
 			let [, row, column] = this.adjacentTile(1);
-			centerDist = this.distToTile(row, column);
+			this.centerDist = this.distToTile(row, column);
 		}
-		this.centerDist = centerDist;
 	} 
 	/**
 	 * move user
