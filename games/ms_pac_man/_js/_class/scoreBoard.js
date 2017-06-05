@@ -20,7 +20,7 @@ class ScoreBoard {
 	 */
 	draw() {
 		this.ctx.clearRect(0, 0, game.maze.width, game.monitor.height);
-		this.ctx.font = this.fontSize + "px Arial";
+		this.ctx.font = this.fontSize + "px 'Lucida Console'";
 		this.ctx.textAlign = "center";
 		this.ctx.fillStyle = "white";
 		//display scores
