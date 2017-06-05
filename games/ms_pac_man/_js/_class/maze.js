@@ -4,6 +4,7 @@
  */
 class Maze {
 	constructor() {
+		//determine maze dimension
 		this.gridWidth = null;
 		if(game.monitor.width > game.monitor.height) {
 			this.gridWidth = Math.floor(game.monitor.height * 0.8 / grid.row);
@@ -19,6 +20,7 @@ class Maze {
 		this.fruitCtx = this.makeCanvas(this.width, this.height, 4);
 		this.playerCtx = this.makeCanvas(this.width, this.height, 5);
 		this.uiCtx = this.makeCanvas(this.width, game.monitor.height, 6);
+		//maze tile sets
 		this.tanTile = document.getElementById("maze");
 		this.transparentTile = document.getElementById("maze_transparent");
 		this.step = 0;
@@ -69,10 +71,14 @@ class Maze {
 	 */
 	draw() {
 		this.backCtx.clearRect(0, 0, this.width, this.height);
-		if(this.step === 0) {
-			this.backCtx.drawImage(this.tanTile, 0, 0, this.width, this.height);
+		if(!this.step) {
+			this.backCtx.drawImage(
+				this.tanTile, 0, 0, this.width, this.height
+			);
 		} else {
-			this.backCtx.drawImage(this.transparentTile, 0, 0, this.width, this.height);
+			this.backCtx.drawImage(
+				this.transparentTile, 0, 0, this.width, this.height
+			);
 		}
 	} 
 } 

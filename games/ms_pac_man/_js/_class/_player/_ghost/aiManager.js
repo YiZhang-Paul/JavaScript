@@ -32,10 +32,10 @@ class AIManager {
 	 * reset AIs
 	 */
 	reset() {
-		this.cell = new Set(this.ais.slice(1));
 		this.ais.forEach(ai => {
 			ai.reset();
 		});
+		this.cell = new Set(this.ais.slice(1));
 	} 
 	/**
 	 * reset cooldown

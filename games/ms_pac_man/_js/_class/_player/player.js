@@ -68,7 +68,8 @@ class Player {
 	 * returns array []
 	 */
 	centerCord(row, column) {
-		return [(column + 0.5) * game.maze.gridWidth, (row + 0.5) * game.maze.gridWidth];
+		let gridWidth = game.maze.gridWidth;
+		return [(column + 0.5) * gridWidth, (row + 0.5) * gridWidth];
 	} 
 	/**
 	 * check if player is on center
@@ -165,8 +166,7 @@ class Player {
 	 * returns float
 	 */
 	getCollideDist() {
-		if(this.hasWall(this.direction)) {
-			//check adjacent tile
+		if(this.hasWall()) {
 			let [, row, column] = this.adjacentTile(1);
 			this.collideDist = this.distToTile(row, column) - game.maze.gridWidth;
 		} else {
@@ -175,8 +175,8 @@ class Player {
 	} 
 	/**
 	 * grid center detection
-	 * find distance before next grid center
-	 * on current moving direction
+	 * find distance before center of
+	 * next grid on current moving direction
 	 *
 	 * returns float
 	 */ 
@@ -187,14 +187,14 @@ class Player {
 		}
 		//check current location relative to current grid
 		let [curCenterX, curCenterY] = this.centerCord(this.row, this.column);
-		let locationToGrid;
+		let directToGrid;
 		if(this.xCord == curCenterX) {
-			locationToGrid = this.yCord > curCenterY ? "down" : "up";
+			directToGrid = this.yCord > curCenterY ? "down" : "up";
 		} else {
-			locationToGrid = this.xCord > curCenterX ? "right" : "left";
+			directToGrid = this.xCord > curCenterX ? "right" : "left";
 		}
 		//find distance to grid center
-		if(locationToGrid == this.findOpposite()) {
+		if(directToGrid == this.findOpposite()) {
 			this.centerDist = this.distToTile(this.row, this.column);
 		} else {
 			let [, row, column] = this.adjacentTile(1);
@@ -221,7 +221,7 @@ class Player {
 		}
 		if(this.direction == "up" || this.direction == "down") {
 			this.yCord -= (this.direction == "up" ? 1 : -1) * speed;
-		} else if(this.direction == "left" || this.direction == "right") {
+		} else {
 			this.xCord -= (this.direction == "left" ? 1 : -1) * speed;
 		}
 		//check worm holes
@@ -233,11 +233,10 @@ class Player {
 	 * warp through worm holes
 	 */
 	crossBridge() {
-		let gridWidth = game.maze.gridWidth;
-		if(this.xCord < -gridWidth) {
-			this.xCord = game.maze.width + gridWidth;
-		} else if(this.xCord > game.maze.width + gridWidth) {
-			this.xCord = -gridWidth;
+		let leftBound = -game.maze.gridWidth;
+		let rightBound = game.maze.width + game.maze.gridWidth;
+		if(this.xCord < leftBound || this.xCord > rightBound) {
+			this.xCord = this.xCord < leftBound ? rightBound : leftBound;
 		}
 	}
 	/**
@@ -264,7 +263,6 @@ class Player {
 	 * totalStep : total step of current player state
 	 */
 	changeStep(totalStep = this.totalStep) {
-		//loop step from 0 to 2 and repeat
 		this.step = (this.step + 1) % totalStep;
 		//update crop XY location
 		this.cropXY();
@@ -314,11 +312,16 @@ class Player {
 	 * draw player
 	 */
 	draw() {
-		this.ctx.drawImage(this.tile, this.cropX, this.cropY,
-			                 this.cropWidth, this.cropWidth,
-			                 this.xCord - game.maze.gridWidth * 0.8,
-			                 this.yCord - game.maze.gridWidth * 0.8,
-			                 game.maze.gridWidth * 1.6, 
-			                 game.maze.gridWidth * 1.6);
+		this.ctx.drawImage(
+			this.tile, 
+			this.cropX, 
+			this.cropY,
+			this.cropWidth, 
+			this.cropWidth,
+			this.xCord - game.maze.gridWidth * 0.8,
+			this.yCord - game.maze.gridWidth * 0.8,
+			game.maze.gridWidth * 1.6, 
+			game.maze.gridWidth * 1.6
+		);
 	} 
 } 

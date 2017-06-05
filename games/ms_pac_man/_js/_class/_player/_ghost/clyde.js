@@ -11,16 +11,15 @@ class Clyde extends AI {
 		this.name = "clyde";
 		this.state = new StateMachine(this, "inCell");
 		//initialize/reset AI
-		super.reset();
+		this.reset();
 	}
 	/**
 	 * change moving direction inside of cell
 	 */
 	inCellDir() {
-		if(this.owner.cell.size > 1 ||
-			 this.owner.onCooldown()) {
+		if(this.owner.cell.size > 1 || this.owner.onCooldown()) {
 			this.turnAround();
-		} else if(!this.owner.onCooldown()) {
+		} else {
 			this.moveOutCell();
 		}
 	} 

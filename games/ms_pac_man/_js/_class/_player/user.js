@@ -6,7 +6,7 @@ class User extends Player {
 	constructor() {
 		super();
 		this.name = "user";
-		this.life = 1;
+		this.life = 3;
 		this.highestScore = 0;
 		this.totalStep = 3;
 		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
@@ -44,6 +44,20 @@ class User extends Player {
 		return direction;
 	} 
 	/**
+	 * check if user can turn into new directions
+	 * @param String
+	 *
+	 * direction : new direction to be checked
+	 *
+	 * returns boolean
+	 */
+	canTurn(direction) {
+		let isOpposite = direction == this.findOpposite();
+		let withinBoard = this.xCord >= 0 && this.xCord <= game.maze.width;
+		let walkable = !this.hasWall(direction) && !this.hasDoor(direction);
+		return isOpposite || (withinBoard && walkable && this.onCenter());
+	} 
+	/**
 	 * check movement controls
 	 */
 	checkMoveKey() {
@@ -51,12 +65,8 @@ class User extends Player {
 			let keyCode = control.keyPressed[control.keyPressed.length - 1];
 			//change direction
 			let direction = this.keyCodeToDirection(keyCode);
-			if(direction == this.findOpposite()) {
+			if(this.canTurn(direction)) {
 				this.setDirection(direction);
-			} else if(this.xCord >= 0 && this.xCord <= game.maze.width) {
-				if(!this.hasWall(direction) && this.onCenter()) {
-					this.setDirection(direction);
-				}
 			}
 		}
 	} 
@@ -64,18 +74,16 @@ class User extends Player {
 	 * eat food 
 	 */
 	eatFood() {
-		//check current grid
-		if(this.centerDist === null) {
+		if(!this.centerDist) {
 			let curGrid = this.currentTile();
 			if(curGrid instanceof Food) {
+				//special beans eaten
 				if(curGrid.type == "l") {
 					game.manager.beans.delete(curGrid);
 					game.manager.aiManager.enterFlee();
 				}
 				//update and display score
-				this.score += curGrid.score;
-				this.highestScore = Math.max(this.score, this.highestScore);
-				game.manager.scoreBoard.draw();
+				game.manager.scoreBoard.refreshScore(curGrid.score);
 				curGrid.clear();
 				//check game end
 				if(--game.manager.totalFood === 0) {
@@ -98,16 +106,15 @@ class User extends Player {
 	 * eat ghost
 	 */
 	eatGhost() {
-		let gridWidth = game.maze.gridWidth;
-		//check distance to a ghost
 		game.manager.aiManager.ais.forEach(ghost => {
-			let distance = this.distToGhost(ghost.xCord, ghost.yCord);
-			if(ghost.state.activeState() == "flee" && distance < gridWidth * 0.5) {
-				this.score += ghost.score;
-				//change crop function
-				ghost.cropXY = ghost.cropRetreatXY;
-				ghost.stopAnimation(0);
-				ghost.state.swapState("retreat");
+			if(ghost.state.activeState() == "flee") {
+				//check distance to a ghost
+				let distance = this.distToGhost(ghost.xCord, ghost.yCord);
+				if(distance < game.maze.gridWidth * 0.5) {
+					game.manager.scoreBoard.refreshScore(ghost.score);
+					//enter retreat mode
+					ghost.enterRetreat();
+				}
 			} 
 		});
 	} 
@@ -134,7 +141,7 @@ class User extends Player {
 	 * timeStep : game loop time step
 	 */
 	update(timeStep) {
-		this.animateOn = this.collideDist === null;
+		this.animateOn = this.collideDist !== 0;
 		//animate user
 		this.animatePlayer();
 		//check movment

@@ -11,16 +11,15 @@ class Pinky extends AI {
 		this.name = "pinky";
 		this.state = new StateMachine(this, "inCell");
 		//initialize/reset AI
-		super.reset();
+		this.reset();
 	}
 	/**
 	 * change moving direction inside of cell
 	 */
 	inCellDir() {
-		if(this.owner.cell.has(this.owner.blinky) ||
-			 this.owner.onCooldown()) {
+		if(this.owner.cell.has(this.owner.blinky) || this.owner.onCooldown()) {
 			this.turnAround();
-		} else if(!this.owner.onCooldown()) {
+		} else {
 			this.moveOutCell();
 		}
 	} 

@@ -11,7 +11,7 @@ class Inky extends AI {
 		this.name = "inky";
 		this.state = new StateMachine(this, "inCell");
 		//initialize/reset AI
-		super.reset();
+		this.reset();
 	}
 	/**
 	 * change moving direction inside of cell
@@ -21,7 +21,7 @@ class Inky extends AI {
 			 this.owner.cell.has(this.owner.pinky) ||
 			 this.owner.onCooldown()) {
 			this.turnAround();
-		} else if(!this.owner.onCooldown()) {
+		} else {
 			this.moveOutCell();
 		}
 	} 

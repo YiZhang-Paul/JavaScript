@@ -62,10 +62,9 @@ class AI extends Player {
 	randomDirection(availableDir) {
 		if(this.collideDist === 0) {
 			let finalDir = availableDir[Math.floor(Math.random() * availableDir.length)];
-			let oppositeDir = this.findOpposite();
-			if(finalDir != oppositeDir) {
+			if(finalDir != this.findOpposite()) {
 				this.setDirection(finalDir);
-			} else if(finalDir == oppositeDir && Math.random() < 0.4) {
+			} else if(Math.random() < 0.4) {
 				this.setDirection(finalDir);
 			} else {
 				this.randomDirection(availableDir);
@@ -76,8 +75,9 @@ class AI extends Player {
 	 * move out cell
 	 */
 	moveOutCell() {
-		let doorLeftX = game.maze.width * 0.5 - game.maze.gridWidth * 0.1;
-		let doorRightX = game.maze.width * 0.5 + game.maze.gridWidth * 0.1;
+		let doorWidth = game.maze.gridWidth * 0.2;
+		let doorLeftX = (game.maze.width - doorWidth) * 0.5;
+		let doorRightX = (game.maze.width + doorWidth) * 0.5;
 		let cellCenterY = (grid.door.spawnRow + 2) * game.maze.gridWidth;
 		let inXRange = this.xCord > doorLeftX && this.xCord < doorRightX;
 		let inYRange = Math.round(Math.abs(this.yCord - cellCenterY)) < game.maze.gridWidth * 0.5;
@@ -89,12 +89,11 @@ class AI extends Player {
 		} else {
 			this.turnAround();
 		}
-		//check door position
-		if(this.yCord <= grid.door.spawnRow * game.maze.gridWidth) {
-			this.state.swapState("outCell");
+		//check door
+		if(this.hasDoor("down")) {
 			this.owner.cell.delete(this);
-			//record time moving out cell
 			this.owner.resetCooldown();
+			this.state.swapState("outCell");
 		}
 	} 
 	/**
@@ -107,7 +106,7 @@ class AI extends Player {
 				//clear time out first
 				clearTimeout(this.timeoutHandler);
 				this.timeoutHandler = null;
-				//finalize transition to normal state
+				//start transition back to normal
 				this.cropXY = this.cropFleeS2XY;
 				this.stopAnimation(0);
 				this.animatePlayer(4);
@@ -121,12 +120,13 @@ class AI extends Player {
 	finishFleeToNormal() {
 		if(!this.timeoutHandler) {
 			this.timeoutHandler = setTimeout(() => {
-				this.cropXY = this.defaultCropXY;
-				this.stopAnimation(0);
-				this.state.swapState("outCell");
 				//clear time out
 				clearTimeout(this.timeoutHandler);
 				this.timeoutHandler = null;
+				//finalize transition to normal state
+				this.cropXY = this.defaultCropXY;
+				this.stopAnimation(0);
+				this.state.swapState("outCell");
 			}, 3000);
 		}
 	} 
@@ -192,6 +192,14 @@ class AI extends Player {
 			availableDir.splice(availableDir.indexOf(this.findOpposite()), 1);
 			this.randomDirection(availableDir);	
 		}
+	} 
+	/**
+	 * enter retreat mode
+	 */
+	enterRetreat() {
+		this.cropXY = this.cropRetreatXY;
+		this.stopAnimation(0);
+		this.state.swapState("retreat");
 	} 
 	/**
 	 * ghost eat user
@@ -284,7 +292,7 @@ class AI extends Player {
 			this.outCellDir();
 			this.move(timeStep);
 			//eat user
-			//this.eatUser();
+			this.eatUser();
 		}
 		//animate ghost
 		this.animatePlayer();
@@ -312,6 +320,7 @@ class AI extends Player {
 		}
 		//animate ghost
 		this.animatePlayer();
+		//clear time out
 		if(this.timeoutHandler) {
 			clearTimeout(this.timeoutHandler);
 			this.timeoutHandler = null;

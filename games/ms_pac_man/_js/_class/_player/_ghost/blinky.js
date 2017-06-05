@@ -11,7 +11,7 @@ class Blinky extends AI {
 		this.name = "blinky";
 		this.state = new StateMachine(this, "outCell");
 		//initialize/reset AI
-		super.reset();
+		this.reset();
 	}
 	/**
 	 * change moving direction inside of cell

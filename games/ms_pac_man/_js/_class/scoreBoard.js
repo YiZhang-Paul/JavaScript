@@ -16,6 +16,17 @@ class ScoreBoard {
 		this.draw();
 	}
 	/**
+	 * update and display current score
+	 * @param int
+	 *
+	 * score : score received
+	 */
+	refreshScore(score = 0) {
+		this.owner.score += score;
+		this.owner.highestScore = Math.max(this.owner.score, this.owner.highestScore);
+		this.draw();
+	} 
+	/**
 	 * draw score board
 	 */
 	draw() {

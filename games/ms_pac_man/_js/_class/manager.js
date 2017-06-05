@@ -5,6 +5,9 @@
  */
 class Manager {
 	constructor() {
+		this.user = null;
+		this.aiManager = null;
+		this.scoreBoard = null;
 		this.totalFood = 0;
 		this.beans = new Set();
 		this.step = 0;
@@ -12,7 +15,7 @@ class Manager {
 		this.timeoutHandler = null;
 		this.intervalHandler = null;
 		this.beanInterval = null;
-		this.state = new StateMachine(this, "ready");
+		this.state = null;
 		//create a new game
 		this.newGame();
 	}
@@ -71,7 +74,7 @@ class Manager {
 		this.user = new User();
 		this.aiManager = new AIManager(["blinky", "pinky", "inky", "clyde"]);
 		this.scoreBoard = new ScoreBoard(this.user);
-		this.state.reset();
+		this.state = new StateMachine(this, "ready");
 	} 
 	/**
 	 * reset game
@@ -79,12 +82,13 @@ class Manager {
 	resetGame() {
 		//create all food
 		this.makeAllFood();	
+		//reset assets and players
 		this.user.reset();
 		this.aiManager.reset();
 		game.maze.reset();
 		this.state.reset();
 		//re-draw score board
-		this.scoreBoard.draw(); 
+		this.scoreBoard.refreshScore(); 
 	} 
 	/**
 	 * clear time out and interval
@@ -168,7 +172,7 @@ class Manager {
 		} else if(!this.user.life) {
 			this.bufferEnd([[this, "newGame"]]);
 		} else {
-			this.bufferEnd(this.user.respawn);
+			this.bufferEnd([[this, "newGame"]]);
 		}
 	}
 	/**

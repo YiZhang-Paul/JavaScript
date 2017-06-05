@@ -9,16 +9,15 @@
  */
 class Food {
 	constructor(row, column, type) {
+		this.type = type;
 		this.row = row;
 		this.column = column;
 		this.xCord = game.maze.gridWidth * (column + 0.5); 
 		this.yCord = game.maze.gridWidth * (row + 0.5);
-		this.type = type;
 		[this.score, this.radius] = this.getFoodStat(type);
 		this.color = "red";
 		this.foodCtx = game.maze.foodCtx;
 		this.beanCtx = game.maze.beanCtx;
-		this.fruitCtx = game.maze.fruitCtx;
 		//draw food
 		this.draw();
 	}
@@ -49,13 +48,13 @@ class Food {
 	 */
 	clear() {
 		let gridWidth = game.maze.gridWidth;
-		let ctx;
-		if(this.type == "s") ctx = this.foodCtx;
-		else if(this.type == "l") ctx = this.beanCtx;
-		else ctx = this.fruitCtx;
-		ctx.clearRect(this.column * gridWidth, 
-											 this.row * gridWidth,
-											 gridWidth, gridWidth);
+		let ctx = this.type == "s" ? this.foodCtx : this.beanCtx;
+		ctx.clearRect(
+			this.column * gridWidth, 
+			this.row * gridWidth,
+			gridWidth, 
+			gridWidth
+		);
 		grid.maze[0][this.row][this.column] = null;
 	} 
 	/**
@@ -63,7 +62,7 @@ class Food {
 	 */
 	draw() {
 		if(this.type == "s") this.drawFood();
-		else if(this.type == "l") this.drawBean();
+		else this.drawBean();
 	}
 	/**
 	 * draw food
@@ -82,11 +81,5 @@ class Food {
 		this.beanCtx.arc(this.xCord, this.yCord, this.radius, 0, 2 * Math.PI);
 		this.beanCtx.fillStyle = this.color;
 		this.beanCtx.fill();
-	} 
-	/**
-	 * draw fruit
-	 */
-	drawFruit() {
-
 	} 
 } 
