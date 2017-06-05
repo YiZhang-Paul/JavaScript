@@ -7,6 +7,7 @@ class User extends Player {
 		super();
 		this.name = "user";
 		this.life = 1;
+		this.highestScore = 0;
 		this.totalStep = 3;
 		this.speed = Math.round(game.maze.height* 0.00025 * 100) / 100;
 		//initialize/reset user
@@ -71,7 +72,10 @@ class User extends Player {
 					game.manager.beans.delete(curGrid);
 					game.manager.aiManager.enterFlee();
 				}
+				//update and display score
 				this.score += curGrid.score;
+				this.highestScore = Math.max(this.score, this.highestScore);
+				game.manager.scoreBoard.draw();
 				curGrid.clear();
 				//check game end
 				if(--game.manager.totalFood === 0) {

@@ -21,7 +21,7 @@ class AI extends Player {
 	 */
 	reset() {
 		this.moving = false;
-		this.score = 0;
+		this.score = 200;
 		this.step = 0;
 		this.cropXY = this.defaultCropXY;
 		this.state.swapState(this.name == "blinky" ? "outCell" : "inCell");

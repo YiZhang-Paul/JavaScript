@@ -58,7 +58,7 @@ class Manager {
 				} else {
 					game.maze.beanCtx.clearRect(0, 0, game.maze.width, game.maze.height);
 				}
-			}, 220);
+			}, 150);
 		}
 	} 
 	/**
@@ -70,6 +70,7 @@ class Manager {
 		//all players
 		this.user = new User();
 		this.aiManager = new AIManager(["blinky", "pinky", "inky", "clyde"]);
+		this.scoreBoard = new ScoreBoard(this.user);
 		this.state.reset();
 	} 
 	/**
@@ -82,6 +83,8 @@ class Manager {
 		this.aiManager.reset();
 		game.maze.reset();
 		this.state.reset();
+		//re-draw score board
+		this.scoreBoard.draw(); 
 	} 
 	/**
 	 * clear time out and interval

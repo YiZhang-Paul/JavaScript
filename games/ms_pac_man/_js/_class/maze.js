@@ -6,19 +6,19 @@ class Maze {
 	constructor() {
 		this.gridWidth = null;
 		if(game.monitor.width > game.monitor.height) {
-			this.gridWidth = Math.floor(game.monitor.height * 0.9 / grid.row);
+			this.gridWidth = Math.floor(game.monitor.height * 0.8 / grid.row);
 		} else {
-			this.gridWidth = Math.floor(game.monitor.width * 0.9 / grid.column);
+			this.gridWidth = Math.floor(game.monitor.width * 0.8 / grid.column);
 		}
 		this.width = this.gridWidth * grid.column;
 		this.height = this.gridWidth * grid.row;
 		//create game canvases
-		this.backCtx = this.makeCanvase(this.width, this.height, 1);
-		this.foodCtx = this.makeCanvase(this.width, this.height, 2);
-		this.beanCtx = this.makeCanvase(this.width, this.height, 3);
-		this.fruitCtx = this.makeCanvase(this.width, this.height, 4);
-		this.playerCtx = this.makeCanvase(this.width, this.height, 5);
-		this.uiCtx = this.makeCanvase(this.width, this.height, 6);
+		this.backCtx = this.makeCanvas(this.width, this.height, 1);
+		this.foodCtx = this.makeCanvas(this.width, this.height, 2);
+		this.beanCtx = this.makeCanvas(this.width, this.height, 3);
+		this.fruitCtx = this.makeCanvas(this.width, this.height, 4);
+		this.playerCtx = this.makeCanvas(this.width, this.height, 5);
+		this.uiCtx = this.makeCanvas(this.width, game.monitor.height, 6);
 		this.tanTile = document.getElementById("maze");
 		this.transparentTile = document.getElementById("maze_transparent");
 		this.step = 0;
@@ -34,7 +34,7 @@ class Maze {
 	 * zIndex : canvas z-index
 	 * returns obj {}
 	 */
-	makeCanvase(width, height, zIndex) {
+	makeCanvas(width, height, zIndex) {
 		let canvas = document.createElement("canvas");
 		canvas.style.zIndex = zIndex;
 		canvas.width = width;
