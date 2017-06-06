@@ -11,9 +11,11 @@ class Manager {
 		this.totalFood = 0;
 		this.beans = new Set();
 		this.fruits = new Set();
+		this.emptyCells = [];
 		this.step = 0;
 		this.ctx = game.maze.playerCtx;
 		this.timeoutHandler = null;
+		this.fruitTimeout = null;
 		this.intervalHandler = null;
 		this.beanInterval = null;
 		this.state = null;
@@ -65,6 +67,25 @@ class Manager {
 		this.fruits.add(fruit);
 	} 
 	/**
+	 * put random fruit on random places
+	 * on random interval
+	 */
+	randomFruit() {
+		if(this.emptyCells.length > 40 && !this.fruitTimeout) {
+			let timeout = Math.floor(Math.random() * 21 + 10) * 1000;
+			let cellIndex = Math.floor(Math.random() * this.emptyCells.length);
+			let cell = this.emptyCells[cellIndex];
+			let type = Math.floor(Math.random() * 7 + 1);
+			this.fruitTimeout = setTimeout(() => {
+				this.putFruit(cell.row, cell.col, type);
+				this.emptyCells.splice(cellIndex, 1);
+				//clear time out
+				clearTimeout(this.fruitTimeout);
+				this.fruitTimeout = null;
+			}, timeout);
+		}
+	}
+	/**
 	 * blink all beans
 	 */
 	blinkBean() {
@@ -87,7 +108,6 @@ class Manager {
 		this.aiManager = new AIManager(["blinky", "pinky", "inky", "clyde"]);
 		this.scoreBoard = new ScoreBoard(this.user);
 		this.state = new StateMachine(this, "ready");
-		this.putFruit(14, 7, 3);
 	} 
 	/**
 	 * reset game
@@ -110,6 +130,10 @@ class Manager {
 		if(this.timeoutHandler) {
 			clearTimeout(this.timeoutHandler);
 			this.timeoutHandler = null;
+		}
+		if(this.fruitTimeout) {
+			clearTimeout(this.fruitTimeout);
+			this.fruitTimeout = null;
 		}
 		if(this.intervalHandler) {
 			clearInterval(this.intervalHandler);
@@ -174,6 +198,8 @@ class Manager {
 	ongoing(timeStep) {
 		this.aiManager.update(timeStep);
 		this.user.update(timeStep);
+		//put random fruit
+		this.randomFruit();
 	}
 	//buffering state
 	buffering() {

@@ -85,6 +85,8 @@ class User extends Player {
 				} else if(curGrid instanceof Fruit) {
 					game.manager.fruits.delete(curGrid);
 				}
+				//record empty cell
+				game.manager.emptyCells.push({row : curGrid.row, col : curGrid.column});
 				//update and display score
 				game.manager.scoreBoard.refreshScore(curGrid.score);
 				curGrid.clear();
