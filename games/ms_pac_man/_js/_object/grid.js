@@ -16,8 +16,8 @@ let grid = {
 		direction : "right"
 	},
 	blinky   : {
-		spawnRow  : 24, //spawning row
-		spawnCol  : 12, //spawning column
+		spawnRow  : 12, //spawning row
+		spawnCol  : 14, //spawning column
 		direction : "left"
 	},
 	pinky    : {

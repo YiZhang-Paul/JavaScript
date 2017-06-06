@@ -25,7 +25,7 @@ class AI extends Player {
 		this.score = 200;
 		this.step = 0;
 		this.cropXY = this.defaultCropXY;
-		this.state.swapState(this.name == "blinky" ? "retreat" : "inCell");
+		this.state.swapState(this.name == "blinky" ? "outCell" : "inCell");
 		if(this.intervalHandler) {
 			clearInterval(this.intervalHandler);
 			this.intervalHandler = null;
@@ -45,6 +45,19 @@ class AI extends Player {
 		let allDir = this.allDirect.slice();
 		return allDir.filter(direction => 
 			!this.hasWall(direction) && !this.hasDoor(direction));
+	} 
+	/**
+	 * check if AI can turn into new directions
+	 * @param String
+	 *
+	 * direction : new direction to be checked
+	 *
+	 * returns boolean
+	 */
+	canTurn(direction) {
+		let isOpposite = direction == this.findOpposite();
+		let withinBoard = this.xCord >= 0 && this.xCord <= game.maze.width;
+		return isOpposite || (withinBoard && !this.hasWall(direction) && this.onCenter());
 	} 
 	/**
 	 * move back and forth
@@ -175,23 +188,29 @@ class AI extends Player {
 	 * retreat to cell
 	 */
 	retreatDir() {
-		let availableDir = this.availableDir();
-		if((this.collideDist === 0 || this.centerDist === null) && availableDir.length >= 3) {
-			let cellCenterX = game.maze.width * 0.5;
-			let cellCenterY =	(grid.door.spawnRow + 2) * game.maze.gridWidth;
-			//find route back to cell
-			let retreatDir = [];
-			if(this.xCord != cellCenterX) {
-				retreatDir.push(this.xCord > cellCenterX ? "left" : "right");
-			}	
-			if(this.yCord != cellCenterY) {
-				retreatDir.push(this.yCord > cellCenterY ? "up" : "down");
+		//get retreat path
+		if(!this.retreatPath) {
+			this.getRetreatPath();
+		}
+		//move along retreat path
+		if(this.retreatPath.length) {
+			let nextTile = this.retreatPath[0];
+			//determine retreat direction
+			let [centerX, centerY] = this.centerCord(nextTile.row, nextTile.column);
+			let direction = this.direction;
+			if(this.row == nextTile.row) {
+				direction = this.xCord < centerX ? "right" : "left";
+			} else if(this.column == nextTile.column) {
+				direction = this.yCord < centerY ? "down" : "up";
 			}
-			retreatDir = retreatDir.filter(direction => availableDir.indexOf(direction) != -1);
-			this.setDirection(retreatDir[Math.floor(Math.random() * retreatDir.length)]);
-		} else if(this.collideDist === 0) {
-			availableDir.splice(availableDir.indexOf(this.findOpposite()), 1);
-			this.randomDirection(availableDir);	
+			if(this.canTurn(direction)) {
+				this.setDirection(direction);	
+			}		
+			if(this.onCenter()) {
+				this.retreatPath.shift();	
+			}
+		} else {
+			this.retreatPath = null;
 		}
 	} 
 	/**
@@ -267,7 +286,7 @@ class AI extends Player {
 	getRetreatPath(end = this.xCord < game.maze.width * 0.5 ? new Node(15, 14) : new Node(15, 15)) {
 		//starting node
 		let start = new Node(this.row, this.column);
-		let path = [start], visited = [start];
+		let path = [], visited = [start];
 		let queue = this.getNeighbours(start, visited);
 		while(queue.length) {
 			//find best tile and add to current path
@@ -280,6 +299,7 @@ class AI extends Player {
 				queue = this.getNeighbours(path[path.length - 1], visited);
 			}
 		}
+		this.retreatPath = path;
 	} 
 	/**
 	 * enter retreat mode

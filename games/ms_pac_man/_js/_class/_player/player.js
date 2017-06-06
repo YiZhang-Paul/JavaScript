@@ -59,8 +59,8 @@ class Player {
 		return grid.getGrid(0, this.row, this.column);		
 	} 
 	/**
-	 * retrieve center coordinate of 
-	 * a given tile
+	 * retrieve center coordinate 
+	 * of a given tile
 	 *
 	 * row    : row of given tile
 	 * column : column of given tile
