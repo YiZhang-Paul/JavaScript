@@ -82,6 +82,8 @@ class User extends Player {
 				if(curGrid instanceof PowerBean) {
 					game.manager.beans.delete(curGrid);
 					game.manager.aiManager.enterFlee();
+				} else if(curGrid instanceof Fruit) {
+					game.manager.fruits.delete(curGrid);
 				}
 				//update and display score
 				game.manager.scoreBoard.refreshScore(curGrid.score);

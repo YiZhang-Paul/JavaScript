@@ -10,6 +10,7 @@ class Manager {
 		this.scoreBoard = null;
 		this.totalFood = 0;
 		this.beans = new Set();
+		this.fruits = new Set();
 		this.step = 0;
 		this.ctx = game.maze.playerCtx;
 		this.timeoutHandler = null;
@@ -51,6 +52,19 @@ class Manager {
 		}
 	} 
 	/**
+	 * place fruit
+	 * @param int, int, int
+	 *
+	 * row    : row of food cell
+	 * column : column of food cell
+	 * type   : type of fruit
+	 */
+	putFruit(row, column, type) {
+		let fruit = new Fruit(row, column, type);
+		grid.maze[0][row][column] = fruit;
+		this.fruits.add(fruit);
+	} 
+	/**
 	 * blink all beans
 	 */
 	blinkBean() {
@@ -73,6 +87,7 @@ class Manager {
 		this.aiManager = new AIManager(["blinky", "pinky", "inky", "clyde"]);
 		this.scoreBoard = new ScoreBoard(this.user);
 		this.state = new StateMachine(this, "ready");
+		this.putFruit(14, 7, 3);
 	} 
 	/**
 	 * reset game
@@ -191,5 +206,9 @@ class Manager {
 		//draw players 
 		this.user.draw();
 		this.aiManager.draw();
+		this.fruits.forEach(fruit => {
+			fruit.clear();
+			fruit.draw();
+		});
 	}
 } 

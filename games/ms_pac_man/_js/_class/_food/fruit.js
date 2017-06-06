@@ -17,8 +17,21 @@ class Fruit extends Food {
 		this.cropX = null;
 		this.cropY = null;
 		this.cropWidth = 30;
+		this.ctx = game.maze.fruitCtx;
 		this.cropXY();
 	}
+	/**
+	 * clear fruit
+	 */
+	clear() {
+		let gridWidth = game.maze.gridWidth;
+		this.ctx.clearRect(
+			this.xCord - gridWidth, 
+			this.yCord - gridWidth,
+			2 * gridWidth, 
+			2 * gridWidth
+		);
+	} 
 	/**
 	 * determine crop image location
 	 */
