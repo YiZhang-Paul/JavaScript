@@ -52,11 +52,14 @@ class Player {
 	} 
 	/**
 	 * check current tile
+	 * @param int
+	 *
+	 * layer : layer to be examined 
 	 * 
 	 * returns obj {}
 	 */
-	currentTile() {
-		return grid.getGrid(0, this.row, this.column);		
+	currentTile(layer = 0) {
+		return grid.getGrid(layer, this.row, this.column);		
 	} 
 	/**
 	 * retrieve center coordinate 

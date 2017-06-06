@@ -13,6 +13,7 @@ class AI extends Player {
 		this.totalStep = 2;
 		this.defaultSpeed = Math.round(game.maze.height* 0.0002 * 100) / 100;
 		this.speed = this.defaultSpeed;
+		this.endPoint = null;
 		this.retreatPath = null;
 		this.defaultCropXY = this.cropXY;
 		this.state = null;
@@ -83,6 +84,16 @@ class AI extends Player {
 			} else {
 				this.randomDirection(availableDir);
 			}
+		}
+	} 
+	/**
+	 * get in cell
+	 */
+	getInCell() {
+		if(this.currentTile(1) && this.currentTile(1).c) {
+			this.cropXY = this.defaultCropXY;
+			this.stopAnimation(0);
+			this.state.swapState("inCell");
 		}
 	} 
 	/**
@@ -191,23 +202,26 @@ class AI extends Player {
 		//get retreat path
 		if(!this.retreatPath) {
 			this.getRetreatPath();
-		}
-		//move along retreat path
-		if(this.retreatPath.length) {
+			//move along retreat path
+		} else if(this.retreatPath.length) {
 			let nextTile = this.retreatPath[0];
 			//determine retreat direction
 			let [centerX, centerY] = this.centerCord(nextTile.row, nextTile.column);
-			let direction = this.direction;
+			let direction;
 			if(this.row == nextTile.row) {
 				direction = this.xCord < centerX ? "right" : "left";
 			} else if(this.column == nextTile.column) {
 				direction = this.yCord < centerY ? "down" : "up";
 			}
+			direction = direction ? direction : this.direction;
 			if(this.canTurn(direction)) {
 				this.setDirection(direction);	
 			}		
 			if(this.onCenter()) {
 				this.retreatPath.shift();	
+				if(this.retreatPath.length && !this.hasEndPoint()) {
+					this.getRetreatPath();
+				}
 			}
 		} else {
 			this.retreatPath = null;
@@ -230,31 +244,32 @@ class AI extends Player {
 	 * find metric
 	 * @param obj {], obj {}
 	 *
-	 * start : starting tile 
-	 * end   : ending tile
+	 * start  : starting tile 
+	 * end    : ending tile
 	 *
 	 * returns int
 	 */
-	getMetric(start, end) {
-		let gScore = this.getTravelDist(start, new Node(this.row, this.column));
+	getMetric(start, end, origin) {
+		let gScore = this.getTravelDist(start, new Node(origin.row, origin.column));
 		let hScore = this.getTravelDist(start, end);
 		let fScore = gScore + hScore;
 		let distToEnd = Math.hypot((start.row - end.row), (start.column - end.column));
-		let distToSelf = Math.hypot((start.row - this.row), (start.column - this.column));
+		let distToSelf = Math.hypot((start.row - origin.row), (start.column - origin.column));
 		return fScore + distToEnd - distToSelf;
 	}
 	/**
 	 * find tile with lowest metric
-	 * @param array [], obj {}
+	 * @param array [], obj {}, obj {}
 	 *
 	 * tileList : list of candidate tiles
 	 * end      : ending tile
+	 * origin : original starting point
 	 *
 	 * returns obj {}
 	 */
-	getBestTile(tileList, end) {
+	getBestTile(tileList, end, origin = this) {
 		tileList.sort((tile1, tile2) => {
-			return this.getMetric(tile1, end) - this.getMetric(tile2, end);
+			return this.getMetric(tile1, end, origin) - this.getMetric(tile2, end, origin);
 		});
 		return tileList[0];
 	} 
@@ -281,16 +296,19 @@ class AI extends Player {
 	 * find shortest path to retreat
 	 * @param obj {}
 	 *
-	 * end : destination tile
+	 * end   : destination tile
+	 *
+	 * returns array []
 	 */
-	getRetreatPath(end = this.xCord < game.maze.width * 0.5 ? new Node(15, 14) : new Node(15, 15)) {
+	getRetreatPath(end = this.xCord < game.maze.width * 0.5 ? new Node(14, 13) : new Node(14, 14)) {
+		this.endPoint = end;
 		//starting node
 		let start = new Node(this.row, this.column);
 		let path = [], visited = [start];
 		let queue = this.getNeighbours(start, visited);
 		while(queue.length) {
 			//find best tile and add to current path
-			let bestTile = this.getBestTile(queue, end);
+			let bestTile = this.getBestTile(queue, end, start);
 			path.push(bestTile);
 			visited = [...visited, ...queue];
 			if(bestTile.row == end.row && bestTile.column == end.column) {
@@ -300,6 +318,18 @@ class AI extends Player {
 			}
 		}
 		this.retreatPath = path;
+	} 
+	/**
+	 * check if a path contains end point
+	 * @param array []
+	 *
+	 * path : path to be examined
+	 *
+	 * returns boolean
+	 */
+	hasEndPoint(path = this.retreatPath) {
+		let lastNode = path[path.length - 1];
+		return lastNode.row == this.endPoint.row && lastNode.column == this.endPoint.column;
 	} 
 	/**
 	 * enter retreat mode
@@ -425,6 +455,7 @@ class AI extends Player {
 		if(this.moving) {
 			this.retreatDir();
 			this.move(timeStep);
+			this.getInCell();
 		}
 		//animate ghost
 		this.animatePlayer();
