@@ -11,10 +11,23 @@ class ScoreBoard {
 		this.width = game.maze.width;
 		this.height = game.monitor.height;
 		this.fontSize = this.height * 0.05;
+		this.step = 0;
+		this.intervalHandler = null;
 		this.ctx = game.maze.uiCtx;
 		//draw score board
 		this.draw();
 	}
+	/**
+	 * reset score board
+	 */
+	reset() {
+		this.step = 0;
+		if(this.intervalHandler) {
+			clearInterval(this.intervalHandler);
+			this.intervalHandler = null;
+		}
+		this.draw();
+	} 
 	/**
 	 * update and display current score
 	 * @param int
@@ -25,6 +38,23 @@ class ScoreBoard {
 		this.owner.score += score;
 		this.owner.highestScore = Math.max(this.owner.score, this.owner.highestScore);
 		this.draw();
+	} 
+	/**
+	 * change step
+	 */
+	changeStep() {
+		this.step = this.step ? 0 : 1;
+	} 
+	/**
+	 * blink player indicator
+	 */
+	blinkCurPlayer() {
+		if(!this.intervalHandler) {
+			this.intervalHandler = setInterval(() => {
+				this.changeStep();
+				this.draw();
+			}, 150);
+		}
 	} 
 	/**
 	 * draw score board
@@ -39,6 +69,9 @@ class ScoreBoard {
 									["HIGH SCORE", this.owner.highestScore]];
 		for(let i = 0; i < scores.length; i++) {
 			for(let j = 0; j < scores[i].length; j++) {
+				if(i === 0 && j === 0 && !this.step) {
+					continue;
+				}
 				this.ctx.fillText(
 					scores[i][j], 
 					this.width * (0.2 + i * 0.4), 

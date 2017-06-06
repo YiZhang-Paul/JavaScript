@@ -86,9 +86,9 @@ class Manager {
 		this.user.reset();
 		this.aiManager.reset();
 		game.maze.reset();
+		//reset score board
+		this.scoreBoard.reset(); 
 		this.state.reset();
-		//re-draw score board
-		this.scoreBoard.refreshScore(); 
 	} 
 	/**
 	 * clear time out and interval
@@ -149,6 +149,7 @@ class Manager {
 	//ready state
 	ready() {
 		this.blinkBean();
+		this.scoreBoard.blinkCurPlayer();
 		//detect game start
 		if(control.keyPressed.length) {
 			this.state.swapState("ongoing");
