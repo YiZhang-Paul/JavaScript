@@ -16,7 +16,7 @@ class Player {
 		this.animateOn = false;
 		this.collideDist = null; //distance before collision
 		this.centerDist = null;  //distance to current grid center
-		//player apperance
+		//player appearance
 		this.tile = document.getElementById("player");
 		this.cropX = null;
 		this.cropY = null;
