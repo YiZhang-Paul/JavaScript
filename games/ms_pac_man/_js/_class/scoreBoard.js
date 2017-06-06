@@ -9,14 +9,13 @@ class ScoreBoard {
 	constructor(owner) {
 		this.owner = owner;
 		this.width = game.maze.width;
-		this.height = game.monitor.height;
-		this.fontSize = this.height * 0.05;
+		this.height = (game.monitor.height - game.maze.height) * 0.5;
+		this.fontSize = this.height * 0.45;
 		this.step = 0;
 		this.intervalHandler = null;
 		this.ctx = game.maze.uiCtx;
+		//draw score board
 		this.draw();
-		//initialize/reset score board
-		this.reset();
 	}
 	/**
 	 * reset score board
@@ -61,7 +60,7 @@ class ScoreBoard {
 	 * draw score board
 	 */
 	draw() {
-		this.ctx.clearRect(0, 0, game.maze.width, game.monitor.height);
+		this.ctx.clearRect(0, 0, this.width, this.height);
 		this.ctx.font = this.fontSize + "px 'Lucida Console'";
 		this.ctx.textAlign = "center";
 		this.ctx.fillStyle = "white";
@@ -77,7 +76,7 @@ class ScoreBoard {
 				this.ctx.fillText(
 					scores[i][j], 
 					this.width * (0.2 + i * 0.4), 
-					this.height * (0.05 + j * 0.05)
+					this.height * (0.5 + j * 0.43)
 				);
 			}
 		}

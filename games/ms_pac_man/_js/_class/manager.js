@@ -12,7 +12,6 @@ class Manager {
 		this.beans = new Set();
 		this.fruits = new Set();
 		this.emptyCells = [];
-		this.step = 0;
 		this.ctx = game.maze.playerCtx;
 		this.timeoutHandler = null;
 		this.fruitTimeout = null;
@@ -22,6 +21,14 @@ class Manager {
 		//create a new game
 		this.newGame();
 	}
+	/**
+	 * reset manager
+	 */
+	reset() {
+		this.beans = new Set();
+		this.fruits = new Set();
+		this.emptyCells = [];
+	} 
 	/**
 	 * generate food
 	 * @param int, int, char
@@ -45,6 +52,7 @@ class Manager {
 	 * generate all food on game start
 	 */
 	makeAllFood() {
+		game.maze.fruitCtx.clearRect(0, 0, game.maze.width, game.maze.height);
 		this.totalFood = 0;
 		for(let i = 0; i < grid.row; i++) {
 			for(let j = 0; j < grid.column; j++) {
@@ -76,9 +84,12 @@ class Manager {
 			let cellIndex = Math.floor(Math.random() * this.emptyCells.length);
 			let cell = this.emptyCells[cellIndex];
 			let type = Math.floor(Math.random() * 7 + 1);
+			//record next fruit
+			this.hud.fruitQueue.push(type);
 			this.fruitTimeout = setTimeout(() => {
 				this.putFruit(cell.row, cell.col, type);
 				this.emptyCells.splice(cellIndex, 1);
+				this.hud.fruitQueue.shift();
 				//clear time out
 				clearTimeout(this.fruitTimeout);
 				this.fruitTimeout = null;
@@ -110,6 +121,7 @@ class Manager {
 			this.scoreBoard.reset();	
 		} 
 		this.scoreBoard = new ScoreBoard(this.user);
+		this.hud = new HUD(this.user);
 		this.state = new StateMachine(this, "ready");
 	} 
 	/**
@@ -122,9 +134,11 @@ class Manager {
 		this.user.reset();
 		this.aiManager.reset();
 		game.maze.reset();
+		this.hud.reset();
 		//reset score board
 		this.scoreBoard.reset(); 
 		this.state.reset();
+		this.reset();
 	} 
 	/**
 	 * clear time out and interval
@@ -215,7 +229,7 @@ class Manager {
 		} else if(!this.user.life) {
 			this.bufferEnd([[this, "newGame"]]);
 		} else {
-			this.bufferEnd([[this, "newGame"]]);
+			this.bufferEnd([[this, "resetGame"]]);
 		}
 	}
 	/**
@@ -239,5 +253,6 @@ class Manager {
 			fruit.clear();
 			fruit.draw();
 		});
+		this.hud.draw();		
 	}
 } 
