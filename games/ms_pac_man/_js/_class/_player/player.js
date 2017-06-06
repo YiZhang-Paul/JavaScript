@@ -96,15 +96,16 @@ class Player {
 	/**
 	 * check adjacent tile on 
 	 * current facing direction
-	 * @param int, String
+	 * @param int, String, int, int
 	 *
 	 * layer     : layer of maze 
 	 * direction : direction of adjacent tile (optional)
+	 * row       : row of current tile
+	 * column    : column of current tile
 	 * 
 	 * returns array []
 	 */
-	adjacentTile(layer, direction = this.direction) {
-		let row = this.row, column = this.column;
+	adjacentTile(layer, direction = this.direction, row = this.row, column = this.column) {
 		if(direction == "up" && this.row > 0) {
 			row--;
 		}	else if(direction == "down" && this.row + 1 < grid.row) {
