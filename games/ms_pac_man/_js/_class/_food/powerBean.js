@@ -15,4 +15,13 @@ class PowerBean extends Food {
 		//draw power bean
 		this.draw();
 	}
+	/**
+	 * delete power bean
+	 */
+	delete() {
+		game.manager.totalFood--;
+		game.manager.beans.delete(this);
+		game.manager.aiManager.enterFlee();
+		super.delete();
+	} 
 } 

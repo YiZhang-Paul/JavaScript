@@ -20,7 +20,7 @@ class Food {
 		this.ctx = game.maze.foodCtx;
 	}
 	/**
-	 * clear food
+	 * clear food graphic
 	 */
 	clear() {
 		let gridWidth = game.maze.gridWidth;
@@ -30,6 +30,17 @@ class Food {
 			gridWidth, 
 			gridWidth
 		);
+	} 
+	/**
+	 * delete food from grid
+	 */
+	delete() {
+		this.clear();
+		//record empty cell 
+		game.manager.emptyCells.push({row : this.row, col : this.column});
+		//update user score
+		game.manager.scoreBoard.refreshScore(this.score);
+		grid.maze[0][this.row][this.column] = null;
 	} 
 	/**
 	 * change step

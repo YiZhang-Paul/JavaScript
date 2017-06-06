@@ -15,4 +15,11 @@ class Bean extends Food {
 		//draw bean
 		this.draw();
 	}
+	/**
+	 * delete bean
+	 */
+	delete() {
+		game.manager.totalFood--;
+		super.delete();
+	} 
 } 

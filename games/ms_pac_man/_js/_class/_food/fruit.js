@@ -21,7 +21,7 @@ class Fruit extends Food {
 		this.cropXY();
 	}
 	/**
-	 * clear fruit
+	 * clear fruit graphic
 	 */
 	clear() {
 		let gridWidth = game.maze.gridWidth;
@@ -31,6 +31,13 @@ class Fruit extends Food {
 			2 * gridWidth, 
 			2 * gridWidth
 		);
+	} 
+	/**
+	 * delete power bean
+	 */
+	delete() {
+		game.manager.fruits.delete(this);
+		super.delete();
 	} 
 	/**
 	 * determine crop image location

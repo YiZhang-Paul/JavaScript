@@ -78,21 +78,9 @@ class User extends Player {
 		if(!this.centerDist) {
 			let curGrid = this.currentTile();
 			if(curGrid instanceof Food) {
-				//special beans eaten
-				if(curGrid instanceof PowerBean) {
-					game.manager.beans.delete(curGrid);
-					game.manager.aiManager.enterFlee();
-				} else if(curGrid instanceof Fruit) {
-					game.manager.fruits.delete(curGrid);
-				}
-				//record empty cell
-				game.manager.emptyCells.push({row : curGrid.row, col : curGrid.column});
-				//update and display score
-				game.manager.scoreBoard.refreshScore(curGrid.score);
-				curGrid.clear();
-				grid.maze[0][curGrid.row][curGrid.column] = null;
+				curGrid.delete();
 				//check game end
-				if(--game.manager.totalFood === 0) {
+				if(!game.manager.totalFood) {
 					game.manager.state.swapState("buffering");
 				}
 			}
