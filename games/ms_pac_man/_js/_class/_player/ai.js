@@ -93,6 +93,8 @@ class AI extends Player {
 		if(this.currentTile(1) && this.currentTile(1).c) {
 			this.cropXY = this.defaultCropXY;
 			this.stopAnimation(0);
+			let direction = this.xCord < game.maze.width * 0.5 ? "left" : "right";
+			this.setDirection(direction);
 			this.state.swapState("inCell");
 		}
 	} 
@@ -213,15 +215,11 @@ class AI extends Player {
 			} else if(this.column == nextTile.column) {
 				direction = this.yCord < centerY ? "down" : "up";
 			}
-			direction = direction ? direction : this.direction;
-			if(this.canTurn(direction)) {
+			if(direction && this.canTurn(direction)) {
 				this.setDirection(direction);	
 			}		
 			if(this.onCenter()) {
 				this.retreatPath.shift();	
-				if(this.retreatPath.length && !this.hasEndPoint()) {
-					this.getRetreatPath();
-				}
 			}
 		} else {
 			this.retreatPath = null;
@@ -317,7 +315,11 @@ class AI extends Player {
 				queue = this.getNeighbours(path[path.length - 1], visited);
 			}
 		}
-		this.retreatPath = path;
+		if(this.hasEndPoint(path)) {
+			this.retreatPath = path;
+		} else {
+			this.randomDirection(this.availableDir());
+		}
 	} 
 	/**
 	 * check if a path contains end point
