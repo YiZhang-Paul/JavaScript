@@ -12,7 +12,7 @@ class PowerBean extends Food {
 		this.score = 50;
 		this.color = "red";
 		this.radius = game.maze.gridWidth * 0.45;
-		//draw bean
+		//draw power bean
 		this.draw();
 	}
 } 
