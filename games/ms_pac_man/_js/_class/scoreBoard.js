@@ -15,6 +15,8 @@ class ScoreBoard {
 		this.intervalHandler = null;
 		this.ctx = game.maze.uiCtx;
 		//draw score board
+		this.scores = [[`${this.owner.playerNum}UP`, this.owner.score], 
+									 ["HIGH SCORE", this.owner.highestScore]];
 		this.draw();
 	}
 	/**
@@ -65,15 +67,13 @@ class ScoreBoard {
 		this.ctx.textAlign = "center";
 		this.ctx.fillStyle = "white";
 		//display scores
-		let scores = [["1UP", this.owner.score], 
-									["HIGH SCORE", this.owner.highestScore]];
-		for(let i = 0; i < scores.length; i++) {
-			for(let j = 0; j < scores[i].length; j++) {
-				if(i === 0 && j === 0 && !this.step) {
+		for(let i = 0; i < this.scores.length; i++) {
+			for(let j = 0; j < this.scores[i].length; j++) {
+				if(!i && !j && !this.step) {
 					continue;
 				}
 				this.ctx.fillText(
-					scores[i][j], 
+					this.scores[i][j], 
 					this.width * (0.2 + i * 0.4), 
 					this.height * (0.05 + j * 0.05)
 				);

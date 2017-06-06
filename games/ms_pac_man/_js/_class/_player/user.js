@@ -6,6 +6,7 @@ class User extends Player {
 	constructor() {
 		super();
 		this.name = "user";
+		this.playerNum = 1;
 		this.life = 3;
 		this.highestScore = 0;
 		this.totalStep = 3;
