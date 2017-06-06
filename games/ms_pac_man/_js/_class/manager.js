@@ -28,12 +28,15 @@ class Manager {
 	 * type   : type of food
 	 */
 	makeFood(row, column, type) {
-		let food = new Food(row, column, type);
+		let food;
+		if(type == "s") {
+			food = new Bean(row, column);
+		} else if(type == "l") {
+			food = new PowerBean(row, column);
+			this.beans.add(food);
+		}
 		grid.maze[0][row][column] = food;
 		this.totalFood++;
-		if(type == "l") {
-			this.beans.add(food);	
-		}
 	} 
 	/**
 	 * generate all food on game start
@@ -53,14 +56,9 @@ class Manager {
 	blinkBean() {
 		if(!this.beanInterval) {
 			this.beanInterval = setInterval(() => {
-				this.step = this.step ? 0 : 1;
-				if(this.step) {
-					this.beans.forEach(bean => {
-						bean.draw();
-					});
-				} else {
-					game.maze.beanCtx.clearRect(0, 0, game.maze.width, game.maze.height);
-				}
+				this.beans.forEach(bean => {
+					bean.blink();
+				});
 			}, 150);
 		}
 	} 

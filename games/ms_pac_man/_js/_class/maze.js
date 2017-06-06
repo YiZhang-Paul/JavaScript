@@ -16,10 +16,8 @@ class Maze {
 		//create game canvases
 		this.backCtx = this.makeCanvas(this.width, this.height, 1);
 		this.foodCtx = this.makeCanvas(this.width, this.height, 2);
-		this.beanCtx = this.makeCanvas(this.width, this.height, 3);
-		this.fruitCtx = this.makeCanvas(this.width, this.height, 4);
-		this.playerCtx = this.makeCanvas(this.width, this.height, 5);
-		this.uiCtx = this.makeCanvas(this.width, game.monitor.height, 6);
+		this.playerCtx = this.makeCanvas(this.width, this.height, 3);
+		this.uiCtx = this.makeCanvas(this.width, game.monitor.height, 4);
 		//maze tile sets
 		this.tanTile = document.getElementById("maze");
 		this.transparentTile = document.getElementById("maze_transparent");

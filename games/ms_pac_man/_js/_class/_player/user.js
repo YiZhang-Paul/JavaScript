@@ -79,13 +79,14 @@ class User extends Player {
 			let curGrid = this.currentTile();
 			if(curGrid instanceof Food) {
 				//special beans eaten
-				if(curGrid.type == "l") {
+				if(curGrid instanceof PowerBean) {
 					game.manager.beans.delete(curGrid);
 					game.manager.aiManager.enterFlee();
 				}
 				//update and display score
 				game.manager.scoreBoard.refreshScore(curGrid.score);
 				curGrid.clear();
+				grid.maze[0][curGrid.row][curGrid.column] = null;
 				//check game end
 				if(--game.manager.totalFood === 0) {
 					game.manager.state.swapState("buffering");
