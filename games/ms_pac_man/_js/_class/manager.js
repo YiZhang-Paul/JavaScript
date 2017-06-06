@@ -106,6 +106,9 @@ class Manager {
 		//all players
 		this.user = new User();
 		this.aiManager = new AIManager(["blinky", "pinky", "inky", "clyde"]);
+		if(this.scoreBoard) {
+			this.scoreBoard.reset();	
+		} 
 		this.scoreBoard = new ScoreBoard(this.user);
 		this.state = new StateMachine(this, "ready");
 	} 

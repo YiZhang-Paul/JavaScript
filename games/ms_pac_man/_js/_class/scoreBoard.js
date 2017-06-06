@@ -15,6 +15,8 @@ class ScoreBoard {
 		this.intervalHandler = null;
 		this.ctx = game.maze.uiCtx;
 		this.draw();
+		//initialize/reset score board
+		this.reset();
 	}
 	/**
 	 * reset score board
