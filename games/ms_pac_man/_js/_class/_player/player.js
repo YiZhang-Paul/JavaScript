@@ -77,11 +77,15 @@ class Player {
 	/**
 	 * check if player is on center
 	 * of current grid 
+	 * @param int, int
+	 *
+	 * row    : row of grid to be examined
+	 * column : column of grid to be examined
 	 *
 	 * returns boolean
 	 */
-	onCenter() {
-		let [centerX, centerY] = this.centerCord(this.row, this.column);
+	onCenter(row = this.row, column = this.column) {
+		let [centerX, centerY] = this.centerCord(row, column);
 		return centerX == this.xCord && centerY == this.yCord;
 	} 
 	/**

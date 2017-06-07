@@ -59,7 +59,7 @@ class AI extends Player {
 	canTurn(direction) {
 		let isOpposite = direction == this.findOpposite();
 		let withinBoard = this.xCord >= 0 && this.xCord <= game.maze.width;
-		return isOpposite || (withinBoard && !this.hasWall(direction) && this.onCenter());
+		return isOpposite || (withinBoard && !this.hasWall(direction));
 	} 
 	/**
 	 * move back and forth
@@ -203,29 +203,33 @@ class AI extends Player {
 	 */
 	retreatDir() {
 		//move along retreat path
-		if(this.retreatPath.length) {
-			let nextTile = this.retreatPath[0];
-			//determine retreat direction
-			let [centerX, centerY] = this.centerCord(nextTile.row, nextTile.column);
-			let direction;
-			if(this.yCord == centerY && this.xCord != centerX) {
-				direction = this.xCord < centerX ? "right" : "left";
-			} else if(this.xCord == centerX && this.yCord != centerY) {
-				direction = this.yCord < centerY ? "down" : "up";
+		let nextTile = this.retreatPath[0];
+		if(this.onCenter(nextTile.row, nextTile.column)) {
+			this.retreatPath.shift();
+			if(!this.retreatPath.length) {
+				this.retreatPath = null;
 			} else {
-				this.randomDirection(this.availableDir());
+				nextTile = this.retreatPath[0];	
 			}
-			if(direction && this.canTurn(direction)) {
-				this.setDirection(direction);	
+		}
+		let [centerX, centerY] = this.centerCord(nextTile.row, nextTile.column);
+		//re-adjust error location calculation
+		if(centerX != this.xCord && centerY != this.yCord) {
+			if(Math.abs(centerX - this.xCord) < Math.abs(centerY - this.yCord)) {
+				this.xCord = centerX;
+			} else {
+				this.yCord = centerY;
 			}
-			if(this.retreatPath && this.onCenter()) {
-				this.retreatPath.shift();	
-				if(!this.retreatPath.length) {
-					this.retreatPath = null;
-				}
-			}
+		}
+		//determine retreat direction
+		let direction;
+		if(this.yCord == centerY) {
+			direction = this.xCord < centerX ? "right" : "left";
 		} else {
-			this.retreatPath = null;
+			direction = this.yCord < centerY ? "down" : "up";
+		}
+		if(direction && this.canTurn(direction)) {
+			this.setDirection(direction);	
 		}
 	} 
 	/**
@@ -320,8 +324,6 @@ class AI extends Player {
 		}
 		if(this.hasEndPoint(path)) {
 			this.retreatPath = path;
-		} else {
-			this.randomDirection(this.availableDir());
 		}
 	} 
 	/**
@@ -462,8 +464,10 @@ class AI extends Player {
 			if(!this.retreatPath) {
 				this.getRetreatPath();
 			} 
-			if(this.retreatPath) {
+			if(this.retreatPath && this.retreatPath.length) {
 				this.retreatDir();
+			} else if(!this.retreatPath) {
+				this.randomDirection(this.availableDir());
 			}
 			this.move(timeStep);
 			this.getInCell();
