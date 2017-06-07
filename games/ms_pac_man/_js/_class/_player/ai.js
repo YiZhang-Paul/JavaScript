@@ -26,6 +26,7 @@ class AI extends Player {
 		this.score = 200;
 		this.step = 0;
 		this.cropXY = this.defaultCropXY;
+		this.retreatPath = null;
 		this.state.swapState(this.name == "blinky" ? "outCell" : "inCell");
 		if(this.intervalHandler) {
 			clearInterval(this.intervalHandler);
@@ -77,9 +78,7 @@ class AI extends Player {
 	randomDirection(availableDir) {
 		if(this.collideDist === 0) {
 			let finalDir = availableDir[Math.floor(Math.random() * availableDir.length)];
-			if(finalDir != this.findOpposite()) {
-				this.setDirection(finalDir);
-			} else if(Math.random() < 0.4) {
+			if(finalDir != this.findOpposite() || Math.random() < 0.4) {
 				this.setDirection(finalDir);
 			} else {
 				this.randomDirection(availableDir);
@@ -95,6 +94,8 @@ class AI extends Player {
 			this.stopAnimation(0);
 			let direction = this.xCord < game.maze.width * 0.5 ? "left" : "right";
 			this.setDirection(direction);
+			game.manager.aiManager.cell.add(this);
+			this.retreatPath = null;
 			this.state.swapState("inCell");
 		}
 	} 
@@ -138,7 +139,7 @@ class AI extends Player {
 				this.stopAnimation(0);
 				this.animatePlayer(4);
 				this.finishFleeToNormal();
-			}, 7000);
+			}, 50000);
 		}
 	} 
 	/**
@@ -201,25 +202,27 @@ class AI extends Player {
 	 * retreat to cell
 	 */
 	retreatDir() {
-		//get retreat path
-		if(!this.retreatPath) {
-			this.getRetreatPath();
-			//move along retreat path
-		} else if(this.retreatPath.length) {
+		//move along retreat path
+		if(this.retreatPath.length) {
 			let nextTile = this.retreatPath[0];
 			//determine retreat direction
 			let [centerX, centerY] = this.centerCord(nextTile.row, nextTile.column);
 			let direction;
-			if(this.row == nextTile.row) {
+			if(this.yCord == centerY && this.xCord != centerX) {
 				direction = this.xCord < centerX ? "right" : "left";
-			} else if(this.column == nextTile.column) {
+			} else if(this.xCord == centerX && this.yCord != centerY) {
 				direction = this.yCord < centerY ? "down" : "up";
+			} else {
+				this.randomDirection(this.availableDir());
 			}
 			if(direction && this.canTurn(direction)) {
 				this.setDirection(direction);	
-			}		
-			if(this.onCenter()) {
+			}
+			if(this.retreatPath && this.onCenter()) {
 				this.retreatPath.shift();	
+				if(!this.retreatPath.length) {
+					this.retreatPath = null;
+				}
 			}
 		} else {
 			this.retreatPath = null;
@@ -455,7 +458,13 @@ class AI extends Player {
 		this.speed = this.defaultSpeed * 1.4;
 		//check movement
 		if(this.moving) {
-			this.retreatDir();
+			//get retreat path
+			if(!this.retreatPath) {
+				this.getRetreatPath();
+			} 
+			if(this.retreatPath) {
+				this.retreatDir();
+			}
 			this.move(timeStep);
 			this.getInCell();
 		}

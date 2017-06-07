@@ -12,11 +12,11 @@ class Manager {
 		this.beans = new Set();
 		this.fruits = new Set();
 		this.emptyCells = [];
-		this.ctx = game.maze.playerCtx;
 		this.timeoutHandler = null;
 		this.fruitTimeout = null;
 		this.intervalHandler = null;
 		this.beanInterval = null;
+		this.ctx = game.maze.playerCtx;
 		this.state = null;
 		//create a new game
 		this.newGame();
@@ -136,10 +136,10 @@ class Manager {
 		//reset assets and players
 		this.user.reset();
 		this.aiManager.reset();
-		game.maze.reset();
-		this.hud.reset();
 		//reset score board
 		this.scoreBoard.reset(); 
+		this.hud.reset();
+		game.maze.reset();
 		this.state.reset();
 	} 
 	/**
