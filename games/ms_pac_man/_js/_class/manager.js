@@ -26,6 +26,7 @@ class Manager {
 	 */
 	reset() {
 		this.beans = new Set();
+		this.fruits.forEach(fruit => fruit.clear());
 		this.fruits = new Set();
 		this.emptyCells = [];
 	} 
@@ -112,6 +113,7 @@ class Manager {
 	 * create new game
 	 */
 	newGame() {
+		this.reset();
 		//create all food
 		this.makeAllFood();
 		//all players
