@@ -128,6 +128,7 @@ class Manager {
 	 * reset game
 	 */
 	resetGame() {
+		this.reset();
 		//create all food
 		this.makeAllFood();	
 		//reset assets and players
@@ -138,7 +139,6 @@ class Manager {
 		//reset score board
 		this.scoreBoard.reset(); 
 		this.state.reset();
-		this.reset();
 	} 
 	/**
 	 * clear time out and interval
@@ -188,12 +188,12 @@ class Manager {
 	bufferEnd(callBackList, timeout = 3000) {
 		if(!this.timeoutHandler) {
 			this.timeoutHandler = setTimeout(() => {
+				//clear time out and interval
+				this.clearHandler();
 				callBackList.forEach(set => {
 					let caller = set[0];
 					caller[set[1]]();
 				});
-				//clear time out and interval
-				this.clearHandler();
 			}, timeout);
 		}
 	} 
