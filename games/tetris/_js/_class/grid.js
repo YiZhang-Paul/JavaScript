@@ -10,7 +10,8 @@ class Grid {
 	constructor(row, column) {
 		this.row = row;
 		this.column = column;
-		this.grid = this.generateGrid();
+		this.logicGrid = this.generateGrid();
+		this.brickGrid = this.generateGrid();
 		//determine grid width
 		this.gridWidth = null;
 		if(game.monitor.width > game.monitor.height) {
@@ -27,7 +28,7 @@ class Grid {
 	generateGrid() {
 		let grid = [];
 		for(let i = 0; i < this.row; i++) {
-			grid.push(new Array(this.column).fill(null));
+			grid.push(new Array(this.column).fill(0));
 		}
 		return grid;
 	} 
