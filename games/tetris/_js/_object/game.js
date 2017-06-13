@@ -7,13 +7,16 @@ let game = {
 	state : null, //current game state
 	monitor : {   //monitor spec
 		"width"  : window.innerWidth,
-		"height" : window.innerheight
+		"height" : window.innerHeight
 	},
 	/**
 	 * load game assets
 	 */
 	loadAsset() {
-
+		//generate game grid
+		this.gameGrid = new Grid(25, 15); 
+		//generate game canvas
+		this.gameCanvas = new GameCanvas();
 	},
 	/**
 	 * initialize game
