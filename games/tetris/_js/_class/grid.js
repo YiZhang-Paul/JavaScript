@@ -20,6 +20,12 @@ class Grid {
 		}
 	}
 	/**
+	 * reset grid
+	 */
+	reset() {
+		this.logicGrid = this.generateGrid();
+	} 
+	/**
 	 * generate game grid
 	 *
 	 * returns array []

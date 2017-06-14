@@ -106,6 +106,13 @@ let game = {
 		this.state = "running";
 	}, 
 	/**
+	 * reset game
+	 */
+	reset() {
+		this.gameGrid.reset();
+		this.manager.reset();
+	}, 
+	/**
 	 * stop game
 	 */ 
 	stop() {

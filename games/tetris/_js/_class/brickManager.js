@@ -5,7 +5,6 @@
 class BrickManager {
 	constructor() {
 		this.allOrients = ["up", "right", "down", "left"];
-		this.fellBricks = null;
 		this.curBrick = null;
 		this.nextBrick = null;
 		this.rowToClear = [];
@@ -18,7 +17,6 @@ class BrickManager {
 	 * reset manager
 	 */
 	reset() {
-		this.fellBricks = new Set();
 		this.curBrick = this.randomBrick();
 		this.nextBrick = this.randomBrick();
 		this.rowToClear = [];
@@ -53,7 +51,6 @@ class BrickManager {
 	 */ 
 	createNext() {
 		if(!this.brickTimeout) {
-			this.fellBricks.add(this.curBrick);
 			this.curBrick = null;
 			this.brickTimeout = setTimeout(() => {
 				//set next bricks 
@@ -71,7 +68,7 @@ class BrickManager {
 	 */
 	checkRow() {
 		for(let i = game.gameGrid.logicGrid.length - 1; i >= 0; i--) {
-			if(game.gameGrid.logicGrid[i].every(grid => grid == 1)) {
+			if(game.gameGrid.logicGrid[i].every(grid => grid !== 0)) {
 				this.rowToClear.push(i);
 			}
 		}
@@ -80,10 +77,19 @@ class BrickManager {
 	 * clear a filled row
 	 */
 	clearRow() {
-		for(let i = 0; i < this.rowToClear.length; i++) {
-			game.gameGrid.logicGrid.splice(this.rowToClear[i], 1);
-			game.gameGrid.logicGrid.unshift(new Array(game.gameGrid.column).fill(0));
+		let newGrid = [];
+		for(let i = game.gameGrid.logicGrid.length - 1; i >= 0; i--) {
+			//insert rows that are not filled
+			if(this.rowToClear.indexOf(i) == -1) {
+				newGrid.unshift(game.gameGrid.logicGrid[i]);
+			}
 		}
+		//replace cleared rows with empty rows
+		for(let i = 0; i < this.rowToClear.length; i++) {
+			newGrid.unshift(new Array(game.gameGrid.column).fill(0));
+		}
+		this.rowToClear = [];
+		game.gameGrid.logicGrid = newGrid;
 	} 
 	/**
 	 * check game condition when brick fell on the groud 
@@ -127,7 +133,7 @@ class BrickManager {
 				this.state.swapState("ongoing");
 				clearTimeout(this.swipeTimeout);
 				this.swipeTimeout = null;
-			}, 3000);
+			}, 1000);
 		}
 	}
 	/**
@@ -137,14 +143,25 @@ class BrickManager {
 		this.state.update();
 	}
 	/**
+	 * draw fallen bricks
+	 */
+	drawFellBrick() {
+		let logicGrid = game.gameGrid.logicGrid;
+		for(let i = 0; i < logicGrid.length; i++) {
+			for(let j = 0; j < logicGrid[i].length; j++) {
+				if(logicGrid[i][j] instanceof Block) {
+					logicGrid[i][j].draw(i, j);
+				}
+			}
+		}
+	} 
+	/**
 	 * draw all bricks
 	 */
 	draw() {
 		if(this.curBrick) {
 			this.curBrick.draw();
 		}
-		this.fellBricks.forEach(brick => {
-			brick.draw();
-		});
+		this.drawFellBrick();
 	} 
 } 

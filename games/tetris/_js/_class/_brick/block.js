@@ -1,36 +1,27 @@
 /* jslint esversion: 6 */
 /**
  * block class 
- * @param String, int, int
+ * @param String
  *
  * color : color of block
- * row   : current row of block on game grid
- * colum : current column of block on game grid
  */
 class Block {
-	constructor(color, row, column) {
+	constructor(color) {
 		this.color = color;
-		this.row = row;
-		this.column = column;
 		this.tile = document.getElementById(this.color);
 		this.ctx = game.gameCanvas.playerCtx;
 	}
 	/**
-	 * block fall down 
-	 * @param int
-	 *
-	 * rowNum : number of rows to fall down
-	 */
-	fallDown(rowNum = 1) {
-		this.row += rowNum;
-	} 
-	/**
 	 * draw block
+	 * @param int, int
+	 *
+	 * row    : current row of block
+	 * column : current column of block
 	 */
-	draw() {
+	draw(row, column) {
 		let gridWidth = game.gameGrid.gridWidth;
-		let xCord = this.column * gridWidth;
-		let yCord = this.row * gridWidth;
+		let xCord = column * gridWidth;
+		let yCord = row * gridWidth;
 		this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);
 	} 
 } 
