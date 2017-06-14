@@ -23,7 +23,7 @@ class Brick {
 		this.rotateSpeed = 200; 
 		this.lastRotate = 0;
 		//brick appearance
-		this.tile = null;
+		this.tile = document.getElementById(this.color);
 		this.ctx = game.gameCanvas.playerCtx;
 	}
 	/**
@@ -172,7 +172,7 @@ class Brick {
 	 */
 	update() {
 		this.checkInput();
-		this.fallDown();
+		//this.fallDown();
 	} 
 	/**
 	 * draw brick

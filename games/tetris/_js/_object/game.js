@@ -17,7 +17,7 @@ let game = {
 		this.gameGrid = new Grid(25, 15); 
 		//generate game canvas
 		this.gameCanvas = new GameCanvas();
-		this.brick = new LBrickLeft("red"); 
+		this.brick = new ZRight("yellow"); 
 	},
 	/**
 	 * initialize game
