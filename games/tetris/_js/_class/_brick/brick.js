@@ -58,7 +58,7 @@ class Brick {
 	 *
 	 * returns String
 	 */
-	converKeyCode(keyCode) {
+	convertKeyCode(keyCode) {
 		let action;
 		switch(keyCode) {
 			case control.W : case control.UP :
@@ -83,12 +83,12 @@ class Brick {
 		//check rotation
 		if(control.rotateKey.length) {
 			let keyCode = control.rotateKey[control.rotateKey.length - 1];
-			this.rotate(this.converKeyCode(keyCode));
+			this.rotate(this.convertKeyCode(keyCode));
 		} 
 		//check movement
 		if(control.moveKey.length) {
 			let keyCode = control.moveKey[control.moveKey.length - 1];
-			this.move(this.converKeyCode(keyCode));
+			this.move(this.convertKeyCode(keyCode));
 		}
 	} 
 	/**
