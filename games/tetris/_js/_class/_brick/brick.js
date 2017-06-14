@@ -11,13 +11,18 @@ class Brick {
 		this.color = color;
 		this.allOrients = ["up", "right", "down", "left"];
 		this.orientation = orientation;
-		this.grids = [];
+		//locations
 		this.spawnGrid = [];
-		this.lastMove = 0;
-		this.defaultMoveSpeed = 1000;
+		this.curGrid = [];
+		this.grids = [];
+		//movement and rotations
+		this.fallSpeed = 500;
+		this.lastFall = 0;
 		this.moveSpeed = 500;
+		this.lastMove = 0;
 		this.rotateSpeed = 200; 
 		this.lastRotate = 0;
+		//brick appearance
 		this.tile = null;
 		this.ctx = game.gameCanvas.playerCtx;
 	}
@@ -63,6 +68,18 @@ class Brick {
 		}
 	} 
 	/**
+	 * refresh fall cooldown
+	 */
+	setFallCD() {
+		this.lastFall = new Date().getTime();
+	} 
+	/**
+	 * check fall cooldown
+	 */
+	onFallCD() {
+		return new Date().getTime() - this.lastFall < this.fallSpeed;
+	} 
+	/**
 	 * refresh rotate cooldown
 	 */
 	setRotateCD() {
@@ -84,7 +101,10 @@ class Brick {
 	 * brick fall down 
 	 */ 
 	fallDown() {
-
+		if(!this.onFallCD()) {
+			this.curGrid = [this.curGrid[0] + 1, this.curGrid[1]];
+			this.setFallCD();
+		}
 	} 
 	/**
 	 * rotate bricks
@@ -109,6 +129,7 @@ class Brick {
 	 */
 	update() {
 		this.checkInput();
+		this.fallDown();
 	} 
 	/**
 	 * draw brick
@@ -118,8 +139,8 @@ class Brick {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				if(this.grids[i][j] == 1) {
 					let gridWidth = game.gameGrid.gridWidth;
-					let xCord = (this.spawnGrid[1] + j) * gridWidth;
-					let yCord = (this.spawnGrid[0] + i) * gridWidth;
+					let xCord = (this.curGrid[1] + j) * gridWidth;
+					let yCord = (this.curGrid[0] + i) * gridWidth;
 					this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);
 				}
 			}
