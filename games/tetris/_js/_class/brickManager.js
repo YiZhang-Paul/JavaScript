@@ -4,11 +4,21 @@
  */
 class BrickManager {
 	constructor() {
-		this.bricks = new Set();
+		this.fellBricks = new Set();
 		this.curBrick = null;
 		this.nextBrick = null;
 		this.allOrients = ["up", "right", "down", "left"];
+		this.state = "ready";
 	}
+	/**
+	 * reset manager
+	 */
+	reset() {
+		this.fellBricks = new Set();
+		this.curBrick = null;
+		this.nextBrick = null;
+		this.state = "ready";
+	} 
 	/**
 	 * generate random brick
 	 *
@@ -32,5 +42,17 @@ class BrickManager {
 		else if(type == 5) brick = new ZLeft(color, orientation);
 		else brick = new ZRight(color, orientation);
 		return brick;
+	} 
+	/**
+	 * update manager
+	 */
+	update() {
+		
+	}
+	/**
+	 * draw all bricks
+	 */
+	draw() {
+
 	} 
 } 

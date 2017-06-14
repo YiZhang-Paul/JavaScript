@@ -19,7 +19,6 @@ let game = {
 		this.gameCanvas = new GameCanvas();
 		//brick manager
 		this.manager = new BrickManager();
-		this.brick = new IBrick("yellow"); 
 	},
 	/**
 	 * initialize game
@@ -116,13 +115,13 @@ let game = {
 	 * update game
 	 */ 
 	update() {
-		this.brick.update();
+		this.manager.update();
 	},
 	/**
 	 * draw game
 	 */ 
 	draw() {
 		this.gameCanvas.playerCtx.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
-		this.brick.draw();
+		this.manager.draw();
 	}  
 }; 
