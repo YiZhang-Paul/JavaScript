@@ -48,7 +48,7 @@ class Brick {
 		}
 		let column = game.gameGrid.column % 2 === 0 ?
 			game.gameGrid.column * 0.5 - 1 : (game.gameGrid.column - 1) * 0.5;
-		return [3 - row, column - 2]; 
+		return [-row - 1, column - 2]; 
 	}
 	/**
 	 * covert key code to in game control
@@ -192,7 +192,7 @@ class Brick {
 	recordLocation() {
 		for(let i = 0; i < this.grids.length; i++) {
 			for(let j = 0; j < this.grids[i].length; j++) {
-				if(this.grids[i][j] == 1) {
+				if(this.curGrid[0] + i >= 0 && this.grids[i][j] == 1) {
 					game.gameGrid.logicGrid[this.curGrid[0] + i][this.curGrid[1] + j] = 1;
 				}
 			}
@@ -207,7 +207,7 @@ class Brick {
 		for(let i = 0; i < this.grids.length; i++) {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				//check logic grids
-				if(this.grids[i][j] == 1) {
+				if(this.curGrid[0] + i >= 0 && this.grids[i][j] == 1) {
 					let rowBelow = game.gameGrid.logicGrid[this.curGrid[0] + i + 1];
 					if(rowBelow === undefined || rowBelow[this.curGrid[1] + j] == 1) {
 						return true;
@@ -229,7 +229,7 @@ class Brick {
 		for(let i = 0; i < this.grids.length; i++) {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				//check logic grids
-				if(this.grids[i][j] == 1) {
+				if(this.curGrid[0] + i >= 0 && this.grids[i][j] == 1) {
 					let curRow = game.gameGrid.logicGrid[this.curGrid[0] + i];
 					let sideColumn = direction == "left" ? 
 						curRow[this.curGrid[1] + j - 1] : curRow[this.curGrid[1] + j + 1];
