@@ -19,10 +19,6 @@ class ZRight extends Brick {
 				          [1, 1, 0, 0],
 				          [0, 0, 0, 0]];
 		this.right = this.left;
-		//current pattern
-		this.grids = this[this.orientation];
-		//find spawn point
-		this.spawnGrid = this.getSpawnGrid();
-		this.curGrid = this.spawnGrid;
+		this.initialize();
 	}
 } 

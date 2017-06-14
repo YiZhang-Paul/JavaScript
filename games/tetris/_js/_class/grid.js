@@ -11,7 +11,6 @@ class Grid {
 		this.row = row;
 		this.column = column;
 		this.logicGrid = this.generateGrid();
-		this.brickGrid = this.generateGrid();
 		//determine grid width
 		this.gridWidth = null;
 		if(game.monitor.width > game.monitor.height) {

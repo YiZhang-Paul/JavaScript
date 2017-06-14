@@ -7,14 +7,14 @@
  * orientation : orientation of brick
  */
 class Brick {
-	constructor(color, orientation = "down") {
+	constructor(color, orientation = "up") {
 		this.color = color;
 		this.allOrients = ["up", "right", "down", "left"];
 		this.orientation = orientation;
 		//locations
+		this.grids = [];
 		this.spawnGrid = [];
 		this.curGrid = [];
-		this.grids = [];
 		//movement and rotations
 		this.fallSpeed = 500;
 		this.lastFall = 0;
@@ -26,6 +26,15 @@ class Brick {
 		this.tile = document.getElementById(this.color);
 		this.ctx = game.gameCanvas.playerCtx;
 	}
+	/**
+	 * initialize bricks
+	 */
+	initialize() {
+		this.grids = this[this.orientation];
+		//find spawn point
+		this.spawnGrid = this.getSpawnGrid();
+		this.curGrid = this.spawnGrid;
+	} 
 	/**
 	 * determine spawn point
 	 *

@@ -16,10 +16,6 @@ class Square extends Brick {
 		this.down  = this.up; 
 		this.left  = this.up;
 		this.right = this.up;
-		//current pattern
-		this.grids = this[this.orientation];
-		//find spawn point
-		this.spawnGrid = this.getSpawnGrid();
-		this.curGrid = this.spawnGrid;
+		this.initialize();
 	}
 } 
