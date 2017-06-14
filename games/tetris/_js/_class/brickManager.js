@@ -4,20 +4,21 @@
  */
 class BrickManager {
 	constructor() {
-		this.fellBricks = new Set();
+		this.allOrients = ["up", "right", "down", "left"];
+		this.fellBricks = null;
 		this.curBrick = null;
 		this.nextBrick = null;
-		this.allOrients = ["up", "right", "down", "left"];
-		this.state = "ready";
+		this.state = null;
+		this.reset();
 	}
 	/**
 	 * reset manager
 	 */
 	reset() {
 		this.fellBricks = new Set();
-		this.curBrick = null;
-		this.nextBrick = null;
-		this.state = "ready";
+		this.curBrick = this.randomBrick();
+		this.nextBrick = this.randomBrick();
+		this.state = new StateMachine(this, "ready");
 	} 
 	/**
 	 * generate random brick
@@ -44,15 +45,40 @@ class BrickManager {
 		return brick;
 	} 
 	/**
+	 * create next bricks
+	 */ 
+	createNext() {
+		this.fellBricks.add(this.curBrick);
+		this.curBrick = this.nextBrick;
+		this.nextBrick = this.randomBrick();
+	} 
+	/**
+	 * manager states
+	 */ 
+	//ready state
+	ready() {
+		//detect game start
+		if(control.keyReleased == control.SPACE) {
+			this.state.swapState("ongoing");
+		}
+	} 
+	//ongoing state
+	ongoing() {
+		this.curBrick.update();
+	}
+	/**
 	 * update manager
 	 */
 	update() {
-		
+		this.state.update();
 	}
 	/**
 	 * draw all bricks
 	 */
 	draw() {
-
+		this.curBrick.draw();
+		this.fellBricks.forEach(brick => {
+			brick.draw();
+		});
 	} 
 } 

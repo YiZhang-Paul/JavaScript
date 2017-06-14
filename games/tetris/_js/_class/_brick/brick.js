@@ -160,6 +160,8 @@ class Brick {
 	fallDown() {
 		if(!this.onFallCD()) {
 			if(this.bottomCollide()) {
+				this.recordLocation();
+				game.manager.createNext();
 				return;
 			}
 			this.curGrid[0]++;
@@ -184,6 +186,18 @@ class Brick {
 			this.setRotateCD();
 		}
 	} 
+	/**
+	 * record current brick location on logic grid
+	 */
+	recordLocation() {
+		for(let i = 0; i < this.grids.length; i++) {
+			for(let j = 0; j < this.grids[i].length; j++) {
+				if(this.grids[i][j] == 1) {
+					game.gameGrid.logicGrid[this.curGrid[0] + i][this.curGrid[1] + j] = 1;
+				}
+			}
+		}
+	}
 	/**
 	 * check bottom collision
 	 * 
@@ -216,7 +230,7 @@ class Brick {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				//check logic grids
 				if(this.grids[i][j] == 1) {
-					let curRow = game.gameGrid.logicGrid[this.curGrid[0] + i - 1];
+					let curRow = game.gameGrid.logicGrid[this.curGrid[0] + i];
 					let sideColumn = direction == "left" ? 
 						curRow[this.curGrid[1] + j - 1] : curRow[this.curGrid[1] + j + 1];
 					if(sideColumn === undefined || sideColumn == 1) {

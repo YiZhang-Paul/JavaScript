@@ -116,6 +116,7 @@ let game = {
 	 */ 
 	update() {
 		this.manager.update();
+		control.keyReleased = null;
 	},
 	/**
 	 * draw game
