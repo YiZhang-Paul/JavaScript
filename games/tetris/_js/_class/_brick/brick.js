@@ -9,8 +9,8 @@
 class Brick {
 	constructor(color, orientation = "up") {
 		this.color = color;
-		this.allOrients = ["up", "right", "down", "left"];
 		this.orientation = orientation;
+		this.allOrients = ["up", "right", "down", "left"];
 		//locations
 		this.grids = [];
 		this.spawnGrid = [];
@@ -137,13 +137,18 @@ class Brick {
 		if(!this.onMoveCD()) {
 			switch(direction) {
 				case "down" :
+					if(this.bottomCollide()) {
+						return;
+					}
 					this.curGrid[0]++;
 					break;
 				case "left" :
-					this.curGrid[1]--;
-					break;
 				case "right" :
-					this.curGrid[1]++;
+					if(this.sideCollide(direction)) {
+						return;
+					}
+					this.curGrid[1] = direction == "left" ? 
+						this.curGrid[1] - 1 : this.curGrid[1] + 1;
 					break;
 			}
 			this.setMoveCD();
@@ -154,6 +159,9 @@ class Brick {
 	 */ 
 	fallDown() {
 		if(!this.onFallCD()) {
+			if(this.bottomCollide()) {
+				return;
+			}
 			this.curGrid[0]++;
 			this.setFallCD();
 		}
@@ -176,12 +184,55 @@ class Brick {
 			this.setRotateCD();
 		}
 	} 
+	/**
+	 * check bottom collision
+	 * 
+	 * returns boolean
+	 */
+	bottomCollide() {
+		for(let i = 0; i < this.grids.length; i++) {
+			for(let j = 0; j < this.grids[i].length; j++) {
+				//check logic grids
+				if(this.grids[i][j] == 1) {
+					let rowBelow = game.gameGrid.logicGrid[this.curGrid[0] + i + 1];
+					if(rowBelow === undefined || rowBelow[this.curGrid[1] + j] == 1) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	} 
+	/**
+	 * check side collision
+	 * @param String
+	 *
+	 * direction : direction to be checked
+	 * 
+	 * returns boolean
+	 */
+	sideCollide(direction) {
+		for(let i = 0; i < this.grids.length; i++) {
+			for(let j = 0; j < this.grids[i].length; j++) {
+				//check logic grids
+				if(this.grids[i][j] == 1) {
+					let curRow = game.gameGrid.logicGrid[this.curGrid[0] + i - 1];
+					let sideColumn = direction == "left" ? 
+						curRow[this.curGrid[1] + j - 1] : curRow[this.curGrid[1] + j + 1];
+					if(sideColumn === undefined || sideColumn == 1) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	} 
 	/** 
 	 * update brick 
 	 */
 	update() {
 		this.checkInput();
-		//this.fallDown();
+		this.fallDown();
 	} 
 	/**
 	 * draw brick
