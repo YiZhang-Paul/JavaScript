@@ -8,7 +8,9 @@ class BrickManager {
 		this.fellBricks = null;
 		this.curBrick = null;
 		this.nextBrick = null;
-		this.timeoutHandler = null;
+		this.rowToClear = [];
+		this.brickTimeout = null;
+		this.swipeTimeout = null;
 		this.state = null;
 		this.reset();
 	}
@@ -19,6 +21,7 @@ class BrickManager {
 		this.fellBricks = new Set();
 		this.curBrick = this.randomBrick();
 		this.nextBrick = this.randomBrick();
+		this.rowToClear = [];
 		this.state = new StateMachine(this, "ready");
 	} 
 	/**
@@ -49,16 +52,53 @@ class BrickManager {
 	 * create next bricks
 	 */ 
 	createNext() {
-		if(!this.timeoutHandler) {
+		if(!this.brickTimeout) {
 			this.fellBricks.add(this.curBrick);
 			this.curBrick = null;
-			this.timeoutHandler = setTimeout(() => {
+			this.brickTimeout = setTimeout(() => {
 				//set next bricks 
 				this.curBrick = this.nextBrick;
 				this.nextBrick = this.randomBrick();
-				clearTimeout(this.timeoutHandler);
-				this.timeoutHandler = null;
+				clearTimeout(this.brickTimeout);
+				this.brickTimeout = null;
 			}, 500);
+		}
+	} 
+	/**
+	 * check if a row is filled
+	 * and determine total number
+	 * of rows to be cleared
+	 */
+	checkRow() {
+		for(let i = game.gameGrid.logicGrid.length - 1; i >= 0; i--) {
+			if(game.gameGrid.logicGrid[i].every(grid => grid == 1)) {
+				this.rowToClear.push(i);
+			}
+		}
+	} 
+	/**
+	 * clear a filled row
+	 */
+	clearRow() {
+		for(let i = 0; i < this.rowToClear.length; i++) {
+			game.gameGrid.logicGrid.splice(this.rowToClear[i], 1);
+			game.gameGrid.logicGrid.unshift(new Array(game.gameGrid.column).fill(0));
+		}
+	} 
+	/**
+	 * check game condition when brick fell on the groud 
+	 * @param obj {}
+	 *
+	 * brick : brick to be checked
+	 */
+	checkBrickFell(brick) {
+		//record fallen brick location
+		brick.recordLocation();
+		this.checkRow();
+		if(this.rowToClear.length) {
+			this.state.swapState("clearing");
+		} else {
+			this.createNext();
 		}
 	} 
 	/**
@@ -75,6 +115,19 @@ class BrickManager {
 	ongoing() {
 		if(this.curBrick) {
 			this.curBrick.update();
+		}
+	}
+	//clearing state
+	clearing() {
+		if(!this.swipeTimeout) {
+			this.swipeTimeout = setTimeout(() => {
+				//clear row and generate next brick
+				this.clearRow();
+				this.createNext();
+				this.state.swapState("ongoing");
+				clearTimeout(this.swipeTimeout);
+				this.swipeTimeout = null;
+			}, 3000);
 		}
 	}
 	/**

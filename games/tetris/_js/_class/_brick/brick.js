@@ -138,6 +138,7 @@ class Brick {
 			switch(direction) {
 				case "down" :
 					if(this.bottomCollide()) {
+						game.manager.checkBrickFell(this);
 						return;
 					}
 					this.curGrid[0]++;
@@ -160,8 +161,7 @@ class Brick {
 	fallDown() {
 		if(!this.onFallCD()) {
 			if(this.bottomCollide()) {
-				this.recordLocation();
-				game.manager.createNext();
+				game.manager.checkBrickFell(this);
 				return;
 			}
 			this.curGrid[0]++;
