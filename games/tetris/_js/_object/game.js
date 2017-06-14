@@ -114,7 +114,7 @@ let game = {
 	 * update game
 	 */ 
 	update() {
-		
+		this.brick.update();
 	},
 	/**
 	 * draw game
