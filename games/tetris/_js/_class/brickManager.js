@@ -7,9 +7,10 @@ class BrickManager {
 		this.allOrients = ["up", "right", "down", "left"];
 		this.curBrick = null;
 		this.nextBrick = null;
-		this.rowToClear = [];
+		this.rowToClear = null;
 		this.brickTimeout = null;
 		this.swipeTimeout = null;
+		this.resetTimeout = null;
 		this.state = null;
 		this.reset();
 	}
@@ -19,7 +20,7 @@ class BrickManager {
 	reset() {
 		this.curBrick = this.randomBrick();
 		this.nextBrick = this.randomBrick();
-		this.rowToClear = [];
+		this.rowToClear = new Set();
 		this.state = new StateMachine(this, "ready");
 	} 
 	/**
@@ -65,13 +66,16 @@ class BrickManager {
 	 * check if a row is filled
 	 * and determine total number
 	 * of rows to be cleared
+	 *
+	 * returns int
 	 */
 	checkRow() {
 		for(let i = game.gameGrid.logicGrid.length - 1; i >= 0; i--) {
 			if(game.gameGrid.logicGrid[i].every(grid => grid !== 0)) {
-				this.rowToClear.push(i);
+				this.rowToClear.add(i);
 			}
 		}
+		return this.rowToClear.size;
 	} 
 	/**
 	 * clear a filled row
@@ -80,15 +84,15 @@ class BrickManager {
 		let newGrid = [];
 		for(let i = game.gameGrid.logicGrid.length - 1; i >= 0; i--) {
 			//insert rows that are not filled
-			if(this.rowToClear.indexOf(i) == -1) {
+			if(!this.rowToClear.has(i)) {
 				newGrid.unshift(game.gameGrid.logicGrid[i]);
 			}
 		}
 		//replace cleared rows with empty rows
-		for(let i = 0; i < this.rowToClear.length; i++) {
+		for(let i = 0; i < this.rowToClear.size; i++) {
 			newGrid.unshift(new Array(game.gameGrid.column).fill(0));
 		}
-		this.rowToClear = [];
+		this.rowToClear = new Set();
 		game.gameGrid.logicGrid = newGrid;
 	} 
 	/**
@@ -100,12 +104,21 @@ class BrickManager {
 	checkBrickFell(brick) {
 		//record fallen brick location
 		brick.recordLocation();
-		this.checkRow();
-		if(this.rowToClear.length) {
+		if(this.checkGameEnd()) {
+			this.state.swapState("buffering");
+		} else if(this.checkRow()) {
 			this.state.swapState("clearing");
 		} else {
 			this.createNext();
 		}
+	} 
+	/**
+	 * check game end
+	 * 
+	 * returns boolean
+	 */
+	checkGameEnd() {
+		return game.gameGrid.logicGrid[0].some(grid => grid !== 0);
 	} 
 	/**
 	 * manager states
@@ -133,7 +146,17 @@ class BrickManager {
 				this.state.swapState("ongoing");
 				clearTimeout(this.swipeTimeout);
 				this.swipeTimeout = null;
-			}, 1000);
+			}, 600);
+		}
+	}
+	//buffering state
+	buffering() {
+		if(!this.resetTimeout) {
+			this.resetTimeout = setTimeout(() => {
+				game.reset();
+				clearTimeout(this.resetTimeout);
+				this.resetTimeout = null;
+			}, 3000);
 		}
 	}
 	/**

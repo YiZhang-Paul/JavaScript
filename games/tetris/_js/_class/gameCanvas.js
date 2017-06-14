@@ -39,17 +39,5 @@ class GameCanvas {
 		this.backCtx.rect(0, 0, this.width, this.height);
 		this.backCtx.fillStyle = "lightgrey";
 		this.backCtx.fill();
-		for(let i = 0; i < game.gameGrid.row; i++) {
-			for(let j = 0; j < game.gameGrid.column; j++) {
-				this.backCtx.beginPath();
-				this.backCtx.rect(
-					j * game.gameGrid.gridWidth, 
-					i * game.gameGrid.gridWidth, 
-					game.gameGrid.gridWidth, 
-					game.gameGrid.gridWidth);
-				this.backCtx.strokeStyle = "black";
-				this.backCtx.stroke();	
-			}
-		}
 	} 
 } 
