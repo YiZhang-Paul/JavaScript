@@ -169,19 +169,54 @@ class Brick {
 		}
 	} 
 	/**
+	 * check if brick can be rotated
+	 * @param String
+	 *
+	 * direction : direction to be checked 
+	 *
+	 * returns boolean
+	 */
+	canRotate(direction) {
+		let newGrids = this[direction];
+		let logicGrid = game.gameGrid.logicGrid;
+		for(let i = 0; i < newGrids.length; i++) {
+			for(let j = 0; j < newGrids[i].length; j++) {
+				if(newGrids[i][j] == 1) {
+					let gameGridRow = logicGrid[this.curGrid[0] + i];
+					if(this.curGrid[0] + i > logicGrid.length - 1 || 
+						 (gameGridRow && gameGridRow[this.curGrid[1] + j]) !== 0) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	} 
+	/**
+	 * get next rotate direction
+	 * @param String
+	 * 
+	 * direction : rotate direction
+	 *
+	 * returns String
+	 */
+	nextRotateDir(direction) {
+		let curOrientIndex = this.allOrients.indexOf(this.orientation);
+		let rotateDir = direction == "clockWise" ? 1 : -1;
+		let newOrientIndex = (curOrientIndex + rotateDir) % this.allOrients.length;
+		return this.allOrients[newOrientIndex];
+	} 
+	/**
 	 * rotate bricks
 	 * @param String
 	 * 
 	 * direction : rotate direction
 	 */
 	rotate(direction) {
-		if(!this.onRotateCD()) {
-			//determine new orientation
-			let curOrientIndex = this.allOrients.indexOf(this.orientation);
-			let rotateDir = direction == "clockWise" ? 1 : -1;
-			let newOrientIndex = (curOrientIndex + rotateDir) % this.allOrients.length;
+		let rotateDir = this.nextRotateDir(direction);
+		if(!this.onRotateCD() && this.canRotate(rotateDir)) {
 			//set new orientation and refresh rotate cooldown
-			this.orientation = this.allOrients[newOrientIndex];
+			this.orientation = rotateDir;
 			this.grids = this[this.orientation];
 			this.setRotateCD();
 		}

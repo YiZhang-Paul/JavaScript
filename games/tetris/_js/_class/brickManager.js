@@ -8,6 +8,7 @@ class BrickManager {
 		this.curBrick = null;
 		this.nextBrick = null;
 		this.rowToClear = null;
+		//time out handlers
 		this.brickTimeout = null;
 		this.swipeTimeout = null;
 		this.resetTimeout = null;
