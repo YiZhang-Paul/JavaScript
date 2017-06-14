@@ -18,7 +18,7 @@ class Brick {
 		//movement and rotations
 		this.fallSpeed = 500;
 		this.lastFall = 0;
-		this.moveSpeed = 500;
+		this.moveSpeed = 70;
 		this.lastMove = 0;
 		this.rotateSpeed = 200; 
 		this.lastRotate = 0;
@@ -55,6 +55,15 @@ class Brick {
 			case control.W : case control.UP :
 				action = "clockWise";
 				break;
+			case control.S : case control.DOWN :
+				action = "down";
+				break;
+			case control.A : case control.LEFT :
+				action = "left";
+				break;
+			case control.D : case control.RIGHT :
+				action = "right";
+				break;			
 		} 
 		return action;
 	} 
@@ -62,9 +71,15 @@ class Brick {
 	 * check input key
 	 */
 	checkInput() {
+		//check rotation
 		if(control.rotateKey.length) {
 			let keyCode = control.rotateKey[control.rotateKey.length - 1];
 			this.rotate(this.converKeyCode(keyCode));
+		} 
+		//check movement
+		if(control.moveKey.length) {
+			let keyCode = control.moveKey[control.moveKey.length - 1];
+			this.move(this.converKeyCode(keyCode));
 		}
 	} 
 	/**
@@ -80,6 +95,18 @@ class Brick {
 		return new Date().getTime() - this.lastFall < this.fallSpeed;
 	} 
 	/**
+	 * refresh move cooldown
+	 */
+	setMoveCD() {
+		this.lastMove = new Date().getTime();
+	} 
+	/**
+	 * check move cooldown
+	 */
+	onMoveCD() {
+		return new Date().getTime() - this.lastMove < this.moveSpeed;
+	} 
+	/**
 	 * refresh rotate cooldown
 	 */
 	setRotateCD() {
@@ -93,16 +120,32 @@ class Brick {
 	} 
 	/**
 	 * move bricks
+	 * @param String
+	 *
+	 * direction : movement direction
 	 */
-	move() {
-
+	move(direction) {
+		if(!this.onMoveCD()) {
+			switch(direction) {
+				case "down" :
+					this.curGrid[0]++;
+					break;
+				case "left" :
+					this.curGrid[1]--;
+					break;
+				case "right" :
+					this.curGrid[1]++;
+					break;
+			}
+			this.setMoveCD();
+		}
 	}
 	/**
 	 * brick fall down 
 	 */ 
 	fallDown() {
 		if(!this.onFallCD()) {
-			this.curGrid = [this.curGrid[0] + 1, this.curGrid[1]];
+			this.curGrid[0]++;
 			this.setFallCD();
 		}
 	} 
