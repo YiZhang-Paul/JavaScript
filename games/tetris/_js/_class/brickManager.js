@@ -8,6 +8,7 @@ class BrickManager {
 		this.fellBricks = null;
 		this.curBrick = null;
 		this.nextBrick = null;
+		this.timeoutHandler = null;
 		this.state = null;
 		this.reset();
 	}
@@ -48,9 +49,17 @@ class BrickManager {
 	 * create next bricks
 	 */ 
 	createNext() {
-		this.fellBricks.add(this.curBrick);
-		this.curBrick = this.nextBrick;
-		this.nextBrick = this.randomBrick();
+		if(!this.timeoutHandler) {
+			this.fellBricks.add(this.curBrick);
+			this.curBrick = null;
+			this.timeoutHandler = setTimeout(() => {
+				//set next bricks 
+				this.curBrick = this.nextBrick;
+				this.nextBrick = this.randomBrick();
+				clearTimeout(this.timeoutHandler);
+				this.timeoutHandler = null;
+			}, 500);
+		}
 	} 
 	/**
 	 * manager states
@@ -64,7 +73,9 @@ class BrickManager {
 	} 
 	//ongoing state
 	ongoing() {
-		this.curBrick.update();
+		if(this.curBrick) {
+			this.curBrick.update();
+		}
 	}
 	/**
 	 * update manager
@@ -76,7 +87,9 @@ class BrickManager {
 	 * draw all bricks
 	 */
 	draw() {
-		this.curBrick.draw();
+		if(this.curBrick) {
+			this.curBrick.draw();
+		}
 		this.fellBricks.forEach(brick => {
 			brick.draw();
 		});
