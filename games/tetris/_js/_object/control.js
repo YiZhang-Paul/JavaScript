@@ -3,7 +3,8 @@
  * game controls
  */
 let control = {
-	"keyPressed" : [],
+	"moveKey" : [],
+  "rotateKey" : [],	
 	"keyReleased" : null,
 	/**
 	 * control keys
@@ -24,13 +25,14 @@ let control = {
 	"SPACE" : 32,
 	/**
 	 * check key press
-	 * @param int
+	 * @param array [], int
 	 *
+	 * control : control key set to be checked
 	 * keyCode : key code of key being checked
 	 *
 	 * returns non-zero number on key press
 	 */
-	isDown(keyCode) {
-		return this.keyPressed.indexOf(keyCode) + 1;
+	isDown(control, keyCode) {
+		return control.indexOf(keyCode) + 1;
 	} 
 }; 

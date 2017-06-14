@@ -17,6 +17,7 @@ let game = {
 		this.gameGrid = new Grid(25, 15); 
 		//generate game canvas
 		this.gameCanvas = new GameCanvas();
+		this.brick = new LBrickLeft("red"); 
 	},
 	/**
 	 * initialize game
@@ -31,11 +32,15 @@ let game = {
 			//track movement key pressed
 			switch(keyCode) {
 				case control.W : case control.UP :
+					if(!control.isDown(control.rotateKey, keyCode)) {
+						control.rotateKey.push(keyCode);
+					}
+					break;
 				case control.S : case control.DOWN :
 				case control.A : case control.LEFT :
 				case control.D : case control.RIGHT :
-					if(!control.isDown(keyCode)) {
-						control.keyPressed.push(keyCode);
+					if(!control.isDown(control.moveKey, keyCode)) {
+						control.moveKey.push(keyCode);
 					}
 					break;
 			}
@@ -50,8 +55,11 @@ let game = {
 				case control.D : case control.RIGHT :
 				case control.SPACE :
 					control.keyReleased = keyCode;
-					if(control.isDown(keyCode)) {
-						control.keyPressed.splice(control.keyPressed.indexOf(keyCode), 1);
+					if(control.isDown(control.rotateKey, keyCode)) {
+						control.rotateKey.splice(control.rotateKey.indexOf(keyCode), 1);
+					}
+					if(control.isDown(control.moveKey, keyCode)) {
+						control.moveKey.splice(control.moveKey.indexOf(keyCode), 1);
 					}
 					break;
 			}
@@ -112,6 +120,7 @@ let game = {
 	 * draw game
 	 */ 
 	draw() {
-		
+		this.gameCanvas.playerCtx.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
+		this.brick.draw();
 	}  
 }; 
