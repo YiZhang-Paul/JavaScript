@@ -1,4 +1,4 @@
-html, body {
+html, body, main {
 	box-sizing: border-box;
 	background-color: black;
 	color: white;
@@ -9,6 +9,51 @@ html, body {
 
 img {
 	display: none;
+}
+
+section {
+	border: 1px solid white;
+	width: 40%;
+	height: 96%;
+	margin: auto;
+	margin-top: 0.5%;
+}
+
+.leftPane, .view, .rightPane {
+	border: 1px solid white;
+	display: inline-block;
+	position: relative;
+	width: 25%;
+	height: 98%;
+	margin-left: 2%;
+	margin-top: 0.5%;
+}
+
+.view {
+	width: 40%;
+}
+
+.hold, .next, .level, .score, .goal {
+	border: 1px solid white;
+	position: absolute;
+	text-align: center;
+	font-weight: bold;
+	font-family: Arial, "Times New Roman";
+	width: 90%;
+	height: 30%;
+	left: 0;
+	right: 0;
+	margin: auto;
+}
+
+.level, .goal {
+	height: 15%;
+	top: 75%; 
+}
+
+.score {
+	height: 15%;
+	top: 45%;
 }
 
 canvas {
