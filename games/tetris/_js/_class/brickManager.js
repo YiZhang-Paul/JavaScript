@@ -57,6 +57,7 @@ class BrickManager {
 			this.brickTimeout = setTimeout(() => {
 				//set next bricks 
 				this.curBrick = this.nextBrick;
+				this.curBrick.forbidMove();
 				this.nextBrick = this.randomBrick();
 				clearTimeout(this.brickTimeout);
 				this.brickTimeout = null;

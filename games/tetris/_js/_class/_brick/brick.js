@@ -18,9 +18,9 @@ class Brick {
 		//movement and rotations
 		this.fallSpeed = 500;
 		this.lastFall = 0;
-		this.moveSpeed = 70;
+		this.moveSpeed = 50;
 		this.lastMove = 0;
-		this.rotateSpeed = 200; 
+		this.rotateSpeed = 175; 
 		this.lastRotate = 0;
 		//brick appearance
 		this.tile = document.getElementById(this.color);
@@ -48,7 +48,7 @@ class Brick {
 		}
 		let column = game.gameGrid.column % 2 === 0 ?
 			game.gameGrid.column * 0.5 - 1 : (game.gameGrid.column - 1) * 0.5;
-		return [-row - 1, column - 2]; 
+		return [-row, column - 1]; 
 	}
 	/**
 	 * covert key code to in game control
@@ -126,6 +126,18 @@ class Brick {
 	 */
 	onRotateCD() {
 		return new Date().getTime() - this.lastRotate < this.rotateSpeed;
+	} 
+	/**
+	 * forbid moving bricks from the very start
+	 */
+	forbidMove() {
+		let forbidTime = 700;
+		this.moveSpeed = forbidTime;
+		this.setMoveCD();
+		let timeout = setTimeout(() => {
+			this.moveSpeed = 50;
+			clearTimeout(timeout);
+		}, forbidTime);
 	} 
 	/**
 	 * move bricks
@@ -291,8 +303,8 @@ class Brick {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				if(this.grids[i][j] == 1) {
 					let gridWidth = game.gameGrid.gridWidth;
-					let xCord = (this.curGrid[1] + j) * gridWidth;
-					let yCord = (this.curGrid[0] + i) * gridWidth;
+					let xCord = (this.curGrid[1] + j) * gridWidth + game.gameCanvas.border;
+					let yCord = (this.curGrid[0] + i) * gridWidth + game.gameCanvas.border;
 					this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);
 				}
 			}
