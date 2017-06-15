@@ -6,8 +6,10 @@
 let game = {
 	state : null, //current game state
 	monitor : {   //monitor spec
-		"width"  : window.innerWidth,
-		"height" : window.innerHeight
+		"width"      : window.innerWidth,
+		"height"     : window.innerHeight,
+		"viewWidth"  : window.innerWidth * 0.4 * 0.4,
+		"viewHeight" : window.innerHeight * 0.96 * 0.98
 	},
 	/**
 	 * load game assets
@@ -30,6 +32,7 @@ let game = {
 		 */
 		document.addEventListener("keydown", event => {
 			let keyCode = event.keyCode;
+			if(keyCode != 123) event.preventDefault();
 			//track movement key pressed
 			switch(keyCode) {
 				case control.W : case control.UP :
@@ -48,6 +51,7 @@ let game = {
 		}); 
 		document.addEventListener("keyup", event => {
 			let keyCode = event.keyCode;
+			if(keyCode != 123) event.preventDefault();
 			//track movement key released
 			switch(keyCode) {
 				case control.W : case control.UP :

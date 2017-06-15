@@ -304,8 +304,8 @@ class Brick {
 				if(this.grids[i][j] == 1) {
 					let gridWidth = game.grid.gridWidth;
 					let viewport = game.canvasManager.viewport;
-					let xCord = (this.curGrid[1] + j) * gridWidth + viewport.vBorder;
-					let yCord = (this.curGrid[0] + i) * gridWidth + viewport.hBorder;
+					let xCord = (this.curGrid[1] + j) * gridWidth + viewport.border;
+					let yCord = (this.curGrid[0] + i) * gridWidth + viewport.border;
 					this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);
 				}
 			}

@@ -1,5 +1,6 @@
 html, body, main {
 	box-sizing: border-box;
+	background: url(../_images/background.jpg) no-repeat;
 	background-color: black;
 	color: white;
 	width: 100%;
@@ -12,10 +13,12 @@ img {
 }
 
 section {
-	width: 40%;
-	height: 96%;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
 	margin: auto;
-	margin-top: 0.5%;
 }
 
 .leftPane, .view, .rightPane {
@@ -54,6 +57,6 @@ section {
 }
 
 canvas {
-	border-radius: 15px;
 	position: absolute;
+	border-radius: 15px;
 }

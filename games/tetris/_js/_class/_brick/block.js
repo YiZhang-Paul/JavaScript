@@ -21,8 +21,8 @@ class Block {
 	draw(row, column) {
 		let gridWidth = game.grid.gridWidth;
 		let viewport = game.canvasManager.viewport;
-		let xCord = column * gridWidth + viewport.vBorder;
-		let yCord = row * gridWidth + viewport.hBorder;
+		let xCord = column * gridWidth + viewport.border;
+		let yCord = row * gridWidth + viewport.border;
 		this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);
 	} 
 } 
