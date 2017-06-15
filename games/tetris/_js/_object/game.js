@@ -18,7 +18,7 @@ let game = {
 		//generate game canvas
 		this.gameCanvas = new GameCanvas();
 		//brick manager
-		this.manager = new BrickManager();
+		this.brickManager = new BrickManager();
 	},
 	/**
 	 * initialize game
@@ -122,7 +122,7 @@ let game = {
 	 * update game
 	 */ 
 	update() {
-		this.manager.update();
+		this.brickManager.update();
 		control.keyReleased = null;
 	},
 	/**
@@ -130,6 +130,6 @@ let game = {
 	 */ 
 	draw() {
 		this.gameCanvas.playerCtx.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
-		this.manager.draw();
+		this.brickManager.draw();
 	}  
 }; 

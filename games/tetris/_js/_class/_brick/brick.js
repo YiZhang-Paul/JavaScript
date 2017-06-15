@@ -303,8 +303,8 @@ class Brick {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				if(this.grids[i][j] == 1) {
 					let gridWidth = game.gameGrid.gridWidth;
-					let xCord = (this.curGrid[1] + j) * gridWidth + game.gameCanvas.border;
-					let yCord = (this.curGrid[0] + i) * gridWidth + game.gameCanvas.border;
+					let xCord = (this.curGrid[1] + j) * gridWidth;
+					let yCord = (this.curGrid[0] + i) * gridWidth;
 					this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);
 				}
 			}

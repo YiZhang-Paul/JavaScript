@@ -13,10 +13,11 @@ class Grid {
 		this.logicGrid = this.generateGrid();
 		//determine grid width
 		this.gridWidth = null;
-		if(game.monitor.width > game.monitor.height) {
-			this.gridWidth = Math.floor(game.monitor.height * 0.9 / this.row);
+		let viewport = document.getElementById("view");
+		if(viewport.offsetWidth > viewport.offsetHeight) {
+			this.gridWidth = Math.floor(viewport.offsetHeight / this.row);
 		} else {
-			this.gridWidth = Math.floor(game.monitor.width * 0.9 / this.column);
+			this.gridWidth = Math.floor(viewport.offsetWidth / this.column);
 		}
 	}
 	/**

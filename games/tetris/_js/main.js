@@ -2,7 +2,7 @@
 (() => {
 	document.addEventListener("DOMContentLoaded", () => {
 		//intialize and run game
-		//game.initialize();
+		game.initialize();
 		if(game.state == "initialized") {
 			game.run();
 		}

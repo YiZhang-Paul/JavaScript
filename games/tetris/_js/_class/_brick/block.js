@@ -20,8 +20,8 @@ class Block {
 	 */
 	draw(row, column) {
 		let gridWidth = game.gameGrid.gridWidth;
-		let xCord = column * gridWidth + game.gameCanvas.border;
-		let yCord = row * gridWidth + game.gameCanvas.border;
+		let xCord = column * gridWidth;
+		let yCord = row * gridWidth;
 		this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);
 	} 
 } 
