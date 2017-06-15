@@ -184,13 +184,11 @@ class BrickManager {
 	 * draw all bricks
 	 */
 	draw() {
-		let ctx = game.canvasManager.viewport.gridCtx;
-		let width = game.canvasManager.viewport.width;
-		let height = game.canvasManager.viewport.height;
-		ctx.clearRect(0, 0, width, height);
+		game.canvasManager.viewport.clear();
 		if(this.curBrick) {
 			this.curBrick.draw();
 		}
 		this.drawFellBrick();
+		game.canvasManager.viewport.drawTopPanel();
 	} 
 } 
