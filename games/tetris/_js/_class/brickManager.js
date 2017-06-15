@@ -72,8 +72,8 @@ class BrickManager {
 	 * returns int
 	 */
 	checkRow() {
-		for(let i = game.gameGrid.logicGrid.length - 1; i >= 0; i--) {
-			if(game.gameGrid.logicGrid[i].every(grid => grid !== 0)) {
+		for(let i = game.grid.logicGrid.length - 1; i >= 0; i--) {
+			if(game.grid.logicGrid[i].every(grid => grid !== 0)) {
 				this.rowToClear.add(i);
 			}
 		}
@@ -84,18 +84,18 @@ class BrickManager {
 	 */
 	clearRow() {
 		let newGrid = [];
-		for(let i = game.gameGrid.logicGrid.length - 1; i >= 0; i--) {
+		for(let i = game.grid.logicGrid.length - 1; i >= 0; i--) {
 			//insert rows that are not filled
 			if(!this.rowToClear.has(i)) {
-				newGrid.unshift(game.gameGrid.logicGrid[i]);
+				newGrid.unshift(game.grid.logicGrid[i]);
 			}
 		}
 		//replace cleared rows with empty rows
 		for(let i = 0; i < this.rowToClear.size; i++) {
-			newGrid.unshift(new Array(game.gameGrid.column).fill(0));
+			newGrid.unshift(new Array(game.grid.column).fill(0));
 		}
 		this.rowToClear = new Set();
-		game.gameGrid.logicGrid = newGrid;
+		game.grid.logicGrid = newGrid;
 	} 
 	/**
 	 * check game condition when brick fell on the groud 
@@ -120,7 +120,7 @@ class BrickManager {
 	 * returns boolean
 	 */
 	checkGameEnd() {
-		return game.gameGrid.logicGrid[0].some(grid => grid !== 0);
+		return game.grid.logicGrid[0].some(grid => grid !== 0);
 	} 
 	/**
 	 * manager states
@@ -171,7 +171,7 @@ class BrickManager {
 	 * draw fallen bricks
 	 */
 	drawFellBrick() {
-		let logicGrid = game.gameGrid.logicGrid;
+		let logicGrid = game.grid.logicGrid;
 		for(let i = 0; i < logicGrid.length; i++) {
 			for(let j = 0; j < logicGrid[i].length; j++) {
 				if(logicGrid[i][j] instanceof Block) {
@@ -184,6 +184,10 @@ class BrickManager {
 	 * draw all bricks
 	 */
 	draw() {
+		let ctx = game.canvasManager.viewport.gridCtx;
+		let width = game.canvasManager.viewport.width;
+		let height = game.canvasManager.viewport.height;
+		ctx.clearRect(0, 0, width, height);
 		if(this.curBrick) {
 			this.curBrick.draw();
 		}

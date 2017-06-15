@@ -14,9 +14,9 @@ let game = {
 	 */
 	loadAsset() {
 		//generate game grid
-		this.gameGrid = new Grid(25, 15); 
-		//generate game canvas
-		this.gameCanvas = new GameCanvas();
+		this.grid = new Grid(25, 15); 
+		//game canvas manager
+		this.canvasManager = new CanvasManager();
 		//brick manager
 		this.brickManager = new BrickManager();
 	},
@@ -109,8 +109,8 @@ let game = {
 	 * reset game
 	 */
 	reset() {
-		this.gameGrid.reset();
-		this.manager.reset();
+		this.grid.reset();
+		this.brickManager.reset();
 	}, 
 	/**
 	 * stop game
@@ -129,7 +129,6 @@ let game = {
 	 * draw game
 	 */ 
 	draw() {
-		this.gameCanvas.playerCtx.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
 		this.brickManager.draw();
 	}  
 }; 

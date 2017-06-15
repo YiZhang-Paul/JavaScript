@@ -1,17 +1,11 @@
 /* jslint esversion: 6 */
 /**
  * game canvas class
- * @param int, String
- *
- * zIndex : z-index of canvas
- * divID  : ID of div to be attached
  */
 class GameCanvas {
-	constructor(zIndex, divID) {
-		//make canvas
-		this.ctx = this.makeCanvas(zIndex, divID);
-		//draw canvas 
-		this.draw();
+	constructor() {
+		this.width = null;
+		this.height = null;
 	}
 	/**
 	 * make game canvas

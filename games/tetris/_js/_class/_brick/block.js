@@ -9,7 +9,7 @@ class Block {
 	constructor(color) {
 		this.color = color;
 		this.tile = document.getElementById(this.color);
-		this.ctx = game.gameCanvas.playerCtx;
+		this.ctx = game.canvasManager.viewport.gridCtx;
 	}
 	/**
 	 * draw block
@@ -19,9 +19,10 @@ class Block {
 	 * column : current column of block
 	 */
 	draw(row, column) {
-		let gridWidth = game.gameGrid.gridWidth;
-		let xCord = column * gridWidth;
-		let yCord = row * gridWidth;
+		let gridWidth = game.grid.gridWidth;
+		let viewport = game.canvasManager.viewport;
+		let xCord = column * gridWidth + viewport.vBorder;
+		let yCord = row * gridWidth + viewport.hBorder;
 		this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);
 	} 
 } 

@@ -24,7 +24,7 @@ class Brick {
 		this.lastRotate = 0;
 		//brick appearance
 		this.tile = document.getElementById(this.color);
-		this.ctx = game.gameCanvas.playerCtx;
+		this.ctx = game.canvasManager.viewport.gridCtx;
 	}
 	/**
 	 * initialize bricks
@@ -46,8 +46,8 @@ class Brick {
 		for(row = this.grids.length - 1; row >= 0; row--) {
 			if(new Set(this.grids[row]).size != 1) break;
 		}
-		let column = game.gameGrid.column % 2 === 0 ?
-			game.gameGrid.column * 0.5 - 1 : (game.gameGrid.column - 1) * 0.5;
+		let column = game.grid.column % 2 === 0 ?
+			game.grid.column * 0.5 - 1 : (game.grid.column - 1) * 0.5;
 		return [-row, column - 1]; 
 	}
 	/**
@@ -131,7 +131,7 @@ class Brick {
 	 * forbid moving bricks from the very start
 	 */
 	forbidMove() {
-		let forbidTime = 700;
+		let forbidTime = 500;
 		this.moveSpeed = forbidTime;
 		this.setMoveCD();
 		let timeout = setTimeout(() => {
@@ -150,7 +150,7 @@ class Brick {
 			switch(direction) {
 				case "down" :
 					if(this.bottomCollide()) {
-						game.manager.checkBrickFell(this);
+						game.brickManager.checkBrickFell(this);
 						return;
 					}
 					this.curGrid[0]++;
@@ -173,7 +173,7 @@ class Brick {
 	fallDown() {
 		if(!this.onFallCD()) {
 			if(this.bottomCollide()) {
-				game.manager.checkBrickFell(this);
+				game.brickManager.checkBrickFell(this);
 				return;
 			}
 			this.curGrid[0]++;
@@ -190,13 +190,13 @@ class Brick {
 	 */
 	canRotate(direction) {
 		let newGrids = this[direction];
-		let logicGrid = game.gameGrid.logicGrid;
+		let logicGrid = game.grid.logicGrid;
 		for(let i = 0; i < newGrids.length; i++) {
 			for(let j = 0; j < newGrids[i].length; j++) {
 				if(newGrids[i][j] == 1) {
-					let gameGridRow = logicGrid[this.curGrid[0] + i];
+					let gridRow = logicGrid[this.curGrid[0] + i];
 					if(this.curGrid[0] + i > logicGrid.length - 1 || 
-						 (gameGridRow && gameGridRow[this.curGrid[1] + j]) !== 0) {
+						 (gridRow && gridRow[this.curGrid[1] + j]) !== 0) {
 						return false;
 					}
 				}
@@ -240,7 +240,7 @@ class Brick {
 		for(let i = 0; i < this.grids.length; i++) {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				if(this.curGrid[0] + i >= 0 && this.grids[i][j] == 1) {
-					game.gameGrid.logicGrid[this.curGrid[0] + i][this.curGrid[1] + j] = new Block(this.color);
+					game.grid.logicGrid[this.curGrid[0] + i][this.curGrid[1] + j] = new Block(this.color);
 				}
 			}
 		}
@@ -255,7 +255,7 @@ class Brick {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				//check logic grids
 				if(this.curGrid[0] + i >= 0 && this.grids[i][j] == 1) {
-					let rowBelow = game.gameGrid.logicGrid[this.curGrid[0] + i + 1];
+					let rowBelow = game.grid.logicGrid[this.curGrid[0] + i + 1];
 					if(rowBelow === undefined || rowBelow[this.curGrid[1] + j]) {
 						return true;
 					}
@@ -277,7 +277,7 @@ class Brick {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				//check logic grids
 				if(this.curGrid[0] + i >= 0 && this.grids[i][j] == 1) {
-					let curRow = game.gameGrid.logicGrid[this.curGrid[0] + i];
+					let curRow = game.grid.logicGrid[this.curGrid[0] + i];
 					let sideColumn = direction == "left" ? 
 						curRow[this.curGrid[1] + j - 1] : curRow[this.curGrid[1] + j + 1];
 					if(sideColumn === undefined || sideColumn) {
@@ -302,9 +302,10 @@ class Brick {
 		for(let i = 0; i < this.grids.length; i++) {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				if(this.grids[i][j] == 1) {
-					let gridWidth = game.gameGrid.gridWidth;
-					let xCord = (this.curGrid[1] + j) * gridWidth;
-					let yCord = (this.curGrid[0] + i) * gridWidth;
+					let gridWidth = game.grid.gridWidth;
+					let viewport = game.canvasManager.viewport;
+					let xCord = (this.curGrid[1] + j) * gridWidth + viewport.vBorder;
+					let yCord = (this.curGrid[0] + i) * gridWidth + viewport.hBorder;
 					this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);
 				}
 			}
