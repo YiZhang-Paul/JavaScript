@@ -301,7 +301,7 @@ class Brick {
 	draw() {
 		for(let i = 0; i < this.grids.length; i++) {
 			for(let j = 0; j < this.grids[i].length; j++) {
-				if(this.grids[i][j] == 1) {
+				if(this.grids[i][j] == 1 && this.curGrid[0] + i >= 0) {
 					let gridWidth = game.grid.gridWidth;
 					let viewport = game.canvasManager.viewport;
 					let xCord = (this.curGrid[1] + j) * gridWidth + viewport.border;

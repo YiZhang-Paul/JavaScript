@@ -5,33 +5,34 @@
 class Viewport extends GameCanvas {
 	constructor() {
 		super();
+		this.allGridsWidth = game.grid.gridWidth * game.grid.column;
+		this.allGridsHeight = game.grid.gridWidth * game.grid.row;
 		//get viewport dimension
 		this.border = null;
 		this.getDimension();
 		//adjust container div height
 		this.adjustContainer();
 		//make canvas
-		this.backCtx = this.makeCanvas(1, "view"); 
+		this.backCtx = this.makeCanvas(1, "view");
 		this.gridCtx = this.makeCanvas(2, "view");
 		//draw canvas
-		this.backColor = "slategrey";
-		this.gridColor = "midnightblue";
+		this.backColor = "darkgrey";
+		this.lineColor = "grey";
+		this.viewportBG = document.getElementById("viewBG");
 		this.draw(); 
 	}
 	/**
 	 * get viewport dimension
 	 */
 	getDimension() {
-		let allGridsWidth = game.grid.gridWidth * game.grid.column;
-		let allGridsHeight = game.grid.gridWidth * game.grid.row;
 		let viewWidth = game.monitor.viewWidth;
 		let viewHeight = game.monitor.viewHeight;
 		//determine border width
 		this.border = viewWidth > viewHeight ?
-			(viewHeight - allGridsHeight) * 0.33 : (viewWidth - allGridsWidth) * 0.5;
+			(viewHeight - this.allGridsHeight) * 0.33 : (viewWidth - this.allGridsWidth) * 0.5;
 		//determine canvas dimension
-		this.width = allGridsWidth + 2 * this.border;
-		this.height = allGridsHeight + 3 * this.border;
+		this.width = this.allGridsWidth + 2 * this.border;
+		this.height = this.allGridsHeight + 3 * this.border;
 	} 
 	/**
 	 * adjust container dimension
@@ -41,29 +42,30 @@ class Viewport extends GameCanvas {
 		container.style.width = Math.floor(this.width / 0.4) + "px";
 		container.style.height = Math.floor(this.height / 0.98) + "px";
 	} 
-	/**
+	/**	
 	 * clear viewport
 	 */
 	clear() {
-		this.gridCtx.clearRect(0, 0, this.width, this.height);
-	} 
-	/**
-	 * draw top panel
-	 */
-	drawTopPanel() {
-		this.gridCtx.beginPath();
-		this.gridCtx.rect(0, 0, this.width, this.border);
-		this.gridCtx.fillStyle = this.backColor;
-		this.gridCtx.fill();
+		this.backCtx.clearRect(0, 0, this.width, this.height);
 	} 
 	/**
 	 * draw background
 	 */
 	drawBG() {
-		this.backCtx.beginPath();
-		this.backCtx.rect(0, 0, this.width, this.height);
-		this.backCtx.fillStyle = this.backColor;
-		this.backCtx.fill();
+		this.gridCtx.beginPath();
+		this.gridCtx.rect(0, 0, this.width, this.height);
+		this.gridCtx.fillStyle = this.backColor;
+		this.gridCtx.fill();
+		this.gridCtx.save();
+		this.gridCtx.globalAlpha = 0.9;
+		this.gridCtx.drawImage(
+			this.viewportBG, 
+			this.border, 
+			this.border,
+			this.allGridsWidth,
+			this.allGridsHeight
+		);
+		this.gridCtx.restore();
 	} 
 	/**
 	 * draw grids
@@ -71,17 +73,15 @@ class Viewport extends GameCanvas {
 	drawGrid() {
 		for(let i = 0; i < game.grid.logicGrid.length; i++) {
 			for(let j = 0; j < game.grid.logicGrid[i].length; j++) {
-				this.backCtx.beginPath();
-				this.backCtx.rect(
+				this.gridCtx.beginPath();
+				this.gridCtx.rect(
 					j * game.grid.gridWidth + this.border, 
 					i * game.grid.gridWidth + this.border, 
 					game.grid.gridWidth, 
 					game.grid.gridWidth
 				);
-				this.backCtx.fillStyle = this.gridColor;
-				this.backCtx.fill();
-				this.backCtx.strokeStyle = this.backColor;
-				this.backCtx.stroke();
+				this.gridCtx.strokeStyle = this.lineColor;
+				this.gridCtx.stroke();
 			}
 		}
 	} 
@@ -89,7 +89,7 @@ class Viewport extends GameCanvas {
 	 * draw viewport
 	 */
 	draw() {
-		this.backCtx.clearRect(0, 0, this.width, this.height);
+		this.clear();
 		this.drawBG();
 		this.drawGrid();
 	} 
