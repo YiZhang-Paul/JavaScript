@@ -8,7 +8,6 @@ class Viewport extends GameCanvas {
 		this.allGridsWidth = game.grid.gridWidth * game.grid.column;
 		this.allGridsHeight = game.grid.gridWidth * game.grid.row;
 		//get viewport dimension
-		this.border = null;
 		this.getDimension();
 		//adjust container div height
 		this.adjustContainer();
@@ -43,10 +42,16 @@ class Viewport extends GameCanvas {
 		container.style.height = Math.floor(this.height / 0.98) + "px";
 	} 
 	/**	
-	 * clear viewport
+	 * clear viewport background
 	 */
-	clear() {
+	clearBG() {
 		this.backCtx.clearRect(0, 0, this.width, this.height);
+	} 
+	/**
+	 * clear grid 
+	 */
+	clearGrid() {
+		this.gridCtx.clearRect(0, 0, this.width, this.height);
 	} 
 	/**
 	 * draw background
@@ -89,7 +94,8 @@ class Viewport extends GameCanvas {
 	 * draw viewport
 	 */
 	draw() {
-		this.clear();
+		this.clearBG();
+		this.clearGrid();
 		this.drawBG();
 		this.drawGrid();
 	} 

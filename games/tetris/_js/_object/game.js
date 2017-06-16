@@ -17,8 +17,10 @@ let game = {
 	loadAsset() {
 		//generate game grid
 		this.grid = new Grid(25, 15); 
-		//game canvas manager
-		this.canvasManager = new CanvasManager();
+		//create viewport
+		this.viewport = new Viewport();
+		//create game HUD
+
 		//brick manager
 		this.brickManager = new BrickManager();
 	},
@@ -133,6 +135,7 @@ let game = {
 	 * draw game
 	 */ 
 	draw() {
+		this.viewport.draw();
 		this.brickManager.draw();
 	}  
 }; 

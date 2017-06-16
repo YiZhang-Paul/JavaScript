@@ -24,7 +24,7 @@ class Brick {
 		this.lastRotate = 0;
 		//brick appearance
 		this.tile = document.getElementById(this.color);
-		this.ctx = game.canvasManager.viewport.gridCtx;
+		this.ctx = game.viewport.gridCtx;
 	}
 	/**
 	 * initialize bricks
@@ -48,7 +48,7 @@ class Brick {
 		}
 		let column = game.grid.column % 2 === 0 ?
 			game.grid.column * 0.5 - 1 : (game.grid.column - 1) * 0.5;
-		return [-row, column - 1]; 
+		return [-row - 1, column - 1]; 
 	}
 	/**
 	 * covert key code to in game control
@@ -131,7 +131,7 @@ class Brick {
 	 * forbid moving bricks from the very start
 	 */
 	forbidMove() {
-		let forbidTime = 500;
+		let forbidTime = 650;
 		this.moveSpeed = forbidTime;
 		this.setMoveCD();
 		let timeout = setTimeout(() => {
@@ -303,7 +303,7 @@ class Brick {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				if(this.grids[i][j] == 1 && this.curGrid[0] + i >= 0) {
 					let gridWidth = game.grid.gridWidth;
-					let viewport = game.canvasManager.viewport;
+					let viewport = game.viewport;
 					let xCord = (this.curGrid[1] + j) * gridWidth + viewport.border;
 					let yCord = (this.curGrid[0] + i) * gridWidth + viewport.border;
 					this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);

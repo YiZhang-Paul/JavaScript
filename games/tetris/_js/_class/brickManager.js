@@ -184,7 +184,6 @@ class BrickManager {
 	 * draw all bricks
 	 */
 	draw() {
-		game.canvasManager.viewport.draw();
 		if(this.curBrick) {
 			this.curBrick.draw();
 		}

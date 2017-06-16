@@ -9,7 +9,7 @@ class Block {
 	constructor(color) {
 		this.color = color;
 		this.tile = document.getElementById(this.color);
-		this.ctx = game.canvasManager.viewport.gridCtx;
+		this.ctx = game.viewport.gridCtx;
 	}
 	/**
 	 * draw block
@@ -20,7 +20,7 @@ class Block {
 	 */
 	draw(row, column) {
 		let gridWidth = game.grid.gridWidth;
-		let viewport = game.canvasManager.viewport;
+		let viewport = game.viewport;
 		let xCord = column * gridWidth + viewport.border;
 		let yCord = row * gridWidth + viewport.border;
 		this.ctx.drawImage(this.tile, xCord, yCord, gridWidth, gridWidth);

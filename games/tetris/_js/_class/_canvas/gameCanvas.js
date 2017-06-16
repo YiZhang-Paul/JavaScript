@@ -4,6 +4,7 @@
  */
 class GameCanvas {
 	constructor() {
+		this.border = null;
 		this.width = null;
 		this.height = null;
 	}
