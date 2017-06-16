@@ -44,6 +44,10 @@ section {
 	margin: auto;
 }
 
+.hold, .next {
+	top: 5%;
+}
+
 .level, .goal {
 	height: 20%;
 	top: 75%; 
@@ -51,7 +55,7 @@ section {
 
 .score {
 	height: 15%;
-	top: 45%;
+	top: 50%;
 }
 
 span {

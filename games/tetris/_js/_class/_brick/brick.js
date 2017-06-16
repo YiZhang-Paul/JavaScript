@@ -16,7 +16,7 @@ class Brick {
 		this.spawnGrid = [];
 		this.curGrid = [];
 		//movement and rotations
-		this.fallSpeed = 500;
+		this.fallSpeed = this.getFallSpeed();
 		this.lastFall = 0;
 		this.moveSpeed = 50;
 		this.lastMove = 0;
@@ -90,6 +90,15 @@ class Brick {
 			let keyCode = control.moveKey[control.moveKey.length - 1];
 			this.move(this.convertKeyCode(keyCode));
 		}
+	} 
+	/**
+	 * determine fall speed
+	 *
+	 * returns int
+	 */
+	getFallSpeed() {
+		let level = game.brickManager ? game.brickManager.level : 1;
+		return Math.max(500 - (level - 1) * 35, 45);
 	} 
 	/**
 	 * refresh fall cooldown

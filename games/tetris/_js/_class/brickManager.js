@@ -53,7 +53,7 @@ class BrickManager {
 	 * returns int
 	 */
 	getGoal(level) {
-		return Math.floor(level / 4) * 1000 + Math.floor(level / 8) * 500 + level % 12 * 800;
+		return level * ((level - 1) * 200 + 600);
 	} 
 	/**
 	 * generate random brick
@@ -134,7 +134,7 @@ class BrickManager {
 	 * check score
 	 */
 	checkScore() {
-		this.score += this.tetris ? (this.rowToClear.size + 4) * 100 : this.rowToClear.size * 100;
+		this.score += this.tetris ? (this.rowToClear.size + 4) * 100 : this.rowToClear.size * 1000;
 		this.tetris = false;
 		//display score 
 		game.hud.drawScore();
