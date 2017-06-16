@@ -59,6 +59,7 @@ class BrickManager {
 				this.curBrick = this.nextBrick;
 				this.curBrick.forbidMove();
 				this.nextBrick = this.randomBrick();
+				game.hud.updateBricks();
 				clearTimeout(this.brickTimeout);
 				this.brickTimeout = null;
 			}, 500);

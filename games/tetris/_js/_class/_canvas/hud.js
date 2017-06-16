@@ -5,71 +5,114 @@
 class HUD extends GameCanvas {
 	constructor() {
 		super();
-		this.opacity = 0.65;
+		//current holding brick and next brick 
+		this.curBrick = {tile : null, grids : null};
+		this.nextBrick = {tile : null, grids : null};
+		this.updateBricks();
+		//make canvas
 		this.holdCtx = this.makeCanvas(1, "hold");
 		this.nextCtx = this.makeCanvas(1, "next");
 		this.scoreCtx = this.makeCanvas(1, "score"); 
 		this.levelCtx = this.makeCanvas(1, "level");
 		this.goalCtx = this.makeCanvas(1, "goal");
-		this.drawHold();
-		this.drawNext();
-		this.drawScore();
-		this.drawLevel();
-		this.drawGoal();
+		this.draw();
 	}	
+	/**
+	 * draw background
+	 * @param String, String, float
+	 *
+	 * id          : div ID
+	 * color       : background color
+	 * globalAlpha : background opacity 
+	 */
+	drawBG(id, color = "black", globalAlpha = 0.6) {
+		let div = document.getElementById(id);
+		let ctx = this[id + "Ctx"];
+		ctx.clearRect(0, 0, div.offsetWidth, div.offsetHeight);
+		ctx.beginPath();
+		ctx.globalAlpha = globalAlpha;
+		ctx.rect(0, 0, div.offsetWidth, div.offsetHeight);
+		ctx.fillStyle = color;
+		ctx.fill();
+	}	 
+	/**
+	 * draw brick icon
+	 * @param String
+	 *
+	 * id : div ID
+	 */
+	drawIcon(id) {
+		let div = document.getElementById(id);
+		let ctx = this[id + "Ctx"];	
+		let brick = id == "hold" ? this.curBrick : this.nextBrick;
+		let gridWidth = div.offsetWidth > div.offsetHeight ? 
+			Math.floor(div.offsetHeight / 6) : Math.floor(div.offsetWidth / 0.6);
+		for(let i = 0; i < brick.grids.length; i++) {
+			for(let j = 0; j < brick.grids[i].length; j++) {
+				if(brick.grids[i][j] == 1) {
+					let xCord = (j + 1) * gridWidth;
+					let yCord = (i + 1) * gridWidth;
+					ctx.drawImage(brick.tile, xCord, yCord, gridWidth, gridWidth);
+				}
+			}
+		}
+	} 
 	/**
 	 * draw holding brick
 	 */
 	drawHold() {
-		let holdDiv = document.getElementById("hold");
-		this.holdCtx.beginPath();
-		this.holdCtx.rect(0, 0, holdDiv.offsetWidth, holdDiv.offsetHeight);
-		this.holdCtx.globalAlpha = this.opacity;
-		this.holdCtx.fillStyle = "black";
-		this.holdCtx.fill();
+		this.drawBG("hold");
+		this.drawIcon("hold");
 	} 
 	/**
 	 * draw next brick
 	 */
 	drawNext() {
-		let nextDiv = document.getElementById("next");
-		this.nextCtx.beginPath();
-		this.nextCtx.rect(0, 0, nextDiv.offsetWidth, nextDiv.offsetHeight);
-		this.nextCtx.globalAlpha = this.opacity;
-		this.nextCtx.fillStyle = "black";
-		this.nextCtx.fill();
+		this.drawBG("next");
+		this.drawIcon("next");
 	}
+	/**
+	 * update hold and next bricks to be notified
+	 */
+	updateBricks() {
+		this.curBrick.tile = game.brickManager.curBrick.tile;
+		this.curBrick.grids = game.brickManager.curBrick.grids.slice();
+		this.nextBrick.tile = game.brickManager.nextBrick.tile;
+		this.nextBrick.grids = game.brickManager.nextBrick.grids.slice();
+	} 
+	/**
+	 * draw hold and next bricks notification
+	 */
+	notifyBricks() {
+		this.drawHold();
+		this.drawNext();
+	} 
 	/**
 	 * draw current score
 	 */
 	drawScore() {
-		let scoreDiv = document.getElementById("score");
-		this.scoreCtx.beginPath();
-		this.scoreCtx.rect(0, 0, scoreDiv.offsetWidth, scoreDiv.offsetHeight);
-		this.scoreCtx.globalAlpha = this.opacity;
-		this.scoreCtx.fillStyle = "black";
-		this.scoreCtx.fill();
+		this.drawBG("score");
 	} 
 	/**
 	 * draw current level
 	 */
 	drawLevel() {
-		let levelDiv = document.getElementById("level");
-		this.levelCtx.beginPath();
-		this.levelCtx.rect(0, 0, levelDiv.offsetWidth, levelDiv.offsetHeight);
-		this.levelCtx.globalAlpha = this.opacity;
-		this.levelCtx.fillStyle = "black";
-		this.levelCtx.fill();
+		this.drawBG("level");
 	}
 	/**
 	 * draw goal
 	 */
 	drawGoal() {
-		let goalDiv = document.getElementById("goal");
-		this.goalCtx.beginPath();
-		this.goalCtx.rect(0, 0, goalDiv.offsetWidth, goalDiv.offsetHeight);
-		this.goalCtx.globalAlpha = this.opacity;
-		this.goalCtx.fillStyle = "black";
-		this.goalCtx.fill();
-	}    
+		this.drawBG("goal");
+	}   
+	/**
+	 * draw all hud
+	 */ 
+	draw() {
+		this.drawHold();
+		this.drawNext();
+		this.drawScore();
+		this.drawLevel();
+		this.drawGoal();
+	} 
 } 

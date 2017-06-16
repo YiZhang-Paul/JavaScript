@@ -137,5 +137,6 @@ let game = {
 	draw() {
 		this.viewport.draw();
 		this.brickManager.draw();
+		this.hud.notifyBricks();
 	}  
 }; 

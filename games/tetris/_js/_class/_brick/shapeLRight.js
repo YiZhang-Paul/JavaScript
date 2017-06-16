@@ -1,13 +1,14 @@
 /* jslint esversion: 6 */
 /**
  * right facing L-shape brick class 
- * @param String
+ * @param String, String
  *
- * color : color of brick
+ * color       : color of brick
+ * orientation : orientation of brick
  */
 class LRight extends Brick {
-	constructor(color) {
-		super(color);
+	constructor(color, orientation) {
+		super(color, orientation);
 		//brick patterns
 		this.up    = [[0, 1, 0, 0],
 		           		[0, 1, 0, 0],

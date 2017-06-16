@@ -59,6 +59,7 @@ class Viewport extends GameCanvas {
 	drawBG() {
 		this.gridCtx.beginPath();
 		this.gridCtx.rect(0, 0, this.width, this.height);
+		this.gridCtx.globalAlpha = 0.65;
 		this.gridCtx.fillStyle = this.backColor;
 		this.gridCtx.fill();
 		this.gridCtx.save();

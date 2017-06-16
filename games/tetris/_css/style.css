@@ -45,13 +45,24 @@ section {
 }
 
 .level, .goal {
-	height: 15%;
+	height: 20%;
 	top: 75%; 
 }
 
 .score {
 	height: 15%;
 	top: 45%;
+}
+
+span {
+	display: inline-block;
+	width: 100%;
+	text-align: center;
+	font-family: Arial, "Times New Roman";
+	font-weight: bold;
+	font-size: 150%;
+	position: absolute;
+	z-index: 2;
 }
 
 canvas {
