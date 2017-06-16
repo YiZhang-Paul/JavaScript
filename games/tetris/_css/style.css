@@ -64,6 +64,7 @@ span {
 	text-align: center;
 	font-family: Arial, "Times New Roman";
 	font-weight: bold;
+	line-height: 150%;
 	font-size: 150%;
 	position: absolute;
 	z-index: 2;

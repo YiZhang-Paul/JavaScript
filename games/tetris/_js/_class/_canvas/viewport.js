@@ -14,6 +14,10 @@ class Viewport extends GameCanvas {
 		//make canvas
 		this.backCtx = this.makeCanvas(1, "view");
 		this.gridCtx = this.makeCanvas(2, "view");
+		this.msgCtx = this.makeCanvas(3, "view");
+		this.msgCtx.font = "20px Arial";
+		this.msgCtx.textAlign = "center";
+		this.msgCtx.fillStyle = "white";
 		//draw canvas
 		this.backColor = "darkgrey";
 		this.lineColor = "grey";
@@ -52,6 +56,12 @@ class Viewport extends GameCanvas {
 	 */
 	clearGrid() {
 		this.gridCtx.clearRect(0, 0, this.width, this.height);
+	} 
+	/**
+	 * clear message 
+	 */
+	clearMsg() {
+		this.msgCtx.clearRect(0, 0, this.width, this.height);
 	} 
 	/**
 	 * draw background
