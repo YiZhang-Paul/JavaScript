@@ -61,6 +61,13 @@ class HUD extends GameCanvas {
 		}
 	} 
 	/**
+	 * reset HUD
+	 */
+	reset() {
+		this.updateBricks();
+		this.draw();
+	} 
+	/**
 	 * draw holding brick
 	 */
 	drawHold() {

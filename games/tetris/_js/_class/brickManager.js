@@ -23,17 +23,26 @@ class BrickManager {
 	 * reset manager
 	 */
 	reset() {
-		this.curBrick = this.randomBrick();
-		this.nextBrick = this.randomBrick();
+		this.makeBricks();
 		this.rowToClear = new Set();
 		this.tetris = false;
 		this.score = 0;
 		this.level = 1;
 		this.goal = this.getGoal(this.level);
+		if(game.hud) game.hud.reset();	
 		this.state = new StateMachine(this, "ready");
-		if(game.hud) {
-			game.hud.draw();	
-		}
+	} 
+	/**
+	 * go to next level
+	 */
+	nextLevel() {
+		this.makeBricks();
+		this.rowToClear = new Set();
+		this.tetris = false;
+		this.goal = this.getGoal(++this.level);
+		game.hud.notifyLevel();
+		game.grid.reset();
+		this.state = new StateMachine(this, "ongoing");
 	} 
 	/**
 	 * calculate goal for current level
@@ -71,17 +80,19 @@ class BrickManager {
 		return brick;
 	} 
 	/**
-	 * go to next level
+	 * generate bricks
 	 */
-	nextLevel() {
+	makeBricks() {
 		this.curBrick = this.randomBrick();
 		this.nextBrick = this.randomBrick();
-		this.rowToClear = new Set();
-		this.tetris = false;
-		this.goal = this.getGoal(++this.level);
-		game.grid.reset();
-		this.state = new StateMachine(this, "ongoing");
-		game.hud.notifyLevel();
+	}
+	/**
+	 * swap current brick to next brick
+	 */
+	swapBrick() {
+		this.curBrick = this.nextBrick;
+		this.nextBrick = this.randomBrick();
+		game.hud.updateBricks();
 	} 
 	/**
 	 * create next bricks
@@ -91,10 +102,8 @@ class BrickManager {
 			this.curBrick = null;
 			this.brickTimeout = setTimeout(() => {
 				//set next bricks 
-				this.curBrick = this.nextBrick;
+				this.swapBrick();
 				this.curBrick.forbidMove();
-				this.nextBrick = this.randomBrick();
-				game.hud.updateBricks();
 				clearTimeout(this.brickTimeout);
 				this.brickTimeout = null;
 			}, 500);
