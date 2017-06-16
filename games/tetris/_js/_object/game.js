@@ -38,16 +38,14 @@ let game = {
 			//track movement key pressed
 			switch(keyCode) {
 				case control.W : case control.UP :
-					if(!control.isDown(control.rotateKey, keyCode)) {
-						control.rotateKey.push(keyCode);
-					}
+					control.recordKey(control.rotateKey, keyCode);
+					control.recordKeyTime(keyCode);
 					break;
 				case control.S : case control.DOWN :
 				case control.A : case control.LEFT :
 				case control.D : case control.RIGHT :
-					if(!control.isDown(control.moveKey, keyCode)) {
-						control.moveKey.push(keyCode);
-					}
+					control.recordKey(control.moveKey, keyCode);
+					control.recordKeyTime(keyCode);
 					break;
 			}
 		}); 
@@ -61,13 +59,12 @@ let game = {
 				case control.A : case control.LEFT :
 				case control.D : case control.RIGHT :
 				case control.SPACE :
+					//record key released
 					control.keyReleased = keyCode;
-					if(control.isDown(control.rotateKey, keyCode)) {
-						control.rotateKey.splice(control.rotateKey.indexOf(keyCode), 1);
-					}
-					if(control.isDown(control.moveKey, keyCode)) {
-						control.moveKey.splice(control.moveKey.indexOf(keyCode), 1);
-					}
+					//remove key pressed
+					control.removeKey(control.rotateKey, keyCode);
+					control.removeKey(control.moveKey, keyCode);
+					control.removeKeyTime(keyCode);
 					break;
 			}
 		});
