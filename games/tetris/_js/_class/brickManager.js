@@ -185,7 +185,7 @@ class BrickManager {
 	 */
 	draw() {
 		if(this.curBrick) {
-			this.curBrick.draw();
+			this.curBrick.draw();			
 		}
 		this.drawFellBrick();
 	} 

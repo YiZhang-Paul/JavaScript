@@ -19,10 +19,10 @@ let game = {
 		this.grid = new Grid(25, 15); 
 		//create viewport
 		this.viewport = new Viewport();
-		//create game HUD
-
 		//brick manager
 		this.brickManager = new BrickManager();
+		//create game HUD
+		this.hud = new HUD();
 	},
 	/**
 	 * initialize game

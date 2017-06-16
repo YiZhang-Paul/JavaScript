@@ -37,9 +37,6 @@ section {
 
 .hold, .next, .level, .score, .goal {
 	position: absolute;
-	text-align: center;
-	font-weight: bold;
-	font-family: Arial, "Times New Roman";
 	width: 90%;
 	height: 30%;
 	left: 0;
