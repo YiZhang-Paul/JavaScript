@@ -44,7 +44,7 @@ class Brick {
 		//find bottom of brick
 		let row; 
 		for(row = this.grids.length - 1; row >= 0; row--) {
-			if(new Set(this.grids[row]).size != 1) break;
+			if(new Set(this.grids[row]).has(1)) break;
 		}
 		let column = game.grid.column % 2 === 0 ?
 			game.grid.column * 0.5 - 1 : (game.grid.column - 1) * 0.5;
