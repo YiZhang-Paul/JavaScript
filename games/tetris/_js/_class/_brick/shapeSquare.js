@@ -17,6 +17,14 @@ class Square extends Brick {
 		this.down  = this.up; 
 		this.left  = this.up;
 		this.right = this.up;
+		//icons
+		this.upIcon    = [[0, 0, 0, 0],
+		           				[0, 1, 1, 0],
+		          				[0, 1, 1, 0],
+		           				[0, 0, 0, 0]];
+		this.downIcon  = this.upIcon; 
+		this.leftIcon  = this.upIcon;
+		this.rightIcon = this.upIcon;
 		this.initialize();
 	}
 } 

@@ -47,13 +47,14 @@ class HUD extends GameCanvas {
 		let div = document.getElementById(id);
 		let ctx = this[id + "Ctx"];	
 		let brick = id == "hold" ? this.curBrick : this.nextBrick;
-		let gridWidth = div.offsetWidth > div.offsetHeight ? 
-			Math.floor(div.offsetHeight / 6) : Math.floor(div.offsetWidth / 0.6);
+		let widthByRow = Math.round(div.offsetHeight / brick.grids.length);
+		let widthByColumn = Math.round(div.offsetWidth / brick.grids[0].length);
+		let gridWidth = widthByRow > widthByColumn ? widthByColumn : widthByRow;
 		for(let i = 0; i < brick.grids.length; i++) {
-			for(let j = 0; j < brick.grids[i].length; j++) {
+			for(let j = 0; j < brick.grids[0].length; j++) {
 				if(brick.grids[i][j] == 1) {
-					let xCord = (j + 1) * gridWidth;
-					let yCord = (i + 1) * gridWidth;
+					let xCord = j * gridWidth;
+					let yCord = i * gridWidth;
 					ctx.drawImage(brick.tile, xCord, yCord, gridWidth, gridWidth);
 				}
 			}
@@ -77,11 +78,12 @@ class HUD extends GameCanvas {
 	 * update hold and next bricks to be notified
 	 */
 	updateBricks() {
-		let manager = game.brickManager;
-		this.curBrick.tile = manager.curBrick.tile;
-		this.curBrick.grids = manager.curBrick.grids.slice();
-		this.nextBrick.tile = manager.nextBrick.tile;
-		this.nextBrick.grids = manager.nextBrick.grids.slice();
+		let curBrick = game.brickManager.curBrick; 
+		let nextBrick = game.brickManager.nextBrick;
+		this.curBrick.tile = curBrick.tile;
+		this.curBrick.grids = curBrick[curBrick.orientation + "Icon"].slice();
+		this.nextBrick.tile = nextBrick.tile;
+		this.nextBrick.grids = nextBrick[nextBrick.orientation + "Icon"].slice();
 	} 
 	/**
 	 * draw hold and next bricks notification
@@ -95,6 +97,15 @@ class HUD extends GameCanvas {
 	 */
 	drawScore() {
 		this.drawBG("score");
+		let scoreBoard = document.getElementById("score");
+		this.scoreCtx.font="25px Arial";
+		this.scoreCtx.textAlign = "center";
+		this.scoreCtx.fillStyle = "white";
+		this.scoreCtx.fillText(
+			game.brickManager.score, 
+			scoreBoard.offsetWidth * 0.5, 
+			scoreBoard.offsetHeight * 0.7
+		);
 	} 
 	/**
 	 * draw current level

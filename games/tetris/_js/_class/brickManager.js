@@ -8,6 +8,8 @@ class BrickManager {
 		this.curBrick = null;
 		this.nextBrick = null;
 		this.rowToClear = null;
+		this.tetris = false;
+		this.score = null;
 		//time out handlers
 		this.brickTimeout = null;
 		this.swipeTimeout = null;
@@ -22,6 +24,8 @@ class BrickManager {
 		this.curBrick = this.randomBrick();
 		this.nextBrick = this.randomBrick();
 		this.rowToClear = new Set();
+		this.tetris = false;
+		this.score = 0;
 		this.state = new StateMachine(this, "ready");
 	} 
 	/**
@@ -73,12 +77,27 @@ class BrickManager {
 	 * returns int
 	 */
 	checkRow() {
+		let tetris = 0;
 		for(let i = game.grid.logicGrid.length - 1; i >= 0; i--) {
 			if(game.grid.logicGrid[i].every(grid => grid !== 0)) {
 				this.rowToClear.add(i);
+				if(++tetris == 4) {
+					this.tetris = true;
+				}
+				continue;
 			}
+			tetris = 0;
 		}
 		return this.rowToClear.size;
+	} 
+	/**
+	 * check score
+	 */
+	checkScore() {
+		this.score += this.tetris ? (this.rowToClear.size + 4) * 100 : this.rowToClear.size * 100;
+		this.tetris = false;
+		//display score 
+		game.hud.drawScore();
 	} 
 	/**
 	 * clear a filled row
@@ -95,6 +114,8 @@ class BrickManager {
 		for(let i = 0; i < this.rowToClear.size; i++) {
 			newGrid.unshift(new Array(game.grid.column).fill(0));
 		}
+		//calculate score
+		this.checkScore();
 		this.rowToClear = new Set();
 		game.grid.logicGrid = newGrid;
 	} 

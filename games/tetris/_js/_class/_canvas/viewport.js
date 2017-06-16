@@ -88,7 +88,7 @@ class Viewport extends GameCanvas {
 				);
 				this.backCtx.strokeStyle = this.lineColor;
 				this.backCtx.stroke();
-			}
+			}	
 		}
 	} 
 	/**

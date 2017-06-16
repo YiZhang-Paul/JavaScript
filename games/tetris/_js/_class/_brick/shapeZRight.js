@@ -20,6 +20,18 @@ class ZRight extends Brick {
 				          [0, 0, 0, 0]];
 		this.down  = this.up; 
 		this.right = this.left;
+		//icons
+		this.upIcon    = [[0, 0, 0, 0, 0],
+											[0, 0, 1, 0, 0],
+				           		[0, 0, 1, 1, 0],
+				          		[0, 0, 0, 1, 0],
+				           		[0, 0, 0, 0, 0]];
+		this.leftIcon  = [[0, 0, 0, 0, 0],
+						          [0, 0, 1, 1, 0],
+						          [0, 1, 1, 0, 0],
+						          [0, 0, 0, 0, 0]];
+		this.downIcon  = this.upIcon; 
+		this.rightIcon = this.leftIcon;
 		this.initialize();
 	}
 } 
