@@ -8,9 +8,19 @@
 class Block {
 	constructor(color) {
 		this.color = color;
-		this.tile = document.getElementById(this.color);
+		this.defaultTile = document.getElementById(this.color);
+		this.blinkTile = document.getElementById("blink");
+		this.tile = this.defaultTile;
+		this.step = 0;
 		this.ctx = game.viewport.gridCtx;
 	}
+	/**
+	 * change tile
+	 */
+	changeTile() {
+		this.step = this.step ? 0 : 1;
+		this.tile = this.step ? this.defaultTile : this.blinkTile;
+	} 
 	/**
 	 * draw block
 	 * @param int, int

@@ -16,6 +16,8 @@ class BrickManager {
 		this.brickTimeout = null;
 		this.swipeTimeout = null;
 		this.resetTimeout = null;
+		//interval handlers
+		this.swipeInterval = null;
 		this.state = null;
 		this.reset();
 	}
@@ -110,6 +112,20 @@ class BrickManager {
 		}
 	} 
 	/**
+	 * blink filled row
+	 */
+	blinkRow() {
+		if(!this.swipeInterval) {
+			this.swipeInterval = setInterval(() => {
+				this.rowToClear.forEach(row => {
+					game.grid.logicGrid[row].forEach(block => {
+						block.changeTile();
+					});
+				});
+			}, 100);
+		}
+	} 
+	/**
 	 * check if a row is filled
 	 * and determine total number
 	 * of rows to be cleared
@@ -134,7 +150,7 @@ class BrickManager {
 	 * check score
 	 */
 	checkScore() {
-		this.score += this.tetris ? (this.rowToClear.size + 4) * 100 : this.rowToClear.size * 1000;
+		this.score += this.tetris ? (this.rowToClear.size + 4) * 100 : this.rowToClear.size * 100;
 		this.tetris = false;
 		//display score 
 		game.hud.drawScore();
@@ -213,7 +229,11 @@ class BrickManager {
 	//clearing state
 	clearing() {
 		if(!this.swipeTimeout) {
+			this.blinkRow();
+			//clear filled rows
 			this.swipeTimeout = setTimeout(() => {
+				clearInterval(this.swipeInterval);
+				this.swipeInterval = null;
 				//clear row and generate next brick
 				this.clearRow();
 				this.createNext();
