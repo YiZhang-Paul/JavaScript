@@ -10,6 +10,8 @@ class BrickManager {
 		this.rowToClear = null;
 		this.tetris = false;
 		this.score = null;
+		this.level = null;
+		this.goal = null;
 		//time out handlers
 		this.brickTimeout = null;
 		this.swipeTimeout = null;
@@ -26,7 +28,20 @@ class BrickManager {
 		this.rowToClear = new Set();
 		this.tetris = false;
 		this.score = 0;
+		this.level = 1;
+		this.goal = this.getGoal(this.level);
 		this.state = new StateMachine(this, "ready");
+	} 
+	/**
+	 * calculate goal for current level
+	 * @param int
+	 *
+	 * level : current level
+	 *
+	 * returns int
+	 */
+	getGoal(level) {
+		return Math.floor(level / 4) * 1000 + Math.floor(level / 8) * 500 + level % 12 * 800;
 	} 
 	/**
 	 * generate random brick

@@ -93,31 +93,47 @@ class HUD extends GameCanvas {
 		this.drawNext();
 	} 
 	/**
+	 * draw numbers
+	 * @param float, String, float, float
+	 *
+	 * number     : number to be drawn
+	 * id         : div ID 
+	 * fontSize   : font size
+	 * lineHeight : line height of text
+	 *
+	 */
+	drawNumber(number, id, fontSize = 25, lineHeight = 0.7) {
+		let div = document.getElementById(id);
+		let ctx = this[id + "Ctx"];
+		ctx.font = fontSize + "px Arial";
+		ctx.textAlign = "center";
+		ctx.fillStyle = "white";
+		ctx.fillText(
+			number,
+			div.offsetWidth * 0.5,
+			div.offsetHeight * lineHeight
+		);
+	} 
+	/**
 	 * draw current score
 	 */
 	drawScore() {
 		this.drawBG("score");
-		let scoreBoard = document.getElementById("score");
-		this.scoreCtx.font="25px Arial";
-		this.scoreCtx.textAlign = "center";
-		this.scoreCtx.fillStyle = "white";
-		this.scoreCtx.fillText(
-			game.brickManager.score, 
-			scoreBoard.offsetWidth * 0.5, 
-			scoreBoard.offsetHeight * 0.7
-		);
+		this.drawNumber(game.brickManager.score, "score");
 	} 
 	/**
 	 * draw current level
 	 */
 	drawLevel() {
 		this.drawBG("level");
+		this.drawNumber(game.brickManager.level, "level", 45);
 	}
 	/**
 	 * draw goal
 	 */
 	drawGoal() {
 		this.drawBG("goal");
+		this.drawNumber(game.brickManager.goal, "goal", 35);
 	}   
 	/**
 	 * draw all hud
