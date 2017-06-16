@@ -57,21 +57,21 @@ class Viewport extends GameCanvas {
 	 * draw background
 	 */
 	drawBG() {
-		this.gridCtx.beginPath();
-		this.gridCtx.rect(0, 0, this.width, this.height);
-		this.gridCtx.globalAlpha = 0.65;
-		this.gridCtx.fillStyle = this.backColor;
-		this.gridCtx.fill();
-		this.gridCtx.save();
-		this.gridCtx.globalAlpha = 0.9;
-		this.gridCtx.drawImage(
+		this.backCtx.beginPath();
+		this.backCtx.rect(0, 0, this.width, this.height);
+		this.backCtx.globalAlpha = 0.65;
+		this.backCtx.fillStyle = this.backColor;
+		this.backCtx.fill();
+		this.backCtx.save();
+		this.backCtx.globalAlpha = 0.9;
+		this.backCtx.drawImage(
 			this.viewportBG, 
 			this.border, 
 			this.border,
 			this.allGridsWidth,
 			this.allGridsHeight
 		);
-		this.gridCtx.restore();
+		this.backCtx.restore();
 	} 
 	/**
 	 * draw grids
@@ -79,15 +79,15 @@ class Viewport extends GameCanvas {
 	drawGrid() {
 		for(let i = 0; i < game.grid.logicGrid.length; i++) {
 			for(let j = 0; j < game.grid.logicGrid[i].length; j++) {
-				this.gridCtx.beginPath();
-				this.gridCtx.rect(
+				this.backCtx.beginPath();
+				this.backCtx.rect(
 					j * game.grid.gridWidth + this.border, 
 					i * game.grid.gridWidth + this.border, 
 					game.grid.gridWidth, 
 					game.grid.gridWidth
 				);
-				this.gridCtx.strokeStyle = this.lineColor;
-				this.gridCtx.stroke();
+				this.backCtx.strokeStyle = this.lineColor;
+				this.backCtx.stroke();
 			}
 		}
 	} 

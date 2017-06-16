@@ -30,10 +30,12 @@ class HUD extends GameCanvas {
 		let ctx = this[id + "Ctx"];
 		ctx.clearRect(0, 0, div.offsetWidth, div.offsetHeight);
 		ctx.beginPath();
+		ctx.save();
 		ctx.globalAlpha = globalAlpha;
 		ctx.rect(0, 0, div.offsetWidth, div.offsetHeight);
 		ctx.fillStyle = color;
 		ctx.fill();
+		ctx.restore();
 	}	 
 	/**
 	 * draw brick icon
@@ -75,10 +77,11 @@ class HUD extends GameCanvas {
 	 * update hold and next bricks to be notified
 	 */
 	updateBricks() {
-		this.curBrick.tile = game.brickManager.curBrick.tile;
-		this.curBrick.grids = game.brickManager.curBrick.grids.slice();
-		this.nextBrick.tile = game.brickManager.nextBrick.tile;
-		this.nextBrick.grids = game.brickManager.nextBrick.grids.slice();
+		let manager = game.brickManager;
+		this.curBrick.tile = manager.curBrick.tile;
+		this.curBrick.grids = manager.curBrick.grids.slice();
+		this.nextBrick.tile = manager.nextBrick.tile;
+		this.nextBrick.grids = manager.nextBrick.grids.slice();
 	} 
 	/**
 	 * draw hold and next bricks notification
