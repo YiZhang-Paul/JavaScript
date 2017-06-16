@@ -134,7 +134,14 @@ class HUD extends GameCanvas {
 	drawGoal() {
 		this.drawBG("goal");
 		this.drawNumber(game.brickManager.goal, "goal", 35);
-	}   
+	}  
+	/**
+	 * draw next level and goal notification
+	 */ 
+	notifyLevel() {
+		this.drawLevel();
+		this.drawGoal();
+	} 
 	/**
 	 * draw all hud
 	 */ 

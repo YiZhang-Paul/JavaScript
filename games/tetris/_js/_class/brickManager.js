@@ -31,6 +31,9 @@ class BrickManager {
 		this.level = 1;
 		this.goal = this.getGoal(this.level);
 		this.state = new StateMachine(this, "ready");
+		if(game.hud) {
+			game.hud.draw();	
+		}
 	} 
 	/**
 	 * calculate goal for current level
@@ -66,6 +69,19 @@ class BrickManager {
 		else if(type == 5) brick = new ZLeft(color, orientation);
 		else brick = new ZRight(color, orientation);
 		return brick;
+	} 
+	/**
+	 * go to next level
+	 */
+	nextLevel() {
+		this.curBrick = this.randomBrick();
+		this.nextBrick = this.randomBrick();
+		this.rowToClear = new Set();
+		this.tetris = false;
+		this.goal = this.getGoal(++this.level);
+		game.grid.reset();
+		this.state = new StateMachine(this, "ongoing");
+		game.hud.notifyLevel();
 	} 
 	/**
 	 * create next bricks
@@ -115,6 +131,14 @@ class BrickManager {
 		game.hud.drawScore();
 	} 
 	/**
+	 * check goal
+	 */
+	checkGoal() {
+		if(this.score >= this.goal) {
+			this.nextLevel();
+		}
+	} 
+	/**
 	 * clear a filled row
 	 */
 	clearRow() {
@@ -133,6 +157,8 @@ class BrickManager {
 		this.checkScore();
 		this.rowToClear = new Set();
 		game.grid.logicGrid = newGrid;
+		//check goal
+		this.checkGoal();
 	} 
 	/**
 	 * check game condition when brick fell on the groud 
