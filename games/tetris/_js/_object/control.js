@@ -5,7 +5,9 @@
 let control = {
 	"moveKey" : [],
   "rotateKey" : [],	
-  "keyPressed" : new Map(),
+  "keyHeld" : new Map(),
+  "keyTapped" : new Map(),
+  "keyPressed" : new Set(),
 	"keyReleased" : null,
 	/**
 	 * control keys
@@ -32,8 +34,12 @@ let control = {
 	 * keyCode : control key code
 	 */
 	recordKey(keySet, keyCode) {
-		if(!this.isDown(keySet, keyCode)) {
+		if(!this.isDown(keyCode, keySet)) {
 			keySet.push(keyCode);
+		}
+		//always record key pressed
+		if(!this.keyPressed.has(keyCode)) {
+			this.keyPressed.add(keyCode);
 		}
 	}, 
 	/**
@@ -44,8 +50,12 @@ let control = {
 	 * keyCode : control key code
 	 */
 	removeKey(keySet, keyCode) {
-		if(this.isDown(keySet, keyCode)) {
+		if(this.isDown(keyCode, keySet)) {
 			keySet.splice(keySet.indexOf(keyCode), 1);
+		}
+		//alway remove key released
+		if(this.keyPressed.has(keyCode)) {
+			this.keyPressed.delete(keyCode);
 		}
 	},  
 	/**
@@ -54,9 +64,9 @@ let control = {
 	 *
 	 * keyCode : key code to be checked
 	 */
-	recordKeyTime(keyCode) {
-		if(!this.keyPressed.has(keyCode)) {
-			this.keyPressed.set(keyCode, new Date().getTime());
+	recordKeyHeld(keyCode) {
+		if(!this.keyHeld.has(keyCode)) {
+			this.keyHeld.set(keyCode, new Date().getTime());
 		}
 	}, 
 	/**
@@ -65,21 +75,33 @@ let control = {
 	 *
 	 * keyCode : key code to be checked
 	 */
-	removeKeyTime(keyCode) {
-		if(this.keyPressed.has(keyCode)) {
-			this.keyPressed.delete(keyCode);
+	removeKeyHeld(keyCode) {
+		if(this.keyHeld.has(keyCode)) {
+			this.keyHeld.delete(keyCode);
 		}
 	},
 	/**
-	 * check key press
-	 * @param array [], int
+	 * record control key tapped time
+	 * @param int
 	 *
-	 * control : control key set to be checked
+	 * keyCode : key code to be checked
+	 */
+	recordKeyTap(keyCode) {
+		this.keyTapped.set(keyCode, new Date().getTime());
+	}, 
+	/**
+	 * 
+	 */
+	/**
+	 * check key press
+	 * @param int, array []
+	 *
 	 * keyCode : key code of key being checked
+	 * control : control key set to be checked
 	 *
 	 * returns non-zero number on key press
 	 */
-	isDown(control, keyCode) {
+	isDown(keyCode, control = this.keyPressed) {
 		return control.indexOf(keyCode) + 1;
 	}, 
 	/**
@@ -90,10 +112,24 @@ let control = {
 	 * threshold : key hold threshold (ms)
 	 */
   isHeld(keyCode, threshold = 400) {
-  	if(this.keyPressed.has(keyCode)) {
-  		let pressTime = new Date().getTime() - this.keyPressed.get(keyCode);
+  	if(this.keyHeld.has(keyCode)) {
+  		let pressTime = new Date().getTime() - this.keyHeld.get(keyCode);
   		return pressTime >= threshold;
   	}
   	return false;
-  }
+  },
+  /**
+   * check key tap
+   * @param int, int
+   *
+   * keyCode   : key code to be checked
+   * threshold : key tap threshold (ms)
+   */
+  isTapped(keyCode, threshold = 80) {
+  	if(this.keyPressed.has(keyCode)) {
+  		let tapTime = new Date().getTime() - this.keyTapped.get(keyCode);
+  		return tapTime <= threshold;
+  	}
+  	return false;
+  } 
 }; 

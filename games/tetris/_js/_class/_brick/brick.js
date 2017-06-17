@@ -158,7 +158,7 @@ class Brick {
 		this.moveDownSpeed = forbidTime;
 		this.setMoveDownCD();
 		//reset key hold
-		control.keyPressed = new Map();
+		control.keyHeld = new Map();
 		let timeout = setTimeout(() => {
 			this.moveDownSpeed = 50;
 			clearTimeout(timeout);
@@ -333,9 +333,9 @@ class Brick {
 					let curRow = this.curGrid[0] + i;
 					let nextColumn = direction == "left" ? this.curGrid[1] + j - 1 : this.curGrid[1] + j + 1;
 					//check side boundary
-					let outBound = curRow < 0 && (nextColumn < 0 || nextColumn > logicGrid[0].length - 1);
+					let outBound = nextColumn < 0 || nextColumn > logicGrid[0].length - 1;
 					//check other bricks
-					let hitOtherBrick = curRow >= 0 && logicGrid[curRow][nextColumn] !== 0;
+					let hitOtherBrick = logicGrid[curRow] && logicGrid[curRow][nextColumn] instanceof Block;
 					if(outBound || hitOtherBrick) {
 						return true;
 					}

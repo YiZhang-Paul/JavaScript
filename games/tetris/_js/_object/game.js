@@ -39,13 +39,13 @@ let game = {
 			switch(keyCode) {
 				case control.W : case control.UP :
 					control.recordKey(control.rotateKey, keyCode);
-					control.recordKeyTime(keyCode);
+					control.recordKeyHeld(keyCode);
 					break;
 				case control.S : case control.DOWN :
 				case control.A : case control.LEFT :
 				case control.D : case control.RIGHT :
 					control.recordKey(control.moveKey, keyCode);
-					control.recordKeyTime(keyCode);
+					control.recordKeyHeld(keyCode);
 					break;
 			}
 		}); 
@@ -61,10 +61,11 @@ let game = {
 				case control.SPACE :
 					//record key released
 					control.keyReleased = keyCode;
+					control.recordKeyTap(keyCode);
 					//remove key pressed
 					control.removeKey(control.rotateKey, keyCode);
 					control.removeKey(control.moveKey, keyCode);
-					control.removeKeyTime(keyCode);
+					control.removeKeyHeld(keyCode);
 					break;
 			}
 		});
