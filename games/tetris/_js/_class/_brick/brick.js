@@ -24,6 +24,7 @@ class Brick {
 		this.lastSideMove = 0;
 		this.rotateSpeed = 175; 
 		this.lastRotate = 0;
+		this.hardLandDistance = 9;
 		//brick appearance
 		this.tile = document.getElementById(this.color);
 		this.ctx = game.viewport.gridCtx;
@@ -203,10 +204,13 @@ class Brick {
 	 * returns int
 	 */
 	getLandingLocation() {
-		let endRow = this.curGrid[0];
+		let startRow = this.curGrid[0]; 
+		let endRow = startRow;
 		while(!this.bottomCollide(endRow)) {
 			endRow++;
 		}
+		//calculate hard land distance
+		this.hardLandDistance = endRow - startRow;
 		return endRow;
 	} 
 	/**

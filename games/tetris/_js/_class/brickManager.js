@@ -5,6 +5,7 @@
 class BrickManager {
 	constructor() {
 		this.allOrients = ["up", "right", "down", "left"];
+		this.lastBrick = null;
 		this.curBrick = null;
 		this.nextBrick = null;
 		this.rowToClear = null;
@@ -26,6 +27,7 @@ class BrickManager {
 	 * reset manager
 	 */
 	reset() {
+		this.lastBrick = null;
 		this.makeBricks();
 		this.rowToClear = new Set();
 		this.tetris = false;
@@ -39,12 +41,12 @@ class BrickManager {
 	 * go to next level
 	 */
 	nextLevel() {
+		this.lastBrick = null;
 		this.makeBricks();
 		this.rowToClear = new Set();
 		this.tetris = false;
 		this.goal = this.getGoal(++this.level);
 		game.hud.notifyLevel();
-		game.grid.reset();
 		this.state = new StateMachine(this, "ongoing");
 	} 
 	/**
@@ -56,7 +58,7 @@ class BrickManager {
 	 * returns int
 	 */
 	getGoal(level) {
-		return level * ((level - 1) * 200 + 600);
+		return level * ((level - 1) * 150 + 600);
 	} 
 	/**
 	 * generate random brick
@@ -151,8 +153,14 @@ class BrickManager {
 	 * check score
 	 */
 	checkScore() {
-		this.score += this.tetris ? (this.rowToClear.size + 4) * 100 : this.rowToClear.size * 100;
+		//calculate row clear score
+		let multiplier = this.lastBrick.hardLandDistance ? 1.5 : 1; 
+		this.score += this.tetris ? 
+			(this.rowToClear.size + 4) * 100 * multiplier : this.rowToClear.size * 100 * multiplier;
+		//calculate hard land bonus
+		this.score += this.lastBrick.hardLandDistance * 5;
 		this.tetris = false;
+		this.lastBrick = null;
 		//display score 
 		game.hud.drawScore();
 	} 
@@ -198,6 +206,8 @@ class BrickManager {
 		if(this.checkGameEnd()) {
 			this.state.swapState("buffering");
 		} else if(this.checkRow()) {
+			//record last brick
+			this.lastBrick = brick;
 			this.state.swapState("clearing");
 		} else {
 			this.createNext();
@@ -264,7 +274,7 @@ class BrickManager {
 				this.state.swapState("ongoing");
 				clearTimeout(this.swipeTimeout);
 				this.swipeTimeout = null;
-			}, 600);
+			}, 700);
 		}
 	}
 	//buffering state
@@ -274,7 +284,7 @@ class BrickManager {
 				game.reset();
 				clearTimeout(this.resetTimeout);
 				this.resetTimeout = null;
-			}, 3000);
+			}, 3500);
 		}
 	}
 	/**
