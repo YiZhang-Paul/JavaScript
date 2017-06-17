@@ -89,7 +89,7 @@ let control = {
 	 * keyCode   : key code to be checked
 	 * threshold : key hold threshold (ms)
 	 */
-  isHeld(keyCode, threshold = 3000) {
+  isHeld(keyCode, threshold = 400) {
   	if(this.keyPressed.has(keyCode)) {
   		let pressTime = new Date().getTime() - this.keyPressed.get(keyCode);
   		return pressTime >= threshold;

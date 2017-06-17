@@ -18,8 +18,10 @@ class Brick {
 		//movement and rotations
 		this.fallSpeed = this.getFallSpeed();
 		this.lastFall = 0;
-		this.moveSpeed = 50;
-		this.lastMove = 0;
+		this.moveDownSpeed = 50;
+		this.lastMoveDown = 0;
+		this.sideMoveSpeed = 50;
+		this.lastSideMove = 0;
 		this.rotateSpeed = 175; 
 		this.lastRotate = 0;
 		//brick appearance
@@ -113,16 +115,28 @@ class Brick {
 		return new Date().getTime() - this.lastFall < this.fallSpeed;
 	} 
 	/**
-	 * refresh move cooldown
+	 * refresh move down cooldown
 	 */
-	setMoveCD() {
-		this.lastMove = new Date().getTime();
+	setMoveDownCD() {
+		this.lastMoveDown = new Date().getTime();
 	} 
 	/**
-	 * check move cooldown
+	 * check move down cooldown
 	 */
-	onMoveCD() {
-		return new Date().getTime() - this.lastMove < this.moveSpeed;
+	onMoveDownCD() {
+		return new Date().getTime() - this.lastMoveDown < this.moveDownSpeed;
+	} 
+	/**
+	 * refresh side move cooldown
+	 */
+	setSideMoveCD() {
+		this.lastSideMove = new Date().getTime();
+	} 
+	/**
+	 * check side move cooldown
+	 */
+	onSideMoveCD() {
+		return new Date().getTime() - this.lastSideMove < this.sideMoveSpeed;
 	} 
 	/**
 	 * refresh rotate cooldown
@@ -137,14 +151,16 @@ class Brick {
 		return new Date().getTime() - this.lastRotate < this.rotateSpeed;
 	} 
 	/**
-	 * forbid moving bricks from the very start
+	 * forbid moving down bricks from the very start
 	 */
 	forbidMove() {
-		let forbidTime = 650;
-		this.moveSpeed = forbidTime;
-		this.setMoveCD();
+		let forbidTime = 250;
+		this.moveDownSpeed = forbidTime;
+		this.setMoveDownCD();
+		//reset key hold
+		control.keyPressed = new Map();
 		let timeout = setTimeout(() => {
-			this.moveSpeed = 50;
+			this.moveDownSpeed = 50;
 			clearTimeout(timeout);
 		}, forbidTime);
 	} 
@@ -155,27 +171,51 @@ class Brick {
 	 * direction : movement direction
 	 */
 	move(direction) {
-		if(!this.onMoveCD()) {
-			switch(direction) {
-				case "down" :
+		switch(direction) {
+			//move down
+			case "down" :
+				if(!this.onMoveDownCD()) {
 					if(this.bottomCollide()) {
 						game.brickManager.checkBrickFell(this);
 						return;
 					}
 					this.curGrid[0]++;
-					break;
-				case "left" :
-				case "right" :
+					this.setMoveDownCD();
+				}
+				break;
+			//side move
+			case "left" :
+			case "right" :
+				if(!this.onSideMoveCD()) {
 					if(this.sideCollide(direction)) {
 						return;
 					}
 					this.curGrid[1] = direction == "left" ? 
-						this.curGrid[1] - 1 : this.curGrid[1] + 1;
-					break;
-			}
-			this.setMoveCD();
+					this.curGrid[1] - 1 : this.curGrid[1] + 1;
+					this.setSideMoveCD();
+				}
+				break;
 		}
 	}
+	/**
+	 * calculate landing location
+	 * 
+	 * returns int
+	 */
+	getLandingLocation() {
+		let endRow = this.curGrid[0];
+		while(!this.bottomCollide(endRow)) {
+			endRow++;
+		}
+		return endRow;
+	} 
+	/**
+	 * hard landing
+	 */
+	hardLand() {
+		this.curGrid[0] = this.getLandingLocation();
+		game.brickManager.checkBrickFell(this);
+	} 
 	/**
 	 * brick fall down 
 	 */ 
@@ -256,15 +296,18 @@ class Brick {
 	}
 	/**
 	 * check bottom collision
-	 * 
+	 * @param int 
+	 *
+	 * row : current row
+	 *
 	 * returns boolean
 	 */
-	bottomCollide() {
+	bottomCollide(row = this.curGrid[0]) {
 		for(let i = 0; i < this.grids.length; i++) {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				//check logic grids
-				if(this.curGrid[0] + i >= 0 && this.grids[i][j] == 1) {
-					let rowBelow = game.grid.logicGrid[this.curGrid[0] + i + 1];
+				if(row + i >= 0 && this.grids[i][j] == 1) {
+					let rowBelow = game.grid.logicGrid[row + i + 1];
 					if(rowBelow === undefined || rowBelow[this.curGrid[1] + j]) {
 						return true;
 					}
@@ -285,11 +328,15 @@ class Brick {
 		for(let i = 0; i < this.grids.length; i++) {
 			for(let j = 0; j < this.grids[i].length; j++) {
 				//check logic grids
-				if(this.curGrid[0] + i >= 0 && this.grids[i][j] == 1) {
-					let curRow = game.grid.logicGrid[this.curGrid[0] + i];
-					let sideColumn = direction == "left" ? 
-						curRow[this.curGrid[1] + j - 1] : curRow[this.curGrid[1] + j + 1];
-					if(sideColumn === undefined || sideColumn) {
+				if(this.grids[i][j] == 1) {
+					let logicGrid = game.grid.logicGrid;
+					let curRow = this.curGrid[0] + i;
+					let nextColumn = direction == "left" ? this.curGrid[1] + j - 1 : this.curGrid[1] + j + 1;
+					//check side boundary
+					let outBound = curRow < 0 && (nextColumn < 0 || nextColumn > logicGrid[0].length - 1);
+					//check other bricks
+					let hitOtherBrick = curRow >= 0 && logicGrid[curRow][nextColumn] !== 0;
+					if(outBound || hitOtherBrick) {
 						return true;
 					}
 				}
@@ -301,8 +348,12 @@ class Brick {
 	 * update brick 
 	 */
 	update() {
-		this.checkInput();
-		this.fallDown();
+		if(control.isHeld(control.S) || control.isHeld(control.DOWN)) {
+			this.hardLand();
+		} else {
+			this.checkInput();
+			this.fallDown();
+		}
 	} 
 	/**
 	 * draw brick
