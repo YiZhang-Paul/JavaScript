@@ -125,7 +125,7 @@ let control = {
    * keyCode   : key code to be checked
    * threshold : key tap threshold (ms)
    */
-  isTapped(keyCode, threshold = 80) {
+  isTapped(keyCode, threshold = 100) {
   	if(this.keyPressed.has(keyCode)) {
   		let tapTime = new Date().getTime() - this.keyTapped.get(keyCode);
   		return tapTime <= threshold;

@@ -158,7 +158,7 @@ class Brick {
 		this.moveDownSpeed = forbidTime;
 		this.setMoveDownCD();
 		//reset key hold
-		control.keyHeld = new Map();
+		control.keyTapped = new Map();
 		let timeout = setTimeout(() => {
 			this.moveDownSpeed = 50;
 			clearTimeout(timeout);
@@ -348,7 +348,7 @@ class Brick {
 	 * update brick 
 	 */
 	update() {
-		if(control.isHeld(control.S) || control.isHeld(control.DOWN)) {
+		if(control.isTapped(control.S) || control.isTapped(control.DOWN)) {
 			this.hardLand();
 		} else {
 			this.checkInput();
