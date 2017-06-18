@@ -24,7 +24,7 @@ class Brick {
 		this.lastSideMove = 0;
 		this.rotateSpeed = 175; 
 		this.lastRotate = 0;
-		this.hardLandDistance = 9;
+		this.hardLandDistance = 0;
 		//brick appearance
 		this.tile = document.getElementById(this.color);
 		this.ctx = game.viewport.gridCtx;
