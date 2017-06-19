@@ -15,7 +15,7 @@ class Sound {
 	 * volume : volumn of sound
 	 * loop   : loop sound file
 	 */
-	playSound(dom, start = 0, volume = 0.5, loop = false) {
+	playSound(dom, start = 0, volume = 1, loop = false) {
 		//record sound
 		if(!this.allSounds.has(dom)) {
 			this.allSounds.set(dom, true);

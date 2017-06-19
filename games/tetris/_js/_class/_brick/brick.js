@@ -177,6 +177,8 @@ class Brick {
 			case "down" :
 				if(!this.onMoveDownCD()) {
 					if(this.bottomCollide()) {
+						//play sound effect
+						game.sound.playSound(document.getElementById("impact"));
 						game.brickManager.checkBrickFell(this);
 						return;
 					}
@@ -191,6 +193,8 @@ class Brick {
 					if(this.sideCollide(direction)) {
 						return;
 					}
+					//play sound effect
+					game.sound.playSound(document.getElementById("move"));
 					this.curGrid[1] = direction == "left" ? 
 					this.curGrid[1] - 1 : this.curGrid[1] + 1;
 					this.setSideMoveCD();
@@ -217,6 +221,8 @@ class Brick {
 	 * hard landing
 	 */
 	hardLand() {
+		//play sound effect
+		game.sound.playSound(document.getElementById("hard_impact"));
 		this.curGrid[0] = this.getLandingLocation();
 		game.brickManager.checkBrickFell(this);
 	} 
@@ -226,6 +232,8 @@ class Brick {
 	fallDown() {
 		if(!this.onFallCD()) {
 			if(this.bottomCollide()) {
+				//play sound effect
+				game.sound.playSound(document.getElementById("impact"));
 				game.brickManager.checkBrickFell(this);
 				return;
 			}
@@ -280,6 +288,8 @@ class Brick {
 	rotate(direction) {
 		let rotateDir = this.nextRotateDir(direction);
 		if(!this.onRotateCD() && this.canRotate(rotateDir)) {
+			//play sound effect
+			game.sound.playSound(document.getElementById("rotate"));
 			//set new orientation and refresh rotate cooldown
 			this.orientation = rotateDir;
 			this.grids = this[this.orientation];

@@ -40,6 +40,8 @@ class BrickManager {
 	 * go to next level
 	 */
 	nextLevel() {
+		//play sound effect
+		game.sound.playSound(document.getElementById("level_up"));
 		this.lastBrick = null;
 		this.makeBricks();
 		this.rowToClear = new Set();
@@ -156,6 +158,8 @@ class BrickManager {
 		let multiplier = this.lastBrick.hardLandDistance ? 1.5 : 1; 
 		this.score += this.tetris ? 
 			(this.rowToClear.size + 4) * 100 * multiplier : this.rowToClear.size * 100 * multiplier;
+		//play sound effect
+		game.sound.playSound(document.getElementById(this.tetris ? "tetris" : "row_clear"));
 		//calculate hard land bonus
 		this.score += this.lastBrick.hardLandDistance * 5;
 		this.tetris = false;
@@ -202,8 +206,6 @@ class BrickManager {
 	checkBrickFell(brick) {
 		//record fallen brick location
 		brick.recordLocation();
-		//play sound effect
-		game.sound.playSound(document.getElementById("impact"));
 		if(this.checkGameEnd()) {
 			this.state.swapState("buffering");
 		} else if(this.checkRow()) {
@@ -240,7 +242,7 @@ class BrickManager {
 			this.curBrick.update();
 		}
 		//play background music
-		game.sound.playSound(document.getElementById("bgMusic"), 0, 0.6, true);
+		game.sound.playSound(document.getElementById("bgMusic"), 0, 0.4, true);
 	}
 	//clearing state
 	clearing() {
@@ -264,6 +266,8 @@ class BrickManager {
 		if(!this.resetTimeout) {
 			//clear game sound
 			game.sound.clearAllSound();
+			//play sound effect
+			game.sound.playSound(document.getElementById("game_end"));
 			this.resetTimeout = setTimeout(() => {
 				game.reset();
 				clearTimeout(this.resetTimeout);
