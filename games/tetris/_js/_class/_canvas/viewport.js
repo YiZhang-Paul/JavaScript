@@ -18,6 +18,7 @@ class Viewport extends GameCanvas {
 		this.msgCtx.font = "20px Arial";
 		this.msgCtx.textAlign = "center";
 		this.msgCtx.fillStyle = "white";
+		this.msgInterval = null;
 		//draw canvas
 		this.backColor = "darkgrey";
 		this.lineColor = "grey";
@@ -59,9 +60,32 @@ class Viewport extends GameCanvas {
 	} 
 	/**
 	 * clear message 
+	 * @param boolean
+	 *
+	 * permanent : temporarily/permanently clear message
 	 */
-	clearMsg() {
+	clearMsg(permanent) {
 		this.msgCtx.clearRect(0, 0, this.width, this.height);
+		if(permanent) {
+			clearInterval(this.msgInterval);
+			this.msgInterval = null;
+		}
+	} 
+	/**
+	 * display message
+	 */
+	displayMsg() {
+		if(!this.msgInterval) {
+			let step = 0;
+			this.msgInterval = setInterval(() => {
+				step = step ? 0 : 1;
+				if(step) {
+					this.msgCtx.fillText("Press SPACE", this.allGridsWidth * 0.565, this.allGridsHeight * 0.5);
+				} else {
+					this.clearMsg();
+				}
+			}, 350);
+		}
 	} 
 	/**
 	 * draw background

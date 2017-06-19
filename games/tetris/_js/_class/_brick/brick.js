@@ -352,7 +352,7 @@ class Brick {
 	 * update brick 
 	 */
 	update() {
-		if(control.keyReleased == control.SPACE) {
+		if(control.keyPressed.has(control.SPACE)) {
 			this.hardLand();
 		} else {
 			this.checkInput();

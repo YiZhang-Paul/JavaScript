@@ -34,7 +34,7 @@ let control = {
 	 * keyCode : control key code
 	 */
 	recordKey(keySet, keyCode) {
-		if(!this.isDown(keyCode, keySet)) {
+		if(keySet && !this.isDown(keyCode, keySet)) {
 			keySet.push(keyCode);
 		}
 		//always record key pressed
@@ -50,7 +50,7 @@ let control = {
 	 * keyCode : control key code
 	 */
 	removeKey(keySet, keyCode) {
-		if(this.isDown(keyCode, keySet)) {
+		if(keySet && this.isDown(keyCode, keySet)) {
 			keySet.splice(keySet.indexOf(keyCode), 1);
 		}
 		//alway remove key released

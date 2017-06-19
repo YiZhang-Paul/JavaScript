@@ -49,6 +49,9 @@ let game = {
 					control.recordKey(control.moveKey, keyCode);
 					control.recordKeyHeld(keyCode);
 					break;
+				case control.SPACE :
+					control.recordKey(null, keyCode);
+					break;
 			}
 		}); 
 		document.addEventListener("keyup", event => {

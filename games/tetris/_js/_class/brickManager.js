@@ -19,7 +19,6 @@ class BrickManager {
 		this.resetTimeout = null;
 		//interval handlers
 		this.swipeInterval = null;
-		this.msgInterval = null;
 		this.state = null;
 		this.reset();
 	}
@@ -224,35 +223,14 @@ class BrickManager {
 		return game.grid.logicGrid[0].some(grid => grid !== 0);
 	} 
 	/**
-	 * display message
-	 */
-	displayMsg() {
-		if(!this.msgInterval) {
-			let viewWidth = game.viewport.allGridsWidth;
-			let viewHeight = game.viewport.allGridsHeight;
-			let ctx = game.viewport.msgCtx;
-			let step = 0;
-			this.msgInterval = setInterval(() => {
-				step = step ? 0 : 1;
-				if(step) {
-					ctx.fillText("Press SPACE", viewWidth * 0.55, viewHeight * 0.5);
-				} else {
-					game.viewport.clearMsg();
-				}
-			}, 350);
-		}
-	} 
-	/**
 	 * manager states
 	 */ 
 	//ready state
 	ready() {
-		this.displayMsg();
+		game.viewport.displayMsg();
 		//detect game start
 		if(control.keyReleased == control.SPACE) {
-			clearInterval(this.msgInterval);
-			this.msgInterval = null;
-			game.viewport.clearMsg();
+			game.viewport.clearMsg(true);
 			this.state.swapState("ongoing");
 		}
 	} 
