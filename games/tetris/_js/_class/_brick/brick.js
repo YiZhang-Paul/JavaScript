@@ -352,7 +352,7 @@ class Brick {
 	 * update brick 
 	 */
 	update() {
-		if(control.isTapped(control.S) || control.isTapped(control.DOWN)) {
+		if(control.keyReleased == control.SPACE) {
 			this.hardLand();
 		} else {
 			this.checkInput();
