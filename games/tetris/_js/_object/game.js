@@ -16,7 +16,7 @@ let game = {
 	 */
 	loadAsset() {
 		//generate game grid
-		this.grid = new Grid(25, 15); 
+		this.grid = new Grid(20, 10); 
 		//create sound player
 		this.sound = new Sound();
 		//create viewport
