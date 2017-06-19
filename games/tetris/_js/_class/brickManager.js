@@ -203,6 +203,8 @@ class BrickManager {
 	checkBrickFell(brick) {
 		//record fallen brick location
 		brick.recordLocation();
+		//play sound effect
+		game.sound.playSound(document.getElementById("impact"));
 		if(this.checkGameEnd()) {
 			this.state.swapState("buffering");
 		} else if(this.checkRow()) {

@@ -19,6 +19,9 @@ class Sound {
 		//record sound
 		if(!this.allSounds.has(dom)) {
 			this.allSounds.set(dom, true);
+			dom.addEventListener("ended", () => {
+				this.clearSound(dom, start);
+			});
 		}
 		//play sound
 		if(this.allSounds.get(dom)) {
