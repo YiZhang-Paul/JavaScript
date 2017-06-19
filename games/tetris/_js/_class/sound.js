@@ -1,56 +1,55 @@
 /* jslint esversion: 6 */
 /**
  * sound class
- * @param obj {}, obj {}
- *
- * tracks : music sound tracks
- * clips  : sound clips 
  */
 class Sound {
-	constructor(tracks, clips) {
-		this.tracks = tracks;
-		this.clips = clips;
-		this.cleared = false;
-		this.timeoutHandler = null;
+	constructor() {
+		this.allSounds = new Map();
 	}
 	/**
 	 * play sound
-	 * @param String, String, obj {}, float, boolean
+	 * @param obj {}, float, float, boolean
 	 *
-	 * type  : type of sound
-	 * src   : source URL of sound file
-	 * dom   : dom element 
-	 * start : start time of sound file
-	 * loop  : loop sound file
+	 * dom    : dom element 
+	 * start  : start time of sound file
+	 * volume : volumn of sound
+	 * loop   : loop sound file
 	 */
-	playSound(type, src, dom, start, loop) {
-		this.cleared = false;
-		if(dom.src.search(src) == -1) {
-			dom.src = src;
-			dom.volume = type == "track" ? 0.15 : 1;
-			dom.currentTime = start || 0;
-			dom.loop = loop;
+	playSound(dom, start = 0, volume = 0.5, loop = false) {
+		//record sound
+		if(!this.allSounds.has(dom)) {
+			this.allSounds.set(dom, true);
 		}
-		dom.play();
-		dom.currentTime = start || 0;
+		//play sound
+		if(this.allSounds.get(dom)) {
+			this.allSounds.set(dom, false);
+			dom.currentTime = start;
+			dom.volume = volume;
+			dom.loop = loop;
+			dom.play();
+		}
 	} 
 	/**
 	 * clear sound
-	 * @param String, obj {}, float
+	 * @param obj {}, float
 	 *
-	 * src   : source URL of sound file 
 	 * dom   : dom element
 	 * start : start time of sound file
 	 */
-	clearSound(src, dom, start) {
-		if(!this.timeoutHandler && !this.cleared && dom.src.search(src) != -1) {
-			this.timeoutHandler = setTimeout(() => {
-				dom.currentTime = start || 0;
-				dom.pause();
-				this.cleared = true;
-				clearTimeout(this.timeoutHandler);
-				this.timeoutHandler = null;
-			}, 300);
+	clearSound(dom, start = 0) {
+		if(!this.allSounds.get(dom)) {
+			dom.currentTime = start;
+			dom.pause();
+			this.allSounds.set(dom, true);
 		}
+	} 
+	/**
+	 * clear all sound
+	 */
+	clearAllSound() {
+		let sounds = document.getElementsByTagName("audio");
+		[].forEach.call(sounds, sound => {
+			this.clearSound(sound);
+		});
 	} 
 } 

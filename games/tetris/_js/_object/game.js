@@ -17,6 +17,8 @@ let game = {
 	loadAsset() {
 		//generate game grid
 		this.grid = new Grid(25, 15); 
+		//create sound player
+		this.sound = new Sound();
 		//create viewport
 		this.viewport = new Viewport();
 		//brick manager

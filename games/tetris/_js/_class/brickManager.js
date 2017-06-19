@@ -259,6 +259,8 @@ class BrickManager {
 		if(this.curBrick) {
 			this.curBrick.update();
 		}
+		//play background music
+		game.sound.playSound(document.getElementById("bgMusic"), 0, 0.6, true);
 	}
 	//clearing state
 	clearing() {
@@ -280,6 +282,8 @@ class BrickManager {
 	//buffering state
 	buffering() {
 		if(!this.resetTimeout) {
+			//clear game sound
+			game.sound.clearAllSound();
 			this.resetTimeout = setTimeout(() => {
 				game.reset();
 				clearTimeout(this.resetTimeout);
