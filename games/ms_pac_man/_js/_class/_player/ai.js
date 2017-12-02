@@ -1,218 +1,230 @@
 /* jslint esversion: 6 */
-/**
- * AI class
- * @param obj {}
- *
- * owner : manager of ghost
- */
 class AI extends Player {
+
 	constructor(owner) {
+	
 		super();
 		this.owner = owner;
 		this.moving = false;
-		this.totalStep = 2;
-		this.defaultSpeed = Math.round(game.maze.height* 0.0002 * 100) / 100;
+		this.totalTicks = 2;
+		this.defaultSpeed = Math.round(game.maze.height * 0.0002 * 100) / 100;
 		this.speed = this.defaultSpeed;
 		this.endPoint = null;
 		this.retreatPath = null;
-		this.defaultCropXY = this.cropXY;
+		this.defaultState = null;
+		this.defaultCropXY = this.getCropXY;
 		this.state = null;
 	}
-	/**
-	 * reset AI
-	 */
+
 	reset() {
+
 		this.moving = false;
 		this.score = 200;
-		this.step = 0;
-		this.cropXY = this.defaultCropXY;
+		this.tick = 0;
+		this.getCropXY = this.defaultCropXY;
 		this.retreatPath = null;
-		this.state.swapState(this.name == "blinky" ? "outCell" : "inCell");
+		this.state = new StateMachine(this, this.defaultState);
+
 		if(this.intervalHandler) {
+
 			clearInterval(this.intervalHandler);
 			this.intervalHandler = null;
 		}
+
 		if(this.timeoutHandler) {
+
 			clearTimeout(this.timeoutHandler);
 			this.timeoutHandler = null; 
 		}
+
 		super.reset();
-	} 
-	/**
-	 * find available moving direction
-	 *
-	 * returns array []
-	 */
-	availableDir() {
-		let allDir = this.allDirect.slice();
-		return allDir.filter(direction => 
-			!this.hasWall(direction) && !this.hasDoor(direction));
-	} 
-	/**
-	 * check if AI can turn into new directions
-	 * @param String
-	 *
-	 * direction : new direction to be checked
-	 *
-	 * returns boolean
-	 */
+	}
+	
+	getValidDirection() {
+
+		return this.allDirections.filter(direction => {
+
+			return !this.hasWall(direction) && !this.hasDoor(direction);
+		});
+	}
+	
 	canTurn(direction) {
-		let isOpposite = direction == this.findOpposite();
-		let withinBoard = this.xCord >= 0 && this.xCord <= game.maze.width;
-		return isOpposite || (withinBoard && !this.hasWall(direction));
-	} 
-	/**
-	 * move back and forth
-	 */
+
+		const isOpposite = direction === this.getOppositeDirection();
+		const inMazeArea = this.xCord >= 0 && this.xCord <= game.maze.width;
+
+		return isOpposite || (inMazeArea && !this.hasWall(direction));
+	}
+
 	turnAround() {
-		if(this.collideDist === 0) {
-			this.setDirection(this.findOpposite());
+
+		if(this.collisionDistance === 0) {
+
+			this.setDirection(this.getOppositeDirection());
 		}
-	} 
-	/**
-	 * randomly change direction
-	 * @param array []
-	 * 
-	 * availableDir : all available directions
-	 */
-	randomDirection(availableDir) {
-		if(this.collideDist === 0) {
-			let finalDir = availableDir[Math.floor(Math.random() * availableDir.length)];
-			if(finalDir != this.findOpposite() || Math.random() < 0.4) {
-				this.setDirection(finalDir);
-			} else {
-				this.randomDirection(availableDir);
+	}
+
+	randomDirection(directions) {
+
+		if(this.collisionDistance === 0) {
+
+			const direction = directions[Math.floor(Math.random() * directions.length)];
+
+			if(direction != this.getOppositeDirection() || Math.random() < 0.4) {
+
+				this.setDirection(direction);
+			}
+			else {
+
+				this.randomDirection(directions);
 			}
 		}
-	} 
-	/**
-	 * get in cell
-	 */
-	getInCell() {
-		if(this.currentTile(1) && this.currentTile(1).c) {
-			this.cropXY = this.defaultCropXY;
+	}
+
+	getInShelter() {
+
+		if(this.getPosition(1) && this.getPosition(1).hasOwnProperty("c")) {
+
+			this.getCropXY = this.defaultCropXY;
 			this.stopAnimation(0);
-			let direction = this.xCord < game.maze.width * 0.5 ? "left" : "right";
-			this.setDirection(direction);
-			game.manager.aiManager.cell.add(this);
+			this.setDirection(this.xCord < game.maze.width * 0.5 ? "left" : "right");
+			game.manager.aiManager.shelter.add(this);
 			this.retreatPath = null;
-			this.state.swapState("inCell");
+			this.state.swapState("inShelter");
 		}
-	} 
-	/**
-	 * move out cell
-	 */
-	moveOutCell() {
-		let doorWidth = game.maze.gridWidth * 0.2;
-		let doorLeftX = (game.maze.width - doorWidth) * 0.5;
-		let doorRightX = (game.maze.width + doorWidth) * 0.5;
-		let cellCenterY = (grid.door.spawnRow + 2) * game.maze.gridWidth;
-		let inXRange = this.xCord > doorLeftX && this.xCord < doorRightX;
-		let inYRange = Math.round(Math.abs(this.yCord - cellCenterY)) < game.maze.gridWidth * 0.5;
+	}
+
+	moveOutShelter() {
+
+		const doorWidth = game.maze.gridWidth * 0.2;
+		const doorLeftX = (game.maze.width - doorWidth) * 0.5;
+		const doorRightX = (game.maze.width + doorWidth) * 0.5;
+		const shelterCenterY = (grid.door.spawnRow + 2) * game.maze.gridWidth;
+		const inDoorRange = this.xCord > doorLeftX && this.xCord < doorRightX;
+		const inYRange = Math.round(Math.abs(this.yCord - shelterCenterY)) < game.maze.gridWidth * 0.5;
 		//change directions to move out of cell
-		if((this.direction == "up" || this.direction == "down") && !inXRange && inYRange) {
+		if((this.direction === "up" || this.direction === "down") && !inDoorRange && inYRange) {
+
 			this.setDirection(this.xCord > game.maze.width * 0.5 ? "left" : "right");
-		} else if((this.direction == "left" || this.direction == "right") && inXRange) {
+		} 
+		else if((this.direction === "left" || this.direction === "right") && inDoorRange) {
+
 			this.setDirection("up"); 
-		} else {
+		} 
+		else {
+
 			this.turnAround();
 		}
-		//check door
+		
 		if(this.hasDoor("down")) {
-			this.owner.cell.delete(this);
+
+			this.owner.shelter.delete(this);
 			this.owner.resetCooldown();
-			this.state.swapState("outCell");
+			this.state.swapState("outShelter");
 		}
-	} 
+	}
 	/**
-	 * initiate process to return 
-	 * to normal from flee state
+	 * stage 1 of transition from flee state back to normal state
 	 */
-	intiateFleeToNormal() {
+	startFleeToNormal() {
+
 		if(!this.timeoutHandler) {
+
 			this.timeoutHandler = setTimeout(() => {
-				//clear time out first
+				
 				clearTimeout(this.timeoutHandler);
 				this.timeoutHandler = null;
 				//start transition back to normal
-				this.cropXY = this.cropFleeS2XY;
+				this.getCropXY = this.fleeCropXY;
 				this.stopAnimation(0);
 				this.animatePlayer(4);
 				this.finishFleeToNormal();
+
 			}, 50000);
 		}
-	} 
+	}
 	/**
-	 * final transition
+	 * stage 2 of transition from flee state back to normal state
 	 */
 	finishFleeToNormal() {
+
 		if(!this.timeoutHandler) {
+
 			this.timeoutHandler = setTimeout(() => {
-				//clear time out
+				
 				clearTimeout(this.timeoutHandler);
 				this.timeoutHandler = null;
 				//finalize transition to normal state
-				this.cropXY = this.defaultCropXY;
+				this.getCropXY = this.defaultCropXY;
 				this.stopAnimation(0);
-				this.state.swapState("outCell");
+				this.state.swapState("outShelter");
+
 			}, 3000);
 		}
-	} 
+	}
 	/**
 	 * @abstract
 	 * change moving direction inside of cell
 	 */
-	inCellDir() {} 
-	/**
-	 * change moving direction outside of cell
-	 */
-	outCellDir() {
-		this.randomDirection(this.availableDir());
-	} 
-	/**
-	 * move away from user
-	 */
-	fleeDir() {
-		if(this.collideDist === 0 || this.centerDist === null) {
-			let user = game.manager.user;
-			let distToUser = user.distToGhost(this.xCord, this.yCord);
-			let availableDir = this.availableDir();
-			if(distToUser < grid.row * 0.25 * game.maze.gridWidth) {
-				//get all available directions to flee
-				let fleeDir = [];
-				if(this.xCord != user.xCord) {
-					fleeDir.push(user.xCord > this.xCord ? "left" : "right");
+	inShelterDirection() {}
+
+	outShelterDirection() {
+
+		this.randomDirection(this.getValidDirection());
+	}
+
+	fleeDirection() {
+
+		if(this.collisionDistance === 0 || this.distanceToCenter === null) {
+
+			let fleeDirections = [];
+			let directions = this.getValidDirection();
+			//pick all directions the ghost can flee to
+			if(game.manager.user.distanceToGhost(this) < grid.row * 0.25 * game.maze.gridWidth) {
+
+				if(this.xCord != game.manager.user.xCord) {
+
+					fleeDirections.push(game.manager.user.xCord > this.xCord ? "left" : "right");
 				}
-				if(this.yCord != user.yCord) {
-					fleeDir.push(user.yCord > this.yCord ? "up" : "down");
+
+				if(this.yCord != game.manager.user.yCord) {
+
+					fleeDirections.push(game.manager.user.yCord > this.yCord ? "up" : "down");
 				}
-				fleeDir = fleeDir.filter(direction => availableDir.indexOf(direction) != -1);
-				if(fleeDir.length) {
-					this.setDirection(fleeDir[Math.floor(Math.random() * fleeDir.length)]);
-				} else {
-					availableDir.splice(availableDir.indexOf(this.findOpposite()), 1);
-					this.randomDirection(availableDir);
-				}
-			} else {
-				this.randomDirection(availableDir);
+
+				fleeDirections = fleeDirections.filter(direction => directions.includes(direction));
+			}
+
+			if(fleeDirections.length) {
+
+				this.setDirection(fleeDirections[Math.floor(Math.random() * fleeDirections.length)]);
+			}
+			else {
+
+				directions.splice(directions.indexOf(this.getOppositeDirection()), 1);
+				this.randomDirection(directions);
 			}
 		}
-	} 
-	/**
-	 * retreat to cell
-	 */
-	retreatDir() {
-		//move along retreat path
-		let nextTile = this.retreatPath[0];
-		if(this.onCenter(nextTile.row, nextTile.column)) {
+	}
+
+	retreatDirection() {
+		
+		let nextGrid = this.retreatPath[0];
+
+		if(this.onGridCenter(nextGrid.row, nextGrid.column)) {
+
 			this.retreatPath.shift();
+
 			if(!this.retreatPath.length) {
+			
 				this.retreatPath = null;
-			} else {
-				nextTile = this.retreatPath[0];	
+			} 
+			else {
+
+				nextGrid = this.retreatPath[0];	
 			}
 		}
-		let [centerX, centerY] = this.centerCord(nextTile.row, nextTile.column);
+		let [centerX, centerY] = this.centerCord(nextGrid.row, nextGrid.column);
 		//re-adjust error location calculation
 		if(centerX != this.xCord && centerY != this.yCord) {
 			if(Math.abs(centerX - this.xCord) < Math.abs(centerY - this.yCord)) {
@@ -231,263 +243,201 @@ class AI extends Player {
 		if(direction && this.canTurn(direction)) {
 			this.setDirection(direction);	
 		}
-	} 
-	/**
-	 * get total number of tiles needed to 
-	 * traverse from one tile to another tile
-	 * @param obj {], obj {}
-	 *
-	 * start : starting tile 
-	 * end   : ending tile
-	 *
-	 * returns int
-	 */
-	getTravelDist(start, end) {
+	}
+
+	getPathLength(start, end) {
+
 		return Math.abs(start.row - end.row) + Math.abs(start.column - end.column);
-	} 
-	/**
-	 * find metric
-	 * @param obj {], obj {}
-	 *
-	 * start  : starting tile 
-	 * end    : ending tile
-	 *
-	 * returns int
-	 */
-	getMetric(start, end, origin) {
-		let gScore = this.getTravelDist(start, new Node(origin.row, origin.column));
-		let hScore = this.getTravelDist(start, end);
-		let fScore = gScore + hScore;
-		let distToEnd = Math.hypot((start.row - end.row), (start.column - end.column));
-		let distToSelf = Math.hypot((start.row - origin.row), (start.column - origin.column));
-		return fScore + distToEnd - distToSelf;
 	}
 	/**
-	 * find tile with lowest metric
-	 * @param array [], obj {}, obj {}
-	 *
-	 * tileList : list of candidate tiles
-	 * end      : ending tile
-	 * origin : original starting point
-	 *
-	 * returns obj {}
+	 * calculate tile weight for A* algorithm
 	 */
-	getBestTile(tileList, end, origin = this) {
-		tileList.sort((tile1, tile2) => {
-			return this.getMetric(tile1, end, origin) - this.getMetric(tile2, end, origin);
+	getWeight(start, end, origin) {
+
+		const gScore = this.getPathLength(start, origin);
+		const hScore = this.getPathLength(start, end);
+		const fScore = gScore + hScore;
+		const distanceToEnd = Math.hypot((start.row - end.row), (start.column - end.column));
+		const distanceToSelf = Math.hypot((start.row - origin.row), (start.column - origin.column));
+
+		return fScore + distanceToEnd - distanceToSelf;
+	}
+
+	getBestGrid(grids, end, origin = this) {
+
+		grids.sort((grid1, grid2) => {
+
+			return this.getWeight(grid1, end, origin) - this.getWeight(grid2, end, origin);
 		});
-		return tileList[0];
-	} 
-	/**
-	 * get all walkable neighbour tiles
-	 * @param obj {}, array [] 
-	 *
-	 * curTile : current tile
-	 * banList : list of tiles to skip
-	 * 
-	 * returns array []
-	 */
-	getNeighbours(curTile, banList) {
-		let nodeBanned = (row, col) => banList.findIndex(node => node.row == row && node.column == col) != -1;
-		//find adjacent tiles on all four directions
-		let adjacentTiles = this.allDirect.map(direction => this.adjacentTile(1, direction, curTile.row, curTile.column));
-		//find all walkable neighbours
-		let neighbours = adjacentTiles.filter(neighbour => 
-			neighbour[0] && !neighbour[0].w && !neighbour[0].b && !nodeBanned(neighbour[1], neighbour[2]));
+
+		return grids[0];
+	}
+
+	getNeighbours(grid, visited) {
+
+		let isVisited = (row, col) => {
+
+			return visited.some(node => node.row === row && node.column === col);
+		};
+		//find all accessible neighbours
+		let neighbours = this.getAllAdjacentGrids(1, grid.row, grid.column).filter(neighbour => {
+
+			return !neighbour[0].w && !neighbour[0].b && !isVisited(neighbour[1], neighbour[2]);
+		});
 		//return all neighbour nodes 
 		return neighbours.map(neighbour => new Node(neighbour[1], neighbour[2]));
 	}
-	/**
-	 * find shortest path to retreat
-	 * @param obj {}
-	 *
-	 * end   : destination tile
-	 *
-	 * returns array []
-	 */
+
 	getRetreatPath(end = this.xCord < game.maze.width * 0.5 ? new Node(14, 13) : new Node(14, 14)) {
+		
 		this.endPoint = end;
-		//starting node
 		let start = new Node(this.row, this.column);
-		let path = [], visited = [start];
-		let queue = this.getNeighbours(start, visited);
-		while(queue.length) {
-			//find best tile and add to current path
-			let bestTile = this.getBestTile(queue, end, start);
-			path.push(bestTile);
-			visited = [...visited, ...queue];
-			if(bestTile.row == end.row && bestTile.column == end.column) {
+		let path = [];
+		let visited = [start];
+		let toVisit = this.getNeighbours(start, visited);
+
+		while(toVisit.length) {
+
+			let bestGrid = this.getBestGrid(toVisit, end, start);
+			path.push(bestGrid);
+			visited = [...visited, ...toVisit];
+
+			if(bestGrid.row === end.row && bestGrid.column === end.column) {
+
 				break;
-			} else {
-				queue = this.getNeighbours(path[path.length - 1], visited);
 			}
+
+			toVisit = this.getNeighbours(path[path.length - 1], visited);
 		}
+
 		if(this.hasEndPoint(path)) {
+
 			this.retreatPath = path;
 		}
-	} 
-	/**
-	 * check if a path contains end point
-	 * @param array []
-	 *
-	 * path : path to be examined
-	 *
-	 * returns boolean
-	 */
+	}
+
 	hasEndPoint(path = this.retreatPath) {
+
 		let lastNode = path[path.length - 1];
-		return lastNode.row == this.endPoint.row && lastNode.column == this.endPoint.column;
-	} 
-	/**
-	 * enter retreat mode
-	 */
+		return lastNode.row === this.endPoint.row && lastNode.column === this.endPoint.column;
+	}
+
 	enterRetreat() {
-		this.cropXY = this.cropRetreatXY;
+
+		this.getCropXY = this.retreatCropXY;
 		this.stopAnimation(0);
 		this.state.swapState("retreat");
-	} 
-	/**
-	 * ghost eat user
-	 */
-	eatUser() {
-		//check distance to user
-		let distance = game.manager.user.distToGhost(this.xCord, this.yCord);
-		if(distance < game.maze.gridWidth) {
+	}
+
+	killUser() {
+
+		if(game.manager.user.distanceToGhost(this) < game.maze.gridWidth) {
+
 			game.manager.user.life--;
 			game.manager.state.swapState("buffering");
 		}
-	} 
-	/**
-	 * determine AI tile image crop location
-	 * base on current direction and step 
-	 */
-	cropXY() {
+	}
+
+	getCropXY() {
 		//determine starting row base on ghost name
-		let startRow = 0;
-		if(this.name == "blinky") startRow = 2;
-		else if(this.name == "pinky") startRow = 3;
-		else if(this.name == "inky") startRow = 4;
-		else startRow = 5;
+		const row = ["blinky", "pinky", "inky", "clyde"].indexOf(this.name) + 2;
 		//determine crop index base on current direction
-		let index;
-		if(this.direction == "up") index = 0;	
-		else if(this.direction == "down") index = 1;	
-		else if(this.direction == "left") index = 2;	
-		else if(this.direction == "right") index = 3;	
-		//determine and update crop XY location
-		let cropWidth = this.cropWidth + 2;
-		this.cropX = (index * 2 + this.step) * cropWidth + 1;
-		this.cropY = startRow * cropWidth + 1;
-	} 
-	/**
-	 * determine AI tile image crop location
-	 * on flee state stage 1 
-	 */
-	cropFleeS1XY() {
-		//determine and update crop XY location
-		let cropWidth = this.cropWidth + 2;
-		this.cropX = (4 + this.step) * cropWidth + 1;
-		this.cropY = cropWidth + 1;
+		const index = ["up", "down", "left", "right"].indexOf(this.direction);
+		this.cropX = (index * 2 + this.tick) * this.cropWidth;
+		this.cropY = row * this.cropWidth;
 	}
-	/**
-	 * determine AI tile image crop location
-	 * on flee state stage 2 
-	 */
-	cropFleeS2XY() {
-		//determine and update crop XY location
-		let cropWidth = this.cropWidth + 2;
-		this.cropX = (4 + this.step) * cropWidth + 1;
-		this.cropY = cropWidth + 1;
+
+	fleeCropXY() {
+		
+		this.cropX = (4 + this.tick) * this.cropWidth;
+		this.cropY = this.cropWidth;
 	}
-	/**
-	 * determine AI tile image crop location
-	 * on retreat state  
-	 */
-	cropRetreatXY() {
-		//determine crop index base on current direction
-		let index;
-		if(this.direction == "up") index = 0;	
-		else if(this.direction == "down") index = 1;	
-		else if(this.direction == "left") index = 2;	
-		else if(this.direction == "right") index = 3;	
-		//determine and update crop XY location
-		let cropWidth = this.cropWidth + 2;
-		this.cropX = (4 + index) * cropWidth + 1;
-		this.cropY = 7 * cropWidth + 1;
+
+	retreatCropXY() {
+		
+		const index = ["up", "down", "left", "right"].indexOf(this.direction);	
+		this.cropX = (4 + index) * this.cropWidth;
+		this.cropY = 7 * this.cropWidth;
 	} 
 	/**
 	 * ghost states
 	 */
-	//in cell @abstract
-	inCell(timeStep) {
+	inShelter(timeStep) {
+
 		this.speed = this.defaultSpeed * 0.65;
-		//check movement in cell
+		
 		if(this.moving) {
-			this.inCellDir();
+
+			this.inShelterDirection();
 			this.move(timeStep);
 		}
-		//animate ghost
+		
 		this.animatePlayer();
 	}
-	//out cell
-	outCell(timeStep) {
+
+	outShelter(timeStep) {
+
 		this.speed = this.defaultSpeed;
-		//check movement out cell
+		
 		if(this.moving) {
-			this.outCellDir();
+
+			this.outShelterDirection();
 			this.move(timeStep);
-			//eat user
-			this.eatUser();
+			this.killUser();
 		}
-		//animate ghost
+		
 		this.animatePlayer();
 	}
-	//flee state
+	
 	flee(timeStep) {
+
 		this.speed = this.defaultSpeed * 0.8;
-		//check movement
+		
 		if(this.moving) {
-			this.fleeDir();
+
+			this.fleeDirection();
 			this.move(timeStep);
 		}
-		//animate ghost
+		
 		this.animatePlayer();
-		//set timer to go back to normal state
-		this.intiateFleeToNormal();
+		this.startFleeToNormal();
 	}
-	//retreat mode
+	
 	retreat(timeStep) {
+
 		this.speed = this.defaultSpeed * 1.4;
-		//check movement
+		
 		if(this.moving) {
-			//get retreat path
+			
 			if(!this.retreatPath) {
+
 				this.getRetreatPath();
 			} 
+
 			if(this.retreatPath && this.retreatPath.length) {
-				this.retreatDir();
-			} else if(!this.retreatPath) {
-				this.randomDirection(this.availableDir());
+
+				this.retreatDirection();
+			} 
+			else if(!this.retreatPath) {
+
+				this.randomDirection(this.getValidDirection());
 			}
+
 			this.move(timeStep);
-			this.getInCell();
+			this.getInShelter();
 		}
-		//animate ghost
+		
 		this.animatePlayer();
-		//clear time out
+		
 		if(this.timeoutHandler) {
+
 			clearTimeout(this.timeoutHandler);
 			this.timeoutHandler = null;
 		}
 	}
-	/**
-	 * update ghost
-	 * @param float
-	 * 
-	 * timeStep : game loop time step
-	 */
+
 	update(timeStep) {
-		//update ghost behaviour
+		
 		this.state.update(timeStep);
 	}
 } 

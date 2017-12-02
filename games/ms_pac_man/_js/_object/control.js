@@ -24,5 +24,10 @@ let control = {
 	isPressed(keyCode) {
 
 		return this.keyPressed.includes(keyCode);
+	},
+
+	getActiveKey() {
+
+		return this.keyPressed.length ? this.keyPressed[this.keyPressed.length - 1] : null;
 	}
 }; 

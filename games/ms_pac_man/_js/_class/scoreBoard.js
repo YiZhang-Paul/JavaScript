@@ -74,7 +74,7 @@ class ScoreBoard {
 		this.ctx.fillStyle = "white";
 		this.drawText([
 
-			[`${this.owner.playerNum}UP`, this.owner.score],
+			[`${this.owner.playerNumber}UP`, this.owner.score],
 			["HIGH SCORE", this.owner.highestScore]
 		]);
 	}

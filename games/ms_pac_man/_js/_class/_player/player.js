@@ -18,7 +18,7 @@ class Player {
 		this.tile = document.getElementById("player");
 		this.cropX = null;
 		this.cropY = null;
-		this.cropWidth = 30;
+		this.cropWidth = 32;
 		//player animation
 		this.tick = 0;
 		this.totalTicks = 0;
@@ -57,15 +57,15 @@ class Player {
 
 		return [
 
-			[(column + 0.5) * game.maze.gridWidth],
-			[(row + 0.5) * game.maze.gridWidth]
+			(column + 0.5) * game.maze.gridWidth,
+			(row + 0.5) * game.maze.gridWidth
 		];
 	}
 
 	onGridCenter(row = this.row, column = this.column) {
 
 		const [centerX, centerY] = this.getGridCenterCoordinate(row, column);
-		
+
 		return centerX === this.xCord && centerY === this.yCord;
 	}
 
@@ -101,6 +101,12 @@ class Player {
 		else return [null, null, null];
 
 		return [grid.getGrid(layer, row, column), row, column];
+	}
+
+	getAllAdjacentGrids(layer, row = this.row, column = this.column) {
+
+		return this.allDirections.map(direction => getAdjacentGrid(layer, direction, row, column))
+								 .filter(grid => grid[0]);
 	}
 
 	hasWall(direction = this.direction) {
@@ -163,7 +169,7 @@ class Player {
 
 	move(timeStep) {
 		
-		const speed = adjustSpeed(this.speed * timeStep);
+		const speed = this.adjustSpeed(this.speed * timeStep);
 
 		if(this.direction === "up" || this.direction === "down") {
 

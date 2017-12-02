@@ -1,22 +1,16 @@
 /* jslint esversion: 6 */
-/**
- * blinky class
- * @param obj {}
- *
- * owner : manager of AI
- */
 class Blinky extends AI {
+
 	constructor(owner) {
+
 		super(owner);
 		this.name = "blinky";
-		this.state = new StateMachine(this, "outCell");
-		//initialize/reset AI
+		this.defaultState = "outShelter";
 		this.reset();
 	}
-	/**
-	 * change moving direction inside of cell
-	 */
+
 	inCellDir() {
-		this.moveOutCell();
+		
+		this.moveOutShelter();
 	} 
 }
