@@ -1,83 +1,65 @@
 /* jslint esversion: 6 */
-/**
- * maze class
- */
 class Maze {
+
 	constructor() {
-		//determine maze dimension
-		this.gridWidth = null;
-		if(game.monitor.width > game.monitor.height) {
-			this.gridWidth = Math.floor(game.monitor.height * 0.8 / grid.row);
-		} else {
-			this.gridWidth = Math.floor(game.monitor.width * 0.8 / grid.column);
-		}
-		this.width = this.gridWidth * grid.column;
-		this.height = this.gridWidth * grid.row;
+
+		[this.width, this.height, this.gridWidth] = this.getDimension();
 		//create game canvases
-		this.backCtx = this.makeCanvas(this.width, this.height, 1);
-		this.foodCtx = this.makeCanvas(this.width, this.height, 2);
-		this.fruitCtx = this.makeCanvas(this.width, this.height, 3);
-		this.playerCtx = this.makeCanvas(this.width, this.height, 4);
-		this.uiCtx = this.makeCanvas(this.width, game.monitor.height, 5);
+		this.backCtx = this.getCanvas(this.width, this.height, 1);
+		this.foodCtx = this.getCanvas(this.width, this.height, 2);
+		this.fruitCtx = this.getCanvas(this.width, this.height, 3);
+		this.playerCtx = this.getCanvas(this.width, this.height, 4);
+		this.uiCtx = this.getCanvas(this.width, game.monitor.height, 5);
 		//maze tile sets
+		this.tick = 0;
 		this.tanTile = document.getElementById("maze");
-		this.transparentTile = document.getElementById("maze_transparent");
-		this.step = 0;
-		//draw maze
+		this.clippedTile = document.getElementById("maze_clipped");
 		this.draw();
 	}
-	/**
-	 * create game canvas
-	 * @param float, float, int
-	 *
-	 * width  : canvas width
-	 * height : canvas height
-	 * zIndex : canvas z-index
-	 * returns obj {}
-	 */
-	makeCanvas(width, height, zIndex) {
+
+	getDimension() {
+
+		const gridWidth = game.monitor.width > game.monitor.height ? 
+			Math.floor(game.monitor.height * 0.8 / grid.row) :
+			Math.floor(game.monitor.width * 0.8 / grid.column);
+
+		return [gridWidth * grid.column, gridWidth * grid.row, gridWidth];
+	}
+
+	getCanvas(width, height, zIndex) {
+
 		let canvas = document.createElement("canvas");
-		canvas.style.zIndex = zIndex;
 		canvas.width = width;
 		canvas.height = height;
 		canvas.style.width = width + "px";
 		canvas.style.height = height + "px";
+		canvas.style.zIndex = zIndex;
 		document.getElementById("board").appendChild(canvas);
+
 		return canvas.getContext("2d");
-	} 
-	/**
-	 * reset maze
-	 */
+	}
+	
 	reset() {
-		this.step = 0;
+
+		this.tick = 0;
 		this.draw();
 	} 
-	/**
-	 * change step
-	 */
-	changeStep() {
-		this.step = this.step ? 0 : 1;
-	} 
-	/**
-	 * blink maze
-	 */
+	
+	changeTick() {
+
+		this.tick = this.tick ? 0 : 1;
+	}
+	
 	blink() {
-		this.changeStep();
+
+		this.changeTick();
 		this.draw();
-	} 
-	/** 
-	 * draw maze
-	 */
+	}
+
 	draw() {
+
+		let tile = this.tick ? this.clippedTile : this.tanTile;
 		this.backCtx.clearRect(0, 0, this.width, this.height);
-		if(!this.step) {
-			this.backCtx.drawImage(
-				this.tanTile, 0, 0, this.width, this.height
-			);
-		} else {
-			this.backCtx.drawImage(
-				this.transparentTile, 0, 0, this.width, this.height
-			);
-		}
+		this.backCtx.drawImage(tile, 0, 0, this.width, this.height);
 	} 
-} 
+}

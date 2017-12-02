@@ -1,38 +1,46 @@
 /* jslint esversion: 6 */
-/**
- * grid object
- * contains maze information
- */
 let grid = {
-	row      : 31, //total number of rows 
-	column   : 28, //total number of columns
+
+	row      : 31, 
+	column   : 28,
 	door     : {
-		spawnRow : 13, //spawning row
-		spawnCol : [14, 15], //spawning column
+
+		spawnRow : 13,
+		spawnCol : [14, 15],
 	},
+
 	user     : {
-		spawnRow : 24, //spawning row
-		spawnCol : 14, //spawning column
+
+		spawnRow : 24,
+		spawnCol : 14,
 		direction : "right"
 	},
+
 	blinky   : {
-		spawnRow  : 12, //spawning row
-		spawnCol  : 14, //spawning column
+
+		spawnRow  : 12,
+		spawnCol  : 14,
 		direction : "left"
 	},
+
 	pinky    : {
-		spawnRow  : 15, //spawning row
-		spawnCol  : 14, //spawning column
+
+		spawnRow  : 15,
+		spawnCol  : 14,
 		direction : "down"
 	},
+
 	inky     : {
-		spawnRow  : 15, //spawning row
-		spawnCol  : 12, //spawning column
+
+		spawnRow  : 15,
+		spawnCol  : 12,
 		direction : "up"
 	},
+
 	clyde    : {
-		spawnRow  : 15, //spawning row
-		spawnCol  : 16, //spawning column
+
+		spawnRow  : 15,
+		spawnCol  : 16,
 		direction : "up"
 	},
 	//maze layers
@@ -103,17 +111,14 @@ let grid = {
 	[{w:"w"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{w:"w"}],
 	[{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"}]
 	]],
-	/**
-	 * retrieve grid value
-	 * @param int, int, int
-	 *
-	 * layer  :
-	 * row    : 
-	 * column :
-	 *
-	 * returns obj {}
-	 */  
+
 	getGrid(layer, row, column) {
+
 		return this.maze[layer][row][column];
-	} 
+	},
+
+	setGrid(layer, row, column, content) {
+
+		this.maze[layer][row][column] = content;
+	}
 };

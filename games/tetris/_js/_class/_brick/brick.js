@@ -196,7 +196,7 @@ class Brick {
 					//play sound effect
 					game.sound.playSound(document.getElementById("move"));
 					this.curGrid[1] = direction == "left" ? 
-					this.curGrid[1] - 1 : this.curGrid[1] + 1;
+						this.curGrid[1] - 1 : this.curGrid[1] + 1;
 					this.setSideMoveCD();
 				}
 				break;

@@ -34,7 +34,7 @@ let game = {
 				case control.S : case control.DOWN :
 				case control.A : case control.LEFT :
 				case control.D : case control.RIGHT :
-					if(!control.isDown(keyCode)) {
+					if(!control.isPressed(keyCode)) {
 						control.keyPressed.push(keyCode);
 					}
 					break;
@@ -50,7 +50,7 @@ let game = {
 				case control.D : case control.RIGHT :
 				case control.SPACE :
 					control.keyReleased = keyCode;
-					if(control.isDown(keyCode)) {
+					if(control.isPressed(keyCode)) {
 						control.keyPressed.splice(control.keyPressed.indexOf(keyCode), 1);
 					}
 					break;

@@ -78,7 +78,9 @@ class User extends Player {
 		if(!this.centerDist) {
 			let curGrid = this.currentTile();
 			if(curGrid instanceof Food) {
-				curGrid.delete();
+				game.manager.totalFood--;
+				game.manager.scoreBoard.updateScore(curGrid.score);
+				curGrid.clear();
 				//check game end
 				if(!game.manager.totalFood) {
 					game.manager.state.swapState("buffering");

@@ -9,7 +9,7 @@ class Manager {
 		this.aiManager = null;
 		this.scoreBoard = null;
 		this.totalFood = 0;
-		this.beans = new Set();
+		this.powerBeans = new Set();
 		this.fruits = new Set();
 		this.emptyCells = [];
 		this.timeoutHandler = null;
@@ -25,7 +25,7 @@ class Manager {
 	 * reset manager
 	 */
 	reset() {
-		this.beans = new Set();
+		this.powerBeans = new Set();
 		this.fruits.forEach(fruit => fruit.clear());
 		this.fruits = new Set();
 		this.emptyCells = [];
@@ -44,7 +44,7 @@ class Manager {
 			food = new Bean(row, column);
 		} else if(type == "l") {
 			food = new PowerBean(row, column);
-			this.beans.add(food);
+			this.powerBeans.add(food);
 		}
 		grid.maze[0][row][column] = food;
 		this.totalFood++;
@@ -103,7 +103,7 @@ class Manager {
 	blinkBean() {
 		if(!this.beanInterval) {
 			this.beanInterval = setInterval(() => {
-				this.beans.forEach(bean => {
+				this.powerBeans.forEach(bean => {
 					bean.blink();
 				});
 			}, 150);
@@ -205,7 +205,7 @@ class Manager {
 	//ready state
 	ready() {
 		this.blinkBean();
-		this.scoreBoard.blinkCurPlayer();
+		this.scoreBoard.blink();
 		//detect game start
 		if(control.keyPressed.length) {
 			this.state.swapState("ongoing");

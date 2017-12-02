@@ -1,84 +1,81 @@
 /* jslint esversion: 6 */
-/**
- * score board class
- * @param obj {}
- *
- * owner : user
- */
 class ScoreBoard {
+
 	constructor(owner) {
+
 		this.owner = owner;
 		this.width = game.maze.width;
 		this.height = (game.monitor.height - game.maze.height) * 0.5;
 		this.fontSize = this.height * 0.45;
-		this.step = 0;
+		this.tick = 0;
 		this.intervalHandler = null;
 		this.ctx = game.maze.uiCtx;
-		//draw score board
 		this.draw();
 	}
-	/**
-	 * reset score board
-	 */
+
 	reset() {
-		this.step = 0;
+
 		if(this.intervalHandler) {
+			
 			clearInterval(this.intervalHandler);
 			this.intervalHandler = null;
 		}
+
+		this.tick = 0;
 		this.draw();
-	} 
-	/**
-	 * update and display current score
-	 * @param int
-	 *
-	 * score : score received
-	 */
-	refreshScore(score = 0) {
+	}
+
+	updateScore(score = 0) {
+
 		this.owner.score += score;
 		this.owner.highestScore = Math.max(this.owner.score, this.owner.highestScore);
 		this.draw();
-	} 
-	/**
-	 * change step
-	 */
-	changeStep() {
-		this.step = this.step ? 0 : 1;
-	} 
-	/**
-	 * blink player indicator
-	 */
-	blinkCurPlayer() {
+	}
+
+	changeTick() {
+
+		this.tick = this.tick ? 0 : 1;
+	}
+
+	blink() {
+
 		if(!this.intervalHandler) {
+
 			this.intervalHandler = setInterval(() => {
-				this.changeStep();
+
+				this.changeTick();
 				this.draw();
+
 			}, 150);
 		}
-	} 
-	/**
-	 * draw score board
-	 */
+	}
+
+	drawText(texts) {
+
+		for(let i = 0; i < texts.length; i++) {
+
+			for(let j = 0; j < texts[i].length; j++) {
+
+				if(i || j || this.tick) {
+
+					const xCord = this.width * (0.2 + i * 0.4);
+					const yCord = this.height * (0.5 + j * 0.43);
+					this.ctx.fillText(texts[i][j], xCord, yCord);
+				}
+			}
+		}
+	}
+
 	draw() {
+
 		this.ctx.clearRect(0, 0, this.width, this.height);
 		this.ctx.font = this.fontSize + "px 'Lucida Console'";
 		this.ctx.textAlign = "center";
 		this.ctx.fillStyle = "white";
-		//display scores
-		//draw score board
-		let scores = [[`${this.owner.playerNum}UP`, this.owner.score], 
-									["HIGH SCORE", this.owner.highestScore]];
-		for(let i = 0; i < scores.length; i++) {
-			for(let j = 0; j < scores[i].length; j++) {
-				if(!i && !j && !this.step) {
-					continue;
-				}
-				this.ctx.fillText(
-					scores[i][j], 
-					this.width * (0.2 + i * 0.4), 
-					this.height * (0.5 + j * 0.43)
-				);
-			}
-		}
-	} 
+		this.drawText([
+
+			[`${this.owner.playerNum}UP`, this.owner.score],
+			["HIGH SCORE", this.owner.highestScore]
+		]);
+	}
 } 
