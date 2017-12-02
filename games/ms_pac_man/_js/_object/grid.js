@@ -11,35 +11,35 @@ let grid = {
 
 	user     : {
 
-		spawnRow : 24,
+		spawnRow : 23,
 		spawnCol : 14,
 		direction : "right"
 	},
 
 	blinky   : {
 
-		spawnRow  : 12,
+		spawnRow  : 11,
 		spawnCol  : 14,
 		direction : "left"
 	},
 
 	pinky    : {
 
-		spawnRow  : 15,
+		spawnRow  : 14,
 		spawnCol  : 14,
 		direction : "down"
 	},
 
 	inky     : {
 
-		spawnRow  : 15,
+		spawnRow  : 14,
 		spawnCol  : 12,
 		direction : "up"
 	},
 
 	clyde    : {
 
-		spawnRow  : 15,
+		spawnRow  : 14,
 		spawnCol  : 16,
 		direction : "up"
 	},

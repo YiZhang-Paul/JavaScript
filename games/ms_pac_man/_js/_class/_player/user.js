@@ -107,7 +107,7 @@ class User extends Player {
 				//check distance to a ghost
 				let distance = this.distToGhost(ghost.xCord, ghost.yCord);
 				if(distance < game.maze.gridWidth * 0.5) {
-					game.manager.scoreBoard.refreshScore(ghost.score);
+					game.manager.scoreBoard.updateScore(ghost.score);
 					//enter retreat mode
 					ghost.enterRetreat();
 				}
