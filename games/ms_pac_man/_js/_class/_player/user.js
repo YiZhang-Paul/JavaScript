@@ -74,11 +74,7 @@ class User extends Player {
 
 			if(currentGrid instanceof Food) {
 
-				if(!(currentGrid instanceof Fruit)) {
-
-					game.manager.totalFood--;
-				}
-
+				game.manager.totalFood--;
 				game.manager.scoreBoard.updateScore(currentGrid.score);
 				currentGrid.clear();
 				//check game end
@@ -87,6 +83,17 @@ class User extends Player {
 					game.manager.state.swapState("buffering");
 				}
 			}
+		}
+	}
+
+	eatFruit() {
+
+		let fruit = game.manager.activeFruit;
+
+		if(fruit && fruit.row === this.row && fruit.column === this.column) {
+
+			game.manager.scoreBoard.updateScore(fruit.score);
+			fruit.clear();
 		}
 	}
 
@@ -128,6 +135,7 @@ class User extends Player {
 		this.move(timeStep);
 		//eat food and kill ghost
 		this.eatFood();
+		this.eatFruit();
 		this.killGhost();
 	} 
 }

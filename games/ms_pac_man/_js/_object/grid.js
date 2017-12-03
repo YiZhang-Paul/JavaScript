@@ -112,6 +112,16 @@ let grid = {
 	[{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"}]
 	]],
 
+	canGetGrid(row, column) {
+
+		if(this.maze[0][row] === undefined) {
+
+			return false;
+		}
+
+		return this.maze[0][row][column] !== undefined;
+	},
+
 	getGrid(layer, row, column) {
 
 		return this.maze[layer][row][column];

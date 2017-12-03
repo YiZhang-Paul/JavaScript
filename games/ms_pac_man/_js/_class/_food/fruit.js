@@ -1,18 +1,18 @@
 /* jslint esversion: 6 */
 class Fruit extends Food {
 
-	constructor(row, column, type) {
+	constructor(row, column, type, direction) {
 
 		super(row, column);
 		this.type = type;
 		this.score = 500;
 		this.spawnTime = new Date();
-		this.minActiveTime = 15000;
+		this.minActiveTime = 3500000;
 		this.falling = false;
 		this.jumpHeight = 0;
 		this.maxJumpHeight = game.maze.gridWidth;
 		this.jumpSpeed = game.maze.gridWidth * 0.1;
-		this.direction = null;
+		this.direction = direction;
 		this.allDirections = ["up", "down", "left", "right"];
 		this.moveSpeed = Math.round(game.maze.height * 0.001 * 100) / 100;
 		this.distanceToCenter = null;
@@ -41,8 +41,7 @@ class Fruit extends Food {
 	
 	clear() {
 
-		game.manager.fruits.delete(this);
-		super.clear();
+		game.manager.activeFruit = null;
 		this.erase();
 	}
 
@@ -64,6 +63,11 @@ class Fruit extends Food {
 
 		this.row = Math.floor(this.yCord / game.maze.gridWidth); 
 		this.column = Math.floor(this.xCord / game.maze.gridWidth);
+	}
+
+	getPosition(layer = 0) {
+
+		return grid.getGrid(layer, this.row, this.column);		
 	}
 
 	getGridCenterCoordinate() {
@@ -134,21 +138,69 @@ class Fruit extends Food {
 		return direction;
 	}
 
+	getValidDirections() {
+
+		return this.allDirections.filter(direction => {
+
+			return direction !== this.getOppositeDirection(this.direction);
+		});
+	}
+
+	isValidGrid(target) {
+
+		if(!target) {
+
+			return false;
+		}
+
+		return !target.hasOwnProperty("w") && !target.hasOwnProperty("b") && !target.hasOwnProperty("c");
+	}
+
+	canPassThrough(direction) {
+
+		let [row, column] = [this.row, this.column];
+
+		for(let i = 0; i < 3; i++) {
+
+			if(direction === "up" || direction === "down") {
+
+				row += direction === "up" ? -1 : 1;
+			}
+			else {
+
+				column += direction === "left" ? -1 : 1;
+			}
+
+			if(!grid.canGetGrid(row, column)) {
+
+				return false;
+			}
+		}
+
+		return this.isValidGrid(grid.getGrid(1, row, column));
+	}
+
 	getDirection() {
 
-		if(this.onGridCenter() || !this.direction) {
+		let currentGrid = this.getPosition(1);
 
-			let directions = this.allDirections.filter(direction => direction !== this.getOppositeDirection(this.direction));
+		if(this.onGridCenter() && this.isActive() && (currentGrid.f || currentGrid.p)) {
+
+			if(this.isValidGrid(this.getAdjacentGrid(1)[0]) && Math.random() < 0.7) {
+
+				return this.direction;
+			}
+
+			let directions = this.getValidDirections();
+			const direction = directions[Math.floor(Math.random() * directions.length)];
+			let target = this.getAdjacentGrid(1, direction)[0];
 			
-			if(!this.direction || this.isActive()) {
+			if(this.isValidGrid(target) || (Math.random() < 0.2 && this.canPassThrough(direction))) {
 
-				directions = directions.filter(direction => this.getAdjacentGrid(1, direction)[0] !== null); 
+				return direction;
 			}
-
-			if(!this.direction || Math.random() < 0.3) {
-
-				return directions[Math.floor(Math.random() * directions.length)];
-			}
+			
+			return this.getDirection();
 		}
 
 		return this.direction;
@@ -187,7 +239,6 @@ class Fruit extends Food {
 	draw() {
 
 		this.erase();
-
 		this.ctx.drawImage(
 
 			this.tile, 

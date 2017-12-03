@@ -70,26 +70,28 @@ class Manager {
 					this.hud.enqueue(Math.floor(Math.random() * 7 + 1));
 				}
 
-			}, 1000); // 15000
+			}, 15000);
 		}
 	}
 
 	getFruit(type) {
 
-		let row, column;
+		let row, column, direction;
 
 		if(Math.random() < 0.5) {
 
 			row = Math.random() < 0.5 ? 0 : grid.row - 1;
-			column = Math.floor(Math.random() * grid.column);
+			column = Math.floor(Math.random() * (grid.column - 10)) + 5;
+			direction = row === 0 ? "down" : "up";
 		}
 		else {
 
-			row = Math.floor(Math.random() * grid.row);
+			row = Math.floor(Math.random() * (grid.row - 10)) + 5;
 			column = Math.random() < 0.5 ? 0 : grid.column - 1;
+			direction = column === 0 ? "right" : "left";
 		}
 
-		return new Fruit(row, column, type);
+		return new Fruit(row, column, type, direction);
 	}
 
 	putFruit() {
@@ -105,7 +107,7 @@ class Manager {
 				clearTimeout(this.fruitTimeout);
 				this.fruitTimeout = null;
 
-			}, 1000); //delay * 1000
+			}, delay * 1000);
 		}
 	}
 
