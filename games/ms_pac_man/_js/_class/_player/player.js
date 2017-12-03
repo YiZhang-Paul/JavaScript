@@ -162,7 +162,7 @@ class Player {
 		if(this.collisionDistance !== null) {
 
 			return Math.min(speed, this.collisionDistance);
-		} 
+		}
 		
 		return this.distanceToCenter ? Math.min(speed, this.distanceToCenter) : speed;
 	}
