@@ -70,7 +70,7 @@ class Manager {
 					this.hud.enqueue(Math.floor(Math.random() * 7 + 1));
 				}
 
-			}, 15000);
+			}, 1000); // 15000
 		}
 	}
 
@@ -102,8 +102,10 @@ class Manager {
 
 				this.activeFruit = this.getFruit(this.hud.fruitQueue[0]);
 				this.hud.dequeue();
+				clearTimeout(this.fruitTimeout);
+				this.fruitTimeout = null;
 
-			}, delay * 1000);
+			}, 1000); //delay * 1000
 		}
 	}
 
@@ -245,6 +247,11 @@ class Manager {
 		this.user.update(timeStep);
 		this.getFruitQueue();
 		this.putFruit();
+
+		if(this.activeFruit) {
+
+			this.activeFruit.update();
+		}
 	}
 	
 	buffering() {
@@ -275,6 +282,11 @@ class Manager {
 
 		this.ctx.clearRect(0, 0, game.maze.width, game.maze.height);
 		this.user.draw();
-		this.aiManager.draw();	
+		this.aiManager.draw();
+
+		if(this.activeFruit) {
+
+			this.activeFruit.draw();
+		}
 	}
 } 
