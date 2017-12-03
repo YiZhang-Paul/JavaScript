@@ -11,11 +11,25 @@ class HUD {
 		this.margin = this.height * 0.05; 
 		this.tile = document.getElementById("player");
 		this.ctx = game.maze.uiCtx;
+		this.draw();
 	}
 
 	reset() {
 
 		this.fruitQueue = [];
+		this.draw();
+	}
+
+	enqueue(type) {
+
+		this.fruitQueue.push(type);
+		this.draw();
+	}
+
+	dequeue() {
+
+		this.fruitQueue.shift();
+		this.draw();
 	}
 
 	showPlayerIcon() {

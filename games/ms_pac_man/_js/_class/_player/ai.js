@@ -143,7 +143,7 @@ class AI extends Player {
 				this.animatePlayer(4);
 				this.finishFleeToNormal();
 
-			}, 50000);
+			}, 8000);
 		}
 	}
 	/**
@@ -235,7 +235,6 @@ class AI extends Player {
 
 			[this.xCord, this.yCord] = this.getGridCenterCoordinate(this.row, this.column);
 			this.retreatDirection();
-			console.log("ag");
 			return;
 		}
 

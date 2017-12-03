@@ -15,6 +15,7 @@ class Manager {
 		this.intervalHandler = null;
 		this.beanInterval = null;
 		this.ctx = game.maze.playerCtx;
+		this.hudShown = false;
 		this.state = null;
 		this.newGame();
 	}
@@ -75,12 +76,12 @@ class Manager {
 			const type = Math.floor(Math.random() * 7 + 1);
 			let cell = this.emptyCells[index];
 			//record next fruit
-			this.hud.fruitQueue.push(type);
+			this.hud.enqueue(type);
 			this.fruitTimeout = setTimeout(() => {
 
 				this.putFruit(cell.row, cell.col, type);
 				this.emptyCells.splice(index, 1);
-				this.hud.fruitQueue.shift();
+				this.hud.dequeue();
 				clearTimeout(this.fruitTimeout);
 				this.fruitTimeout = null;
 
@@ -199,6 +200,12 @@ class Manager {
 
 		this.blinkPowerBeans();
 		this.scoreBoard.blink();
+
+		if(!this.hudShown && this.hud.tile.complete) {
+
+			this.hud.draw();
+			this.hudShown = true;
+		}
 		//detect game start
 		if(control.getActiveKey() !== null) {
 
@@ -243,7 +250,6 @@ class Manager {
 
 		this.ctx.clearRect(0, 0, game.maze.width, game.maze.height);
 		this.user.draw();
-		this.aiManager.draw();
-		this.hud.draw();		
+		this.aiManager.draw();	
 	}
 } 

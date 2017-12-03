@@ -98,12 +98,8 @@ let game = {
 					delta = 0; //panic measurement
 				}
 			}
-			//draw game
-			if(this.state == "running") {
-
-				this.draw();
-			}
-
+			
+			this.draw();
 			requestAnimationFrame(mainLoop);
 		};
 		
