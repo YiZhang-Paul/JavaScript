@@ -5,7 +5,7 @@ class AIManager {
 
 		this.ais = null;
 		this.shelter = null;
-		this.cooldown = 3000;
+		this.cooldown = 2000;
 		this.lastAIOut = 0; 
 		this.createAIs();
 	}

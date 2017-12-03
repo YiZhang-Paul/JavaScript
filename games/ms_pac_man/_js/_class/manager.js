@@ -8,10 +8,11 @@ class Manager {
 		this.scoreBoard = null;
 		this.totalFood = 0;
 		this.powerBeans = new Set();
-		this.fruits = new Set();
+		this.activeFruit = null;
 		this.emptyCells = [];
 		this.timeoutHandler = null;
 		this.fruitTimeout = null;
+		this.fruitInterval = null;
 		this.intervalHandler = null;
 		this.beanInterval = null;
 		this.ctx = game.maze.playerCtx;
@@ -23,8 +24,6 @@ class Manager {
 	reset() {
 
 		this.powerBeans = new Set();
-		this.fruits.forEach(fruit => fruit.clear());
-		this.fruits = new Set();
 		this.emptyCells = [];
 	}
 
@@ -60,34 +59,22 @@ class Manager {
 		}
 	}
 
-	putFruit(row, column, type) {
+	getFruitQueue() {
 
-		let fruit = new Fruit(row, column, type);
-		grid.setGrid(0, row, column, fruit);
-		this.fruits.add(fruit);
-	}
+		if(!this.fruitInterval) {
 
-	putRandomFruit() {
+			this.fruitInterval = setInterval(() => {
 
-		if(this.emptyCells.length > 40 && !this.fruitTimeout) {
+				if(this.hud.fruitQueue.length < 5) {
 
-			const timeout = Math.floor(Math.random() * 21 + 10) * 1000;
-			const index = Math.floor(Math.random() * this.emptyCells.length);
-			const type = Math.floor(Math.random() * 7 + 1);
-			let cell = this.emptyCells[index];
-			//record next fruit
-			this.hud.enqueue(type);
-			this.fruitTimeout = setTimeout(() => {
+					this.hud.enqueue(Math.floor(Math.random() * 7 + 1));
+				}
 
-				this.putFruit(cell.row, cell.col, type);
-				this.emptyCells.splice(index, 1);
-				this.hud.dequeue();
-				clearTimeout(this.fruitTimeout);
-				this.fruitTimeout = null;
-
-			}, timeout);
+			}, 20000);
 		}
 	}
+
+	
 
 	blinkPowerBeans() {
 
@@ -139,6 +126,12 @@ class Manager {
 
 			clearTimeout(this.timeoutHandler);
 			this.timeoutHandler = null;
+		}
+
+		if(this.fruitInterval) {
+
+			clearInterval(this.fruitInterval);
+			this.fruitInterval = null;
 		}
 
 		if(this.fruitTimeout) {
@@ -213,13 +206,13 @@ class Manager {
 			this.aiManager.initiateMove();
 			this.aiManager.startAnimate();
 		}
-	} 
+	}
 	
 	ongoing(timeStep) {
 
 		this.aiManager.update(timeStep);
 		this.user.update(timeStep);
-		this.putRandomFruit();
+		this.getFruitQueue();
 	}
 	
 	buffering() {
