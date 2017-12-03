@@ -234,6 +234,9 @@ class AI extends Player {
 		else {
 
 			[this.xCord, this.yCord] = this.getGridCenterCoordinate(this.row, this.column);
+			this.retreatDirection();
+			console.log("ag");
+			return;
 		}
 
 		if(direction && this.canTurn(direction)) {
@@ -359,14 +362,14 @@ class AI extends Player {
 
 	fleeCropXY() {
 		
-		this.cropX = (4 + this.tick) * this.cropWidth;
-		this.cropY = this.cropWidth;
+		this.cropX = (4 + this.tick) * this.cropWidth + 1;
+		this.cropY = this.cropWidth + 1;
 	}
 
 	retreatCropXY() {
 		
 		const index = ["up", "down", "left", "right"].indexOf(this.direction);	
-		this.cropX = (4 + index) * this.cropWidth;
+		this.cropX = (4 + index) * this.cropWidth + 1;
 		this.cropY = 7 * this.cropWidth;
 	} 
 	/**
@@ -449,7 +452,7 @@ class AI extends Player {
 	}
 
 	update(timeStep) {
-		
+
 		this.state.update(timeStep);
 	}
-} 
+}
