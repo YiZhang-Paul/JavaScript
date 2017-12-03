@@ -9,7 +9,7 @@ class Blinky extends AI {
 		this.reset();
 	}
 
-	inCellDir() {
+	inShelterDirection() {
 		
 		this.moveOutShelter();
 	} 

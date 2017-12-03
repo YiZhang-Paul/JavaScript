@@ -11,6 +11,18 @@ class Fruit extends Food {
 		this.cropX = this.cropWidth * (this.type - 1);
 		this.cropY = this.cropWidth * 6;
 		this.ctx = game.maze.fruitCtx;
+		this.draw();
+	}
+
+	erase() {
+
+		this.ctx.clearRect(
+
+			this.xCord - game.maze.gridWidth * 0.8,
+			this.yCord - game.maze.gridWidth * 0.8,
+			game.maze.gridWidth * 1.6,
+			game.maze.gridWidth * 1.6
+		);
 	}
 	
 	clear() {

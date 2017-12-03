@@ -74,7 +74,11 @@ class User extends Player {
 
 			if(currentGrid instanceof Food) {
 
-				game.manager.totalFood--;
+				if(!(currentGrid instanceof Fruit)) {
+
+					game.manager.totalFood--;
+				}
+
 				game.manager.scoreBoard.updateScore(currentGrid.score);
 				currentGrid.clear();
 				//check game end
@@ -118,7 +122,7 @@ class User extends Player {
 	update(timeStep) {
 
 		this.animationOn = this.collisionDistance !== 0;
-		this.animatePlayer();
+		this.animatePlayer(this.totalTicks, 100, 0);
 		//movment
 		this.checkMoveKey();
 		this.move(timeStep);

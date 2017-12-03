@@ -83,7 +83,9 @@ class AI extends Player {
 
 	getInShelter() {
 
-		if(this.getPosition(1) && this.getPosition(1).hasOwnProperty("c")) {
+		let currentGrid = this.getPosition(1);
+
+		if(currentGrid && currentGrid.hasOwnProperty("c")) {
 
 			this.getCropXY = this.defaultCropXY;
 			this.stopAnimation(0);
@@ -91,6 +93,7 @@ class AI extends Player {
 			game.manager.aiManager.shelter.add(this);
 			this.retreatPath = null;
 			this.state.swapState("inShelter");
+			this.owner.resetCooldown();
 		}
 	}
 
@@ -209,39 +212,46 @@ class AI extends Player {
 
 	retreatDirection() {
 		
-		let nextGrid = this.retreatPath[0];
+		let target = this.retreatPath[0];
 
-		if(this.onGridCenter(nextGrid.row, nextGrid.column)) {
+		if(this.onGridCenter(target.row, target.column)) {
 
 			this.retreatPath.shift();
-
-			if(!this.retreatPath.length) {
-			
-				this.retreatPath = null;
-			} 
-			else {
-
-				nextGrid = this.retreatPath[0];	
-			}
+			target = this.retreatPath[0];
 		}
-		let [centerX, centerY] = this.centerCord(nextGrid.row, nextGrid.column);
-		//re-adjust error location calculation
-		if(centerX != this.xCord && centerY != this.yCord) {
-			if(Math.abs(centerX - this.xCord) < Math.abs(centerY - this.yCord)) {
-				this.xCord = centerX;
-			} else {
-				this.yCord = centerY;
-			}
-		}
-		//determine retreat direction
+
 		let direction;
-		if(this.yCord == centerY) {
+		let [centerX, centerY] = this.getGridCenterCoordinate(target.row, target.column);
+
+		if(this.yCord === centerY) {
+
 			direction = this.xCord < centerX ? "right" : "left";
-		} else {
+		} 
+		else if(this.xCord === centerX) {
+
 			direction = this.yCord < centerY ? "down" : "up";
 		}
+		else {
+
+			[this.xCord, this.yCord] = this.getGridCenterCoordinate(this.row, this.column);
+		}
+
 		if(direction && this.canTurn(direction)) {
+
 			this.setDirection(direction);	
+		}
+	}
+
+	updateRetreatPath() {
+
+		if(this.retreatPath) {
+
+			let target = this.retreatPath[0];
+
+			if(this.retreatPath.length === 1 && this.onGridCenter(target.row, target.column)) {
+
+				this.retreatPath = null;
+			}
 		}
 	}
 
@@ -414,11 +424,13 @@ class AI extends Player {
 				this.getRetreatPath();
 			} 
 
-			if(this.retreatPath && this.retreatPath.length) {
+			this.updateRetreatPath();
+
+			if(this.retreatPath) {
 
 				this.retreatDirection();
 			} 
-			else if(!this.retreatPath) {
+			else {
 
 				this.randomDirection(this.getValidDirection());
 			}

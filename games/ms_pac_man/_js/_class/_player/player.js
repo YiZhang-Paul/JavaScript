@@ -105,7 +105,7 @@ class Player {
 
 	getAllAdjacentGrids(layer, row = this.row, column = this.column) {
 
-		return this.allDirections.map(direction => getAdjacentGrid(layer, direction, row, column))
+		return this.allDirections.map(direction => this.getAdjacentGrid(layer, direction, row, column))
 								 .filter(grid => grid[0]);
 	}
 
@@ -214,7 +214,7 @@ class Player {
 		this.getCropXY();
 	}
 
-	animatePlayer(totalTick, speed = 100) {
+	animatePlayer(totalTick, speed = 100, endTick = this.tick) {
 
 		if(this.animationOn && !this.intervalHandler) {
 
@@ -224,10 +224,9 @@ class Player {
 
 			}, speed);
 		} 
-		else if(!this.animationOn && this.intervalHandler) {
+		else if(!this.animationOn) {
 
-			clearInterval(this.intervalHandler);
-			this.intervalHandler = null;
+			this.stopAnimation(endTick);
 		}	
 	}
 

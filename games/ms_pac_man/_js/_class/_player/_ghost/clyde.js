@@ -19,5 +19,5 @@ class Clyde extends AI {
 			
 			this.moveOutShelter();
 		}
-	} 
+	}
 }

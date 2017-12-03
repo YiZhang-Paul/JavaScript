@@ -244,13 +244,6 @@ class Manager {
 		this.ctx.clearRect(0, 0, game.maze.width, game.maze.height);
 		this.user.draw();
 		this.aiManager.draw();
-		
-		this.fruits.forEach(fruit => {
-
-			fruit.clear();
-			fruit.draw();
-		});
-
 		this.hud.draw();		
 	}
 } 
