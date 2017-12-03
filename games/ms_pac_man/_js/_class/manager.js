@@ -70,11 +70,42 @@ class Manager {
 					this.hud.enqueue(Math.floor(Math.random() * 7 + 1));
 				}
 
-			}, 20000);
+			}, 15000);
 		}
 	}
 
-	
+	getFruit(type) {
+
+		let row, column;
+
+		if(Math.random() < 0.5) {
+
+			row = Math.random() < 0.5 ? 0 : grid.row - 1;
+			column = Math.floor(Math.random() * grid.column);
+		}
+		else {
+
+			row = Math.floor(Math.random() * grid.row);
+			column = Math.random() < 0.5 ? 0 : grid.column - 1;
+		}
+
+		return new Fruit(row, column, type);
+	}
+
+	putFruit() {
+
+		if(this.hud.fruitQueue.length && !this.activeFruit && !this.fruitTimeout) {
+
+			const delay = Math.floor(Math.random() * 10) + 10;
+
+			this.fruitTimeout = setTimeout(() => {
+
+				this.activeFruit = this.getFruit(this.hud.fruitQueue[0]);
+				this.hud.dequeue();
+
+			}, delay * 1000);
+		}
+	}
 
 	blinkPowerBeans() {
 
@@ -213,6 +244,7 @@ class Manager {
 		this.aiManager.update(timeStep);
 		this.user.update(timeStep);
 		this.getFruitQueue();
+		this.putFruit();
 	}
 	
 	buffering() {
