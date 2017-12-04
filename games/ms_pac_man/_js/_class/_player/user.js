@@ -8,6 +8,7 @@ class User extends Player {
 		this.playerNumber = 1;
 		this.life = 4;
 		this.highestScore = 0;
+		this.killCount = 0;
 		this.totalTicks = 3;
 		this.speed = Math.round(game.maze.height * 0.00025 * 100) / 100;
 		this.reset();
@@ -74,6 +75,11 @@ class User extends Player {
 
 			if(currentGrid instanceof Food) {
 
+				if(currentGrid instanceof PowerBean) {
+
+					this.killCount = 0;
+				}
+
 				game.manager.totalFood--;
 				game.manager.scoreBoard.updateScore(currentGrid.score);
 				currentGrid.clear();
@@ -112,9 +118,10 @@ class User extends Player {
 				const distance = this.distanceToGhost(ghost);
 
 				if(distance < game.maze.gridWidth * 0.5) {
-					
+				
+					this.killCount = Math.min(this.killCount + 1, 4);	
 					game.manager.scoreBoard.updateScore(ghost.score);
-					game.manager.popUps.add(new ScorePopup(ghost.xCord, ghost.yCord, 200));
+					game.manager.popUps.add(new ScorePopup(ghost.xCord, ghost.yCord, this.killCount * 200));
 					ghost.enterRetreat();
 				}
 			}
