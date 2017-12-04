@@ -157,7 +157,14 @@ class Manager {
 
 	resetRound() {
 
-
+		const score = this.user.score;
+		this.user.reset();
+		this.user.score = score;
+		this.aiManager.reset();
+		this.scoreBoard.reset();
+		this.hud.draw();
+		game.maze.reset();
+		this.state.reset();
 	}
 
 	clearHandlers() {
@@ -276,7 +283,7 @@ class Manager {
 		} 
 		else {
 
-			this.bufferEnd([[this, "resetGame"]]);
+			this.bufferEnd([[this, "resetRound"]]);
 		}
 	}
 
