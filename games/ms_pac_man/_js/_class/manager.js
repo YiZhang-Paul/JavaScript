@@ -77,7 +77,7 @@ class Manager {
 					this.hud.enqueue(Math.floor(Math.random() * 7 + 1));
 				}
 
-			}, 1000); //15000
+			}, 15000);
 		}
 	}
 
@@ -114,7 +114,7 @@ class Manager {
 				clearTimeout(this.fruitTimeout);
 				this.fruitTimeout = null;
 
-			}, 1000); //delay * 1000
+			}, delay * 1000);
 		}
 	}
 
@@ -280,6 +280,28 @@ class Manager {
 		}
 	}
 
+	onGhostKill(timeStep) {
+
+		if(!this.timeoutHandler) {
+
+			this.timeoutHandler = setTimeout(() => {
+
+				clearTimeout(this.timeoutHandler);
+				this.timeoutHandler = null;
+				this.state.swapState("ongoing");
+
+			}, 500);
+		}
+
+		this.aiManager.ais.forEach(ai => {
+
+			if(ai.state.activeState() === "retreat") {
+
+				ai.update(timeStep);
+			}
+		});
+	}
+
 	userDeathTransition() {
 
 		if(!this.timeoutHandler) {
@@ -328,7 +350,11 @@ class Manager {
 	draw() {
 
 		this.ctx.clearRect(0, 0, game.maze.width, game.maze.height);
-		this.user.draw();
+
+		if(this.state.activeState() !== "onGhostKill") {
+
+			this.user.draw();
+		}
 
 		if(!this.user.dying) {
 

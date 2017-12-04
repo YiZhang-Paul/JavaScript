@@ -127,6 +127,7 @@ class User extends Player {
 					const score = Math.pow(2, this.killCount - 1) * ghost.score;
 					game.manager.scoreBoard.updateScore(score);
 					game.manager.popUps.add(new ScorePopup(ghost.xCord, ghost.yCord, score));
+					game.manager.state.swapState("onGhostKill");
 					ghost.enterRetreat();
 				}
 			}
