@@ -6,7 +6,7 @@ class User extends Player {
 		super();
 		this.name = "user";
 		this.playerNumber = 1;
-		this.life = 3;
+		this.life = 4;
 		this.highestScore = 0;
 		this.totalTicks = 3;
 		this.speed = Math.round(game.maze.height * 0.00025 * 100) / 100;

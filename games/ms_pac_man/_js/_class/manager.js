@@ -18,7 +18,7 @@ class Manager {
 		this.ctx = game.maze.playerCtx;
 		this.hudShown = false;
 		this.state = null;
-		this.newGame();
+		this.createGame();
 	}
 
 	reset() {
@@ -126,7 +126,7 @@ class Manager {
 		}
 	}
 
-	newGame() {
+	createGame() {
 
 		this.reset();
 		this.makeAllFood();
@@ -135,8 +135,8 @@ class Manager {
 
 		if(this.scoreBoard) {
 
-			this.scoreBoard.reset();	
-		} 
+			this.scoreBoard.reset();
+		}
 
 		this.scoreBoard = new ScoreBoard(this.user);
 		this.hud = new HUD(this.user);
@@ -153,6 +153,11 @@ class Manager {
 		this.hud.reset();
 		game.maze.reset();
 		this.state.reset();
+	}
+
+	resetRound() {
+
+
 	}
 
 	clearHandlers() {
@@ -267,7 +272,7 @@ class Manager {
 		} 
 		else if(!this.user.life) {
 
-			this.bufferEnd([[this, "newGame"]]);
+			this.bufferEnd([[this, "createGame"]]);
 		} 
 		else {
 

@@ -34,7 +34,7 @@ class HUD {
 
 	showPlayerIcon() {
 
-		for(let i = 0; i < this.owner.life; i++) {
+		for(let i = 0; i < this.owner.life - 1; i++) {
 
 			this.ctx.drawImage(
 
