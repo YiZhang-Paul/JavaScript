@@ -27,6 +27,11 @@ class Manager {
 		this.powerBeans = new Set();
 		this.popUps = new WeakSet();
 		this.emptyCells = [];
+
+		if(this.activeFruit) {
+
+			this.activeFruit.clear();
+		}
 	}
 
 	makeFood(row, column, type) {
@@ -167,6 +172,11 @@ class Manager {
 		this.hud.draw();
 		game.maze.reset();
 		this.state.reset();
+
+		if(this.activeFruit) {
+
+			this.activeFruit.clear();
+		}
 	}
 
 	clearHandlers() {
@@ -244,7 +254,7 @@ class Manager {
 		this.scoreBoard.blink();
 
 		if(!this.hudShown && this.hud.tile.complete) {
-			
+
 			this.hud.draw();
 			this.hudShown = true;
 		}
