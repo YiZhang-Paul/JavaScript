@@ -11,12 +11,16 @@ class User extends Player {
 		this.killCount = 0;
 		this.totalTicks = 3;
 		this.speed = Math.round(game.maze.height * 0.00025 * 100) / 100;
+		this.dying = false;
+		this.deathTimeout = null;
+		this.deathInterval = null;
 		this.reset();
 	}
 
 	reset() {
 
 		super.reset();
+		this.dying = false;
 		this.score = 0;
 		this.tick = 2;
 	}
@@ -134,6 +138,41 @@ class User extends Player {
 		const index = ["up", "down", "left", "right"].indexOf(this.direction);
 		this.cropX = (index * 3 + this.tick) * this.cropWidth % 256;
 		this.cropY = Math.floor((index * 3 + this.tick) * this.cropWidth / 256) * this.cropWidth;
+	}
+
+	getDeathCropXY(deathTick) {
+
+		this.cropX = deathTick % 8 * this.cropWidth;
+		this.cropY = (Math.floor(deathTick / 8) + 8) * this.cropWidth;
+	}
+
+	playDeathAnimation() {
+
+		if(!this.deathTimeout && !this.deathInterval) {
+
+			let deathTick = 0;
+			this.dying = true;
+			this.getDeathCropXY(deathTick);
+
+			this.deathTimeout = setTimeout(() => {
+				
+				this.deathInterval = setInterval(() => {
+
+					this.getDeathCropXY(++deathTick);
+
+					if(deathTick === 12) {
+
+						clearTimeout(this.deathTimeout);
+						this.deathTimeout = null;
+						clearInterval(this.deathInterval);
+						this.deathInterval = null;
+						game.manager.state.swapState("buffering");
+					}
+
+				}, 270);
+
+			}, 1500);
+		}
 	}
 
 	update(timeStep) {

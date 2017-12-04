@@ -346,7 +346,7 @@ class AI extends Player {
 		if(game.manager.user.distanceToGhost(this) < game.maze.gridWidth) {
 
 			game.manager.user.life--;
-			game.manager.state.swapState("buffering");
+			game.manager.state.swapState("userDeathTransition");
 		}
 	}
 

@@ -228,7 +228,7 @@ class Manager {
 		}
 	}
 
-	bufferEnd(callBackList, timeout = 3000) {
+	bufferEnd(callBackList, timeout = 1500) {
 
 		if(!this.timeoutHandler) {
 
@@ -279,15 +279,36 @@ class Manager {
 			this.activeFruit.update();
 		}
 	}
+
+	userDeathTransition() {
+
+		if(!this.timeoutHandler) {
+
+			this.user.stopAnimation(2);
+
+			this.timeoutHandler = setTimeout(() => {
+
+				clearTimeout(this.timeoutHandler);
+				this.timeoutHandler = null;
+				this.state.swapState("onUserDeath");
+
+			}, 1500);
+		}
+	}
+
+	onUserDeath() {
+
+		this.user.playDeathAnimation();
+	}
 	
 	buffering() {
-		
+
 		this.user.stopAnimation(2);
 
 		if(!this.totalFood) {
 
 			this.bufferAnimation([[game.maze, "blink"]], 225);
-			this.bufferEnd([[this, "resetGame"]]);
+			this.bufferEnd([[this, "resetGame"]], 3000);
 		} 
 		else if(!this.user.life) {
 
@@ -308,7 +329,11 @@ class Manager {
 
 		this.ctx.clearRect(0, 0, game.maze.width, game.maze.height);
 		this.user.draw();
-		this.aiManager.draw();
+
+		if(!this.user.dying) {
+
+			this.aiManager.draw();
+		}
 
 		if(this.activeFruit) {
 
