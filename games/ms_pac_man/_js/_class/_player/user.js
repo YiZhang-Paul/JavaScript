@@ -93,6 +93,7 @@ class User extends Player {
 		if(fruit && fruit.row === this.row && fruit.column === this.column) {
 
 			game.manager.scoreBoard.updateScore(fruit.score);
+			game.manager.popUps.add(new ScorePopup(fruit.xCord, fruit.yCord, 500));
 			fruit.clear();
 		}
 	}
@@ -113,6 +114,7 @@ class User extends Player {
 				if(distance < game.maze.gridWidth * 0.5) {
 					
 					game.manager.scoreBoard.updateScore(ghost.score);
+					game.manager.popUps.add(new ScorePopup(ghost.xCord, ghost.yCord, 200));
 					ghost.enterRetreat();
 				}
 			}
