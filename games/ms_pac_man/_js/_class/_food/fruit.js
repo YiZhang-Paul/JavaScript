@@ -7,14 +7,14 @@ class Fruit extends Food {
 		this.type = type;
 		this.score = 500;
 		this.spawnTime = new Date();
-		this.minActiveTime = 1000;
+		this.minActiveTime = 30000;
 		this.falling = false;
 		this.jumpHeight = 0;
 		this.maxJumpHeight = game.maze.gridWidth;
 		this.jumpSpeed = game.maze.gridWidth * 0.1;
 		this.direction = direction;
 		this.allDirections = ["up", "down", "left", "right"];
-		this.moveSpeed = game.maze.gridWidth; //Math.round(game.maze.height * 0.001 * 100) / 100;
+		this.moveSpeed = Math.round(game.maze.height * 0.001 * 100) / 100;
 		this.distanceToCenter = null;
 		this.tile = document.getElementById("player");
 		this.cropWidth = 32;
@@ -63,6 +63,11 @@ class Fruit extends Food {
 
 		this.row = Math.floor(this.yCord / game.maze.gridWidth); 
 		this.column = Math.floor(this.xCord / game.maze.gridWidth);
+
+		if(!grid.canGetGrid(this.row, this.column)) {
+
+			this.clear();
+		}
 	}
 
 	getPosition(layer = 0) {
@@ -153,7 +158,7 @@ class Fruit extends Food {
 			return false;
 		}
 
-		return !target.hasOwnProperty("w") && !target.hasOwnProperty("b") && !target.hasOwnProperty("c");
+		return ["w", "b", "c", "d"].every(key => !target.hasOwnProperty(key));
 	}
 
 	canPassThrough(direction) {
@@ -228,11 +233,6 @@ class Fruit extends Food {
 		}
 
 		this.trackPosition();
-
-		if(!grid.canGetGrid(this.row, this.column)) {
-
-			this.clear();
-		}
 	}
 
 	update() {
