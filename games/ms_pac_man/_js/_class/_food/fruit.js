@@ -61,8 +61,7 @@ class Fruit extends Food {
 
 	trackPosition() {
 
-		this.row = Math.floor(this.yCord / game.maze.gridWidth); 
-		this.column = Math.floor(this.xCord / game.maze.gridWidth);
+		Player.prototype.trackPosition.call(this);
 
 		if(!grid.canGetGrid(this.row, this.column)) {
 
@@ -72,75 +71,37 @@ class Fruit extends Food {
 
 	getPosition(layer = 0) {
 
-		return grid.getGrid(layer, this.row, this.column);		
+		return Player.prototype.getPosition.call(this, layer);	
 	}
 
-	getGridCenterCoordinate() {
+	getGridCenterCoordinate(row = this.row, column = this.column) {
 
-		return [
-
-			(this.column + 0.5) * game.maze.gridWidth,
-			(this.row + 0.5) * game.maze.gridWidth
-		];
+		return Player.prototype.getGridCenterCoordinate.call(this, row, column);
 	}
 
-	onGridCenter() {
+	onGridCenter(row = this.row, column = this.column) {
 
-		const [centerX, centerY] = this.getGridCenterCoordinate();
-
-		return centerX === this.xCord && centerY === this.yCord;
+		return Player.prototype.onGridCenter.call(this, row, column);
 	}
 
 	getAdjacentGrid(layer, direction = this.direction, row = this.row, column = this.column) {
 
-		if(direction === "up" && this.row > 0) row--;
-		else if(direction === "down" && this.row + 1 < grid.row) row++;
-		else if(direction === "left" && this.column > 0) column--;
-		else if(direction === "right" && this.column + 1 < grid.column) column++;
-		else return [null, null, null];
-
-		return [grid.getGrid(layer, row, column), row, column];
+		return Player.prototype.getAdjacentGrid.call(this, layer, direction, row, column);
 	}
 
 	distanceToGridCenter(row, column) {
 
-		const [centerX, centerY] = this.getGridCenterCoordinate(row, column);
-
-		return this.direction === "up" || this.direction === "down" ? 
-			Math.abs(this.yCord - centerY) : Math.abs(this.xCord - centerX);
+		return Player.prototype.distanceToGridCenter.call(this, row, column);
 	}
 
 	distanceToFacingGridCenter() {
 
-		if(this.onGridCenter()) {
-
-			this.distanceToCenter = null;
-			return;
-		}
-
-		const [, row, column] = this.getAdjacentGrid(1);
-		const toAdjacentGrid = this.distanceToGridCenter(row, column);
-
-		this.distanceToCenter = toAdjacentGrid > game.maze.gridWidth ? 
-			this.distanceToGridCenter(this.row, this.column) : toAdjacentGrid;
+		Player.prototype.distanceToFacingGridCenter.call(this);
 	}
 
 	getOppositeDirection(direction = this.direction) {
 
-		switch(direction) {
-
-			case "up" : case "down" :
-
-				direction = direction === "up" ? "down" : "up";
-				break;
-
-			case "left" : case "right" :
-
-				direction = direction === "left" ? "right" : "left";
-				break;	
-		}
-
-		return direction;
+		return Player.prototype.getOppositeDirection.call(this, direction);
 	}
 
 	getValidDirections() {

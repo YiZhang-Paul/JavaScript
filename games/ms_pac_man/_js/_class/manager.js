@@ -77,7 +77,7 @@ class Manager {
 					this.hud.enqueue(Math.floor(Math.random() * 7 + 1));
 				}
 
-			}, 15000);
+			}, 1000); //15000
 		}
 	}
 
@@ -114,7 +114,7 @@ class Manager {
 				clearTimeout(this.fruitTimeout);
 				this.fruitTimeout = null;
 
-			}, delay * 1000);
+			}, 1000); //delay * 1000
 		}
 	}
 
