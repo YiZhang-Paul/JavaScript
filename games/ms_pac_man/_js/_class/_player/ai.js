@@ -143,7 +143,7 @@ class AI extends Player {
 				this.animatePlayer(4);
 				this.finishFleeToNormal();
 
-			}, 58000);
+			}, 10000);
 		}
 	}
 	/**
