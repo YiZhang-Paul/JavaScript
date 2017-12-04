@@ -99,7 +99,7 @@ class User extends Player {
 		if(fruit && fruit.row === this.row && fruit.column === this.column) {
 
 			game.manager.scoreBoard.updateScore(fruit.score);
-			game.manager.popUps.add(new ScorePopup(fruit.xCord, fruit.yCord, 500));
+			game.manager.popUps.add(new ScorePopup(fruit.xCord, fruit.yCord, fruit.score));
 			fruit.clear();
 		}
 	}
@@ -119,9 +119,10 @@ class User extends Player {
 
 				if(distance < game.maze.gridWidth * 0.5) {
 				
-					this.killCount = Math.min(this.killCount + 1, 4);	
-					game.manager.scoreBoard.updateScore(ghost.score);
-					game.manager.popUps.add(new ScorePopup(ghost.xCord, ghost.yCord, this.killCount * 200));
+					this.killCount = Math.min(this.killCount + 1, 4);
+					const score = Math.pow(2, this.killCount - 1) * ghost.score;
+					game.manager.scoreBoard.updateScore(score);
+					game.manager.popUps.add(new ScorePopup(ghost.xCord, ghost.yCord, score));
 					ghost.enterRetreat();
 				}
 			}
