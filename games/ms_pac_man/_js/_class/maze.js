@@ -10,6 +10,7 @@ class Maze {
 		this.fruitCtx = this.getCanvas(this.width, this.height, 3);
 		this.playerCtx = this.getCanvas(this.width, this.height, 4);
 		this.uiCtx = this.getCanvas(this.width, game.monitor.height, 5);
+		this.popUpCtx = this.getCanvas(this.width, this.height, 6); 
 		//maze tile sets
 		this.tick = 0;
 		this.tanTile = document.getElementById("maze");

@@ -9,6 +9,7 @@ class Manager {
 		this.totalFood = 0;
 		this.powerBeans = new Set();
 		this.activeFruit = null;
+		this.popUps = new WeakSet();
 		this.emptyCells = [];
 		this.timeoutHandler = null;
 		this.fruitTimeout = null;
@@ -24,6 +25,7 @@ class Manager {
 	reset() {
 
 		this.powerBeans = new Set();
+		this.popUps = new WeakSet();
 		this.emptyCells = [];
 	}
 
@@ -242,7 +244,7 @@ class Manager {
 		this.scoreBoard.blink();
 
 		if(!this.hudShown && this.hud.tile.complete) {
-
+			
 			this.hud.draw();
 			this.hudShown = true;
 		}
