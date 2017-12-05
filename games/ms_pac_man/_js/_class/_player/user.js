@@ -2,15 +2,14 @@
 class User extends Player {
 
 	constructor() {
-	
-		super();
-		this.name = "user";
-		this.playerNumber = 1;
+
+		super("user");
+		this.number = 1;
 		this.life = 4;
-		this.highestScore = 0;
+		this.highScore = 0;
 		this.killCount = 0;
 		this.totalTicks = 3;
-		this.speed = Math.round(game.maze.height * 0.00025 * 100) / 100;
+		this.speed = Math.round(game.maze.height * 0.025) / 100;
 		this.dying = false;
 		this.deathTimeout = null;
 		this.deathInterval = null;
@@ -27,30 +26,26 @@ class User extends Player {
 
 	keyCodeToDirection(keyCode) {
 
-		let direction;
-
 		switch(keyCode) {
 
 			case control.W : case control.UP :
 			case control.S : case control.DOWN :
 
-				direction = keyCode === control.W || keyCode === control.UP ? "up" : "down";
-				break;
+				return keyCode === control.W || keyCode === control.UP ? "up" : "down";
 
 			case control.A : case control.LEFT :
 			case control.D : case control.RIGHT :
 
-				direction = keyCode === control.A || keyCode === control.LEFT ? "left" : "right";
-				break;
+				return keyCode === control.A || keyCode === control.LEFT ? "left" : "right";
 		}
 
-		return direction;
+		return this.direction;
 	}
 
-	canTurn(direction) {
+	isValidDirection(direction) {
 
-		const isOpposite = direction === this.getOppositeDirection();
-		const inMazeArea = this.xCord >= 0 && this.xCord <= game.maze.width;
+		const isOpposite = direction === this.getOppositeWay();
+		const inMazeArea = this.x >= 0 && this.x <= game.maze.width;
 		const canMove = !this.hasWall(direction) && !this.hasDoor(direction);
 
 		return isOpposite || (this.onGridCenter() && inMazeArea && canMove);
@@ -64,84 +59,88 @@ class User extends Player {
 
 			const direction = this.keyCodeToDirection(keyCode);
 
-			if(this.canTurn(direction)) {
+			if(this.isValidDirection(direction)) {
 
 				this.setDirection(direction);
 			}
 		}
 	}
 
-	eatFood() {
+	distanceToGhost(ghost) {
 
-		if(!this.distanceToCenter) {
+		return Math.hypot((this.x - ghost.x), (this.y - ghost.y));
+	}
 
-			let currentGrid = this.getPosition();
+	canKillGhost(ghost) {
 
-			if(currentGrid instanceof Food) {
+		if(ghost.state.peek() !== "flee") {
 
-				if(currentGrid instanceof PowerBean) {
+			return false;
+		}
 
-					this.killCount = 0;
-				}
+		return this.distanceToGhost(ghost) < game.gridWidth * 0.5;
+	}
 
-				game.manager.totalFood--;
-				game.manager.scoreBoard.updateScore(currentGrid.score);
-				currentGrid.clear();
+	killGhost() {
+
+		game.manager.aiManager.ais.forEach(ai => {
+
+			if(this.canKillGhost(ai)) {
+				//calculate score by total ghost kills during current visit 
+				const score = Math.pow(2, this.killCount++ - 1) * ai.score;
+				//display scores
+				game.manager.scoreBoard.update(score);
+				game.manager.popUps.add(new ScorePopup(ai.x, ai.y, score));
+				game.manager.state.swap("ghostKilled");
+				ai.enterRetreat();
+			}
+		});
+	}
+
+	consumeFood() {
+
+		if(this.onGridCenter()) {
+
+			let position = gameGrid.getGrid(0, this.row, this.column);
+
+			if(position instanceof Food) {
+				//refresh kill count on power bean consumption for ghost kill score calculation
+				this.killCount = position instanceof PowerBean ? 0 : this.killCount;
+				game.manager.scoreBoard.update(position.score);
+				position.dispose();
 				//check game end
-				if(game.manager.totalFood === 0) {
+				if(--game.manager.totalFood === 0) {
 
-					game.manager.state.swapState("buffering");
+					game.manager.state.swap("resetting");
 				}
 			}
 		}
 	}
 
-	eatFruit() {
+	consumeFruit() {
 
 		let fruit = game.manager.activeFruit;
 
 		if(fruit && fruit.row === this.row && fruit.column === this.column) {
 
-			game.manager.scoreBoard.updateScore(fruit.score);
-			game.manager.popUps.add(new ScorePopup(fruit.xCord, fruit.yCord, fruit.score));
-			fruit.clear();
+			game.manager.scoreBoard.update(fruit.score);
+			game.manager.popUps.add(new ScorePopup(fruit.x, fruit.y, fruit.score));
+			fruit.dispose();
 		}
 	}
+	/**
+	 * determine user tile image crop location
+	 */
+	getCropLocation() {
 
-	distanceToGhost(ghost) {
-
-		return Math.hypot((this.xCord - ghost.xCord), (this.yCord - ghost.yCord));
-	}
-
-	killGhost() {
-
-		game.manager.aiManager.ais.forEach(ghost => {
-
-			if(ghost.state.activeState() === "flee") {
-				
-				const distance = this.distanceToGhost(ghost);
-
-				if(distance < game.maze.gridWidth * 0.5) {
-				
-					this.killCount = Math.min(this.killCount + 1, 4);
-					const score = Math.pow(2, this.killCount - 1) * ghost.score;
-					game.manager.scoreBoard.updateScore(score);
-					game.manager.popUps.add(new ScorePopup(ghost.xCord, ghost.yCord, score));
-					game.manager.state.swapState("onGhostKill");
-					ghost.enterRetreat();
-				}
-			}
-		});
-	}
-
-	getCropXY() {
-
-		const index = ["up", "down", "left", "right"].indexOf(this.direction);
+		const index = game.directions.indexOf(this.direction);
 		this.cropX = (index * 3 + this.tick) * this.cropWidth % 256;
 		this.cropY = Math.floor((index * 3 + this.tick) * this.cropWidth / 256) * this.cropWidth;
 	}
-
-	getDeathCropXY(deathTick) {
+	/**
+	 * determine user tile image crop location for death animation
+	 */
+	getDeathCropLocation(deathTick) {
 
 		this.cropX = deathTick % 8 * this.cropWidth;
 		this.cropY = (Math.floor(deathTick / 8) + 8) * this.cropWidth;
@@ -153,39 +152,44 @@ class User extends Player {
 
 			let deathTick = 0;
 			this.dying = true;
-			this.getDeathCropXY(deathTick);
+			this.getDeathCropLocation(deathTick);
 
 			this.deathTimeout = setTimeout(() => {
-				
+
 				this.deathInterval = setInterval(() => {
 
-					this.getDeathCropXY(++deathTick);
+					this.getDeathCropLocation(++deathTick);
 
-					if(deathTick === 12) {
+					if(deathTick === 13) {
 
-						clearTimeout(this.deathTimeout);
-						this.deathTimeout = null;
-						clearInterval(this.deathInterval);
-						this.deathInterval = null;
-						game.manager.state.swapState("buffering");
+						this.stopDeathAnimation();
 					}
 
-				}, 270);
+				}, 140);
 
 			}, 1500);
 		}
 	}
 
+	stopDeathAnimation() {
+
+		clearTimeout(this.deathTimeout);
+		this.deathTimeout = null;
+		clearInterval(this.deathInterval);
+		this.deathInterval = null;
+		game.manager.state.swap("resetting");
+	}
+
 	update(timeStep) {
 
-		this.animationOn = this.collisionDistance !== 0;
-		this.animatePlayer(this.totalTicks, 100, 0);
-		//movment
+		this.animationOn = this.toCollision !== 0;
+		this.playAnimation(this.totalTicks, 100, 0);
+		//movement
 		this.checkMoveKey();
 		this.move(timeStep);
-		//eat food and kill ghost
-		this.eatFood();
-		this.eatFruit();
+		//check food and ghost
+		this.consumeFood();
+		this.consumeFruit();
 		this.killGhost();
-	} 
+	}
 }

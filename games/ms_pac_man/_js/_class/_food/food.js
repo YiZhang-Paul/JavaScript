@@ -5,42 +5,42 @@ class Food {
 
 		this.row = row;
 		this.column = column;
-		this.xCord = (column + 0.5) * game.maze.gridWidth;
-		this.yCord = (row + 0.5) * game.maze.gridWidth;
+		this.x = (column + 0.5) * game.gridWidth;
+		this.y = (row + 0.5) * game.gridWidth;
 		this.tick = 0;
 		this.score = 0;
-		this.color = null;
+		this.color = "red";
 		this.radius = null;
 		this.tile = null;
-		this.ctx = game.maze.foodCtx;
+		this.ctx = game.canvas.food;
 	}
 
 	erase() {
 
 		this.ctx.clearRect(
 
-			this.xCord - 0.5 * game.maze.gridWidth,
-			this.yCord - 0.5 * game.maze.gridWidth,
-			game.maze.gridWidth,
-			game.maze.gridWidth
+			this.x - 0.5 * game.gridWidth,
+			this.y - 0.5 * game.gridWidth,
+			game.gridWidth,
+			game.gridWidth
 		);
 	}
 
-	clear() {
+	dispose() {
 
-		grid.setGrid(0, this.row, this.column, null);
-		game.manager.emptyCells.push({row : this.row, col : this.column});
+		gameGrid.setGrid(0, this.row, this.column, null);
+		game.manager.emptyGrids.push(new Node(this.row, this.column));
 		this.erase();
 	}
-	
-	changeTick() {
+
+	nextTick() {
 
 		this.tick = this.tick ? 0 : 1;
 	}
-	
+
 	blink() {
 
-		this.changeTick();
+		this.nextTick();
 
 		if(this.tick) {
 
@@ -55,7 +55,7 @@ class Food {
 	draw() {
 
 		this.ctx.beginPath();
-		this.ctx.arc(this.xCord, this.yCord, this.radius, 0, 2 * Math.PI);
+		this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 		this.ctx.fillStyle = this.color;
 		this.ctx.fill();
 	}

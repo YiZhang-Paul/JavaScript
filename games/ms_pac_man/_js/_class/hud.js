@@ -1,16 +1,16 @@
 /* jslint esversion: 6 */
 class HUD {
 
-	constructor(owner) {
+	constructor(originator) {
 
-		this.owner = owner;
+		this.originator = originator;
 		this.width = game.maze.width;
 		this.height = (game.monitor.height - game.maze.height) * 0.5;
 		this.fruitQueue = [];
-		this.iconWidth = game.maze.gridWidth * 2;
-		this.margin = this.height * 0.05; 
+		this.iconWidth = game.gridWidth * 2;
+		this.margin = this.height * 0.05;
 		this.tile = document.getElementById("player");
-		this.ctx = game.maze.uiCtx;
+		this.ctx = game.canvas.ui;
 		this.draw();
 	}
 
@@ -19,22 +19,26 @@ class HUD {
 		this.fruitQueue = [];
 		this.draw();
 	}
-
+	/**
+	 * add new fruit type to fruit queue
+	 */
 	enqueue(type) {
 
 		this.fruitQueue.push(type);
 		this.draw();
 	}
-
+	/**
+	 * remove fruit type from queue start
+	 */
 	dequeue() {
 
 		this.fruitQueue.shift();
 		this.draw();
 	}
 
-	showPlayerIcon() {
-
-		for(let i = 0; i < this.owner.life - 1; i++) {
+	showUserIcon() {
+		//display remaining lives excluding current life
+		for(let i = 0; i < this.originator.life - 1; i++) {
 
 			this.ctx.drawImage(
 
@@ -52,7 +56,7 @@ class HUD {
 	}
 
 	showFruitIcon() {
-
+		//display fruit queue from left to right
 		for(let i = this.fruitQueue.length - 1; i >= 0; i--) {
 
 			this.ctx.drawImage(
@@ -68,12 +72,12 @@ class HUD {
 				this.iconWidth
 			);
 		}
-	} 
+	}
 
 	draw() {
 
 		this.ctx.clearRect(0, game.monitor.height - this.height, this.width, this.height);
-		this.showPlayerIcon();
+		this.showUserIcon();
 		this.showFruitIcon();
 	}
-} 
+}

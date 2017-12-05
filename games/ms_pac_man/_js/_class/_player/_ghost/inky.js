@@ -1,25 +1,24 @@
 /* jslint esversion: 6 */
 class Inky extends AI {
 
-	constructor(owner) {
+	constructor(manager) {
 
-		super(owner);
-		this.name = "inky";
+		super("inky", manager);
 		this.defaultState = "inShelter";
 		this.reset();
 	}
 
-	inShelterDirection() {
+	setDirectionInShelter() {
 
-		if(this.owner.shelter.has(this.owner.blinky) ||
-		   this.owner.shelter.has(this.owner.pinky) ||
-		   this.owner.onCooldown()) {
+		if(this.manager.shelter.has(this.manager.blinky) ||
+		   this.manager.shelter.has(this.manager.pinky) ||
+		   this.manager.onCooldown()) {
 
 			this.turnAround();
 		} 
 		else {
 			
-			this.moveOutShelter();
+			super.setDirectionInShelter();
 		}
 	} 
 }

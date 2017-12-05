@@ -1,51 +1,54 @@
 /* jslint esversion: 6 */
-let grid = {
+let gameGrid = {
 
-	row      : 31, 
-	column   : 28,
-	door     : {
+	rows    : 31, 
+	columns : 28,
+	/**
+	 * game object default locations
+	 */
+	door : {
 
-		spawnRow : 13,
-		spawnCol : [14, 15],
+		row    : 13,
+		column : [14, 15],
 	},
 
-	user     : {
+	user : {
 
-		spawnRow : 23,
-		spawnCol : 14,
+		row       : 23,
+		column    : 14,
 		direction : "right"
 	},
 
-	blinky   : {
+	blinky : {
 
-		spawnRow  : 11,
-		spawnCol  : 14,
+		row       : 11,
+		column    : 14,
 		direction : "left"
 	},
 
-	pinky    : {
+	pinky : {
 
-		spawnRow  : 14,
-		spawnCol  : 14,
+		row       : 14,
+		column    : 14,
 		direction : "down"
 	},
 
-	inky     : {
+	inky : {
 
-		spawnRow  : 14,
-		spawnCol  : 12,
+		row       : 14,
+		column    : 12,
 		direction : "up"
 	},
 
-	clyde    : {
+	sue : {
 
-		spawnRow  : 14,
-		spawnCol  : 16,
+		row  	  : 14,
+		column    : 16,
 		direction : "up"
 	},
-	//maze layers
-	maze  : [[
-	//layer 1
+
+	layout : [[
+	//logic layer
 	[   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null],
 	[   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null],
 	[   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null],
@@ -78,7 +81,7 @@ let grid = {
 	[   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null],
 	[   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null] 
 	], [
-	//layer 2
+	//meta layer
 	[{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"}],
 	[{w:"w"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{w:"w"},{w:"w"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{w:"w"},{w:"w"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{w:"w"}],
 	[{w:"w"},{f:"s"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{f:"s"},{w:"w"},{w:"w"},{f:"s"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{f:"s"},{w:"w"},{w:"w"},{f:"s"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{f:"s"},{w:"w"}],
@@ -111,24 +114,34 @@ let grid = {
 	[{w:"w"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{w:"w"}],
 	[{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"}]
 	]],
+	/**
+	 * check if given grid exists
+	 */
+	exist(row, column) {
 
-	canGetGrid(row, column) {
-
-		if(this.maze[0][row] === undefined) {
+		if(this.layout[0][row] === undefined) {
 
 			return false;
 		}
 
-		return this.maze[0][row][column] !== undefined;
+		return this.layout[0][row][column] !== undefined;
 	},
 
 	getGrid(layer, row, column) {
 
-		return this.maze[layer][row][column];
+		if(!this.exist(row, column)) {
+
+			return null;
+		}
+
+		return this.layout[layer][row][column];
 	},
 
 	setGrid(layer, row, column, content) {
 
-		this.maze[layer][row][column] = content;
+		if(this.exist(row, column)) {
+
+			this.layout[layer][row][column] = content;
+		}
 	}
 };

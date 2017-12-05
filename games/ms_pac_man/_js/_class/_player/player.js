@@ -1,248 +1,267 @@
 /* jslint esversion: 6 */
 class Player {
 
-	constructor() {
+	constructor(name) {
 
-		this.name = null;
-		this.xCord = null;
-		this.yCord = null;
+		this.name = name;
+		this.x = null;
+		this.y = null;
 		this.row = null;
 		this.column = null;
 		this.direction = null;
-		this.allDirections = ["up", "down", "left", "right"];
 		this.speed = 0;
 		this.score = 0;
-		this.collisionDistance = null;
-		this.distanceToCenter = null;
-		//player appearance
+		this.toCollision = null;  //distance before collision
+		this.toGridCenter = null; //distance to center of nearest facing grid
 		this.tile = document.getElementById("player");
 		this.cropX = null;
 		this.cropY = null;
 		this.cropWidth = 32;
-		//player animation
 		this.tick = 0;
 		this.totalTicks = 0;
 		this.animationOn = false;
-		this.timeoutHandler = null;
-		this.intervalHandler = null;
-		this.ctx = game.maze.playerCtx;
+		this.interval = null;
+		this.ctx = game.canvas.player;
 	}
 
 	reset() {
 
-		this.xCord = game.maze.gridWidth * (grid[this.name].spawnCol);
-		this.yCord = game.maze.gridWidth * (grid[this.name].spawnRow + 0.5);
-		this.direction = grid[this.name].direction;
-		this.collisionDistance = null;
-		this.distanceToCenter = null;
+		let stats = gameGrid[this.name];
+		this.x = game.gridWidth * stats.column;
+		this.y = game.gridWidth * (stats.row + 0.5);
+		this.direction = stats.direction;
+		this.toCollision = null;
+		this.toGridCenter = null;
 		this.animationOn = false;
+		this.getCropLocation();
 		//update current row and column
-		this.trackPosition();
-		//update crop XY location
-		this.getCropXY();
+		this.trackCurrentGrid();
 	}
 
-	trackPosition() {
+	trackCurrentGrid() {
 
-		this.row = Math.floor(this.yCord / game.maze.gridWidth); 
-		this.column = Math.floor(this.xCord / game.maze.gridWidth);
+		this.row = Math.floor(this.y / game.gridWidth);
+		this.column = Math.floor(this.x / game.gridWidth);
 	}
-
-	getPosition(layer = 0) {
-
-		return grid.getGrid(layer, this.row, this.column);		
-	}
-
-	getGridCenterCoordinate(row, column) {
+	/**
+	 * get center coordinate of a given grid
+	 */
+	getGridCenter(row, column) {
 
 		return [
 
-			(column + 0.5) * game.maze.gridWidth,
-			(row + 0.5) * game.maze.gridWidth
+			(column + 0.5) * game.gridWidth,
+			(row + 0.5) * game.gridWidth
 		];
 	}
 
 	onGridCenter(row = this.row, column = this.column) {
 
-		const [centerX, centerY] = this.getGridCenterCoordinate(row, column);
+		const [centerX, centerY] = this.getGridCenter(row, column);
 
-		return centerX === this.xCord && centerY === this.yCord;
+		return centerX === this.x && centerY === this.y;
 	}
+	/**
+	 * retrieve row and column of adjacent grid on given direction
+	 */
+	getAdjacentGrid(direction = this.direction, row = this.row, column = this.column) {
 
+		if(direction === "up" && this.row > 0) row--;
+		else if(direction === "down" && this.row < gameGrid.rows - 1) row++;
+		else if(direction === "left" && this.column > 0) column--;
+		else if(direction === "right" && this.column < gameGrid.columns - 1) column++;
+		else return null;
+
+		return new Node(row, column);
+	}
+	/**
+	 * retrieve row and column of all adjacent grids
+	 */
+	getAllAdjacentGrids(row = this.row, column = this.column) {
+
+		return game.directions.map(direction => {
+
+			return this.getAdjacentGrid(direction, row, column);
+		
+		}).filter(grid => grid !== null);
+	}
+	/**
+	 * calculate distance to center of given grid
+	 */
 	distanceToGridCenter(row, column) {
 
-		const [centerX, centerY] = this.getGridCenterCoordinate(row, column);
+		const [centerX, centerY] = this.getGridCenter(row, column);
 
-		return this.direction === "up" || this.direction === "down" ? 
-			Math.abs(this.yCord - centerY) : Math.abs(this.xCord - centerX);
+		return this.direction === "up" || this.direction === "down" ?
+			Math.abs(this.y - centerY) : Math.abs(this.x - centerX);
 	}
-
+	/**
+	 * calculate distance to center of nearest facing grid
+	 */
 	distanceToFacingGridCenter() {
 
 		if(this.onGridCenter()) {
 
-			this.distanceToCenter = null;
-			return;
+			this.toGridCenter = null;
 		}
+		else {
 
-		const [, row, column] = this.getAdjacentGrid(1);
-		const toAdjacentGrid = this.distanceToGridCenter(row, column);
+			let adjacent = this.getAdjacentGrid();
+			const toAdjacent = this.distanceToGridCenter(adjacent.row, adjacent.column);
 
-		this.distanceToCenter = toAdjacentGrid > game.maze.gridWidth ? 
-			this.distanceToGridCenter(this.row, this.column) : toAdjacentGrid;
-	}
-
-	getAdjacentGrid(layer, direction = this.direction, row = this.row, column = this.column) {
-
-		if(direction === "up" && this.row > 0) row--;
-		else if(direction === "down" && this.row + 1 < grid.row) row++;
-		else if(direction === "left" && this.column > 0) column--;
-		else if(direction === "right" && this.column + 1 < grid.column) column++;
-		else return [null, null, null];
-
-		return [grid.getGrid(layer, row, column), row, column];
-	}
-
-	getAllAdjacentGrids(layer, row = this.row, column = this.column) {
-
-		return this.allDirections.map(direction => this.getAdjacentGrid(layer, direction, row, column))
-								 .filter(grid => grid[0]);
+			this.toGridCenter = toAdjacent > game.gridWidth ?
+				this.distanceToGridCenter(this.row, this.column) : toAdjacent;
+		}
 	}
 
 	hasWall(direction = this.direction) {
 
-		let targetGrid = this.getAdjacentGrid(1, direction)[0];
+		let adjacent = this.getAdjacentGrid(direction);
 
-		return targetGrid && targetGrid.hasOwnProperty("w");
+		if(adjacent === null) {
+
+			return false;
+		}
+
+		return gameGrid.getGrid(1, adjacent.row, adjacent.column).hasOwnProperty("w");
 	}
 
 	hasDoor(direction = this.direction) {
 
-		let targetGrid = this.getAdjacentGrid(1, direction)[0];
+		let adjacent = this.getAdjacentGrid(direction);
 
-		return targetGrid && targetGrid.hasOwnProperty("d");
+		if(adjacent === null) {
+
+			return false;
+		}
+
+		return gameGrid.getGrid(1, adjacent.row, adjacent.column).hasOwnProperty("d");
 	}
 
-	getOppositeDirection(direction = this.direction) {
+	distanceToCollision() {
+
+		if(this.hasWall()) {
+
+			let adjacent = this.getAdjacentGrid();
+			this.toCollision = this.distanceToGridCenter(adjacent.row, adjacent.column) - game.gridWidth;
+		}
+		else {
+
+			this.toCollision = null;
+		}
+	}
+
+	getOppositeWay(direction = this.direction) {
 
 		switch(direction) {
 
 			case "up" : case "down" :
 
-				direction = direction === "up" ? "down" : "up";
-				break;
+				return direction === "up" ? "down" : "up";
 
 			case "left" : case "right" :
 
-				direction = direction === "left" ? "right" : "left";
-				break;	
+				return direction === "left" ? "right" : "left";
 		}
 
 		return direction;
 	}
-
-	getCollisionDistance() {
-
-		if(this.hasWall()) {
-
-			const [, row, column] = this.getAdjacentGrid(1);
-			this.collisionDistance = this.distanceToGridCenter(row, column) - game.maze.gridWidth;
-		} 
-		else {
-
-			this.collisionDistance = null;
-		}
-	}
-
-	adjustSpeed(speed) {
-		//check for collision and distance to center
-		this.getCollisionDistance();
-		this.distanceToFacingGridCenter();
-
-		if(this.collisionDistance !== null) {
-
-			return Math.min(speed, this.collisionDistance);
-		}
-		
-		return this.distanceToCenter ? Math.min(speed, this.distanceToCenter) : speed;
-	}
-
-	move(timeStep) {
-		
-		const speed = this.adjustSpeed(this.speed * timeStep);
-
-		if(this.direction === "up" || this.direction === "down") {
-
-			this.yCord -= (this.direction === "up" ? 1 : -1) * speed;
-		} 
-		else {
-
-			this.xCord -= (this.direction === "left" ? 1 : -1) * speed;
-		}
-		//check worm holes
-		this.checkWormHole();
-		//update current row and column
-		this.trackPosition();
-	}
-
-	checkWormHole() {
-
-		const leftBound = -game.maze.gridWidth;
-		const rightBound = game.maze.width + game.maze.gridWidth;
-
-		if(this.xCord < leftBound || this.xCord > rightBound) {
-
-			this.xCord = this.xCord < leftBound ? rightBound : leftBound;
-		}
-	}
 	/**
-	 * @abstract method
-	 * determine player tile image crop location
-	 * base on current direction and step
+	 * @abstract
+	 * check if player can turn to given direction
 	 */
-	getCropXY() {}
+	isValidDirection() {}
 
 	setDirection(direction) {
 
 		this.direction = direction;
-		this.getCropXY();
+		this.getCropLocation();
+	}
+	/**
+	 * adjust speed to ensure player can reach grid center
+	 */
+	adjustSpeed(speed) {
+
+		this.distanceToCollision();
+		this.distanceToFacingGridCenter();
+
+		if(this.toCollision !== null) {
+
+			return Math.min(speed, this.toCollision);
+		}
+
+		return this.toGridCenter ? Math.min(speed, this.toGridCenter) : speed;
+	}
+	/**
+	 * check for wormholes on both side of maze
+	 */
+	checkWormhole() {
+
+		const left = -game.gridWidth;
+		const right = game.maze.width + game.gridWidth;
+
+		if(this.x < left || this.x > right) {
+
+			this.x = this.x < left ? right : left;
+		}
 	}
 
-	changeTick(totalTick = this.totalTicks) {
+	move(timeStep) {
 
-		this.tick = (this.tick + 1) % totalTick;
-		this.getCropXY();
+		const speed = this.adjustSpeed(this.speed * timeStep);
+
+		if(this.direction === "up" || this.direction === "down") {
+
+			this.y -= speed * (this.direction === "up" ? 1 : -1);
+		}
+		else {
+
+			this.x -= speed * (this.direction === "left" ? 1 : -1);
+		}
+
+		this.checkWormhole();
+		this.trackCurrentGrid();
+	}
+	/**
+	 * @abstract
+	 * determine player tile image crop location
+	 */
+	getCropLocation() {}
+
+	nextTick(totalTicks = this.totalTicks) {
+
+		this.tick = (this.tick + 1) % totalTicks;
+		this.getCropLocation();
 	}
 
-	animatePlayer(totalTick, speed = 100, endTick = this.tick) {
+	playAnimation(totalTicks, speed = 100, endTick = this.tick) {
 
-		if(this.animationOn && !this.intervalHandler) {
+		if(this.animationOn && !this.interval) {
 
-			this.intervalHandler = setInterval(() => {
-				
-				this.changeTick(totalTick);
+			this.interval = setInterval(() => {
+
+				this.nextTick(totalTicks);
 
 			}, speed);
-		} 
+		}
 		else if(!this.animationOn) {
 
 			this.stopAnimation(endTick);
-		}	
+		}
 	}
 
 	stopAnimation(tick) {
 
-		if(this.intervalHandler) {
+		if(this.interval) {
 
-			clearInterval(this.intervalHandler);
-			this.intervalHandler = null;
+			clearInterval(this.interval);
+			this.interval = null;
 			this.tick = tick;
-			this.getCropXY();
+			this.getCropLocation();
 		}
 	}
 	/**
 	 * @abstract
-	 * update player
 	 */
 	update(timeStep) {}
 
@@ -250,15 +269,15 @@ class Player {
 
 		this.ctx.drawImage(
 
-			this.tile, 
-			this.cropX, 
+			this.tile,
+			this.cropX,
 			this.cropY,
-			this.cropWidth, 
 			this.cropWidth,
-			this.xCord - game.maze.gridWidth * 0.8,
-			this.yCord - game.maze.gridWidth * 0.8,
-			game.maze.gridWidth * 1.6, 
-			game.maze.gridWidth * 1.6
+			this.cropWidth,
+			this.x - game.gridWidth * 0.8,
+			this.y - game.gridWidth * 0.8,
+			game.gridWidth * 1.6,
+			game.gridWidth * 1.6
 		);
-	} 
+	}
 }

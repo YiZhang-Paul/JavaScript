@@ -1,16 +1,10 @@
 /* jslint esversion: 6 */
 class Blinky extends AI {
 
-	constructor(owner) {
+	constructor(manager) {
 
-		super(owner);
-		this.name = "blinky";
+		super("blinky", manager);
 		this.defaultState = "outShelter";
 		this.reset();
 	}
-
-	inShelterDirection() {
-		
-		this.moveOutShelter();
-	} 
 }

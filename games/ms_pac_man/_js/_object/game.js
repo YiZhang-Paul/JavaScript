@@ -1,29 +1,84 @@
 /* jslint esversion: 6 */
 let game = {
 
-	state : null, //current game state
-	monitor : {   //monitor spec
+	state      : null,
+	timeStep   : null,
+	gridWidth  : null,
+	maze       : null,
+	mazeWidth  : null,
+	mazeHeight : null,
+	manager    : null,
+	directions : ["up", "down", "left", "right"],
 
-		"width"  : window.innerWidth,
-		"height" : window.innerHeight
+	monitor : {
+
+		width  : window.innerWidth,
+		height : window.innerHeight 
+	},
+
+	canvas : {
+
+		back   : null,
+		food   : null,
+		fruit  : null,
+		player : null,
+		ui     : null,
+		popup  : null
+	},
+	/**
+	 * calculate game grid width base on monitor dimensions
+	 */
+	getGridSize() {
+
+		return this.monitor.width > this.monitor.height ? 
+			Math.floor(this.monitor.height * 0.8 / gameGrid.rows) :
+			Math.floor(this.monitor.width * 0.8 / gameGrid.columns);
+	},
+
+	getMazeSize() {
+
+		this.gridWidth = this.getGridSize();
+		this.mazeWidth = this.gridWidth * gameGrid.columns;
+		this.mazeHeight = this.gridWidth * gameGrid.rows;
+	},
+
+	getCanvas(width, height, zIndex) {
+
+		let canvas = document.createElement("canvas");
+		canvas.width = width;
+		canvas.height = height;
+		canvas.style.width = width + "px";
+		canvas.style.height = height + "px";
+		canvas.style.zIndex = zIndex;
+		document.getElementById("board").appendChild(canvas);
+
+		return canvas.getContext("2d");
+	},
+
+	loadCanvas() {
+
+		this.canvas.back = this.getCanvas(this.mazeWidth, this.mazeHeight, 1); 
+		this.canvas.food = this.getCanvas(this.mazeWidth, this.mazeHeight, 2); 
+		this.canvas.fruit = this.getCanvas(this.mazeWidth, this.mazeHeight, 3); 
+		this.canvas.player = this.getCanvas(this.mazeWidth, this.mazeHeight, 4); 
+		this.canvas.ui = this.getCanvas(this.mazeWidth, this.monitor.height, 5); 
+		this.canvas.popup = this.getCanvas(this.mazeWidth, this.mazeHeight, 6); 
 	},
 
 	loadAsset() {
 
-		this.maze = new Maze();
+		this.getMazeSize();
+		this.loadCanvas();
+		this.maze = new Maze(this.mazeWidth, this.mazeHeight);
 		this.manager = new Manager();
 	},
 
-	initialize() {
+	checkKeyDown() {
 
-		this.loadAsset();
-		/**
-		 * game controls
-		 */
 		document.addEventListener("keydown", event => {
-			
-			let keyCode = event.keyCode;
-			//track movement key pressed
+
+			const keyCode = event.keyCode;
+			//movement keys
 			switch(keyCode) {
 
 				case control.W : case control.UP :
@@ -38,45 +93,53 @@ let game = {
 
 					break;
 			}
-		}); 
+		});
+	},
+
+	checkKeyUp() {
 
 		document.addEventListener("keyup", event => {
-			
-			let keyCode = event.keyCode;
-			//track movement key released
+
+			const keyCode = event.keyCode;
+
 			switch(keyCode) {
 
 				case control.W : case control.UP :
 				case control.S : case control.DOWN :
 				case control.A : case control.LEFT :
 				case control.D : case control.RIGHT :
-				case control.SPACE :
-
-					control.keyReleased = keyCode;
 
 					if(control.isPressed(keyCode)) {
 
-						control.keyPressed.splice(control.keyPressed.indexOf(keyCode), 1);
+						const index = control.keyPressed.indexOf(keyCode);
+						control.keyPressed.splice(index, 1);
 					}
 
 					break;
 			}
 		});
-		
+	},
+
+	initialize() {
+
+		this.loadAsset();
+		//game controls
+		this.checkKeyDown();
+		this.checkKeyUp();
 		this.state = "initialized";
 	},
 
 	run() {
 		//fps optimization
-		let maxFps = 60, 
-		delta = 0, 
-		lastFrameRender = 0;
-		this.timeStep = Math.round(1000 / maxFps * 100) / 100;
+		const maxFPS = 60;
+		let delta = 0;
+		let lastFrameRender = 0;
+		this.timeStep = Math.round(1000 / maxFPS * 100) / 100;
 		
-		let mainLoop = timestamp => {
+		const mainLoop = timestamp => {
 
 			if(timestamp < lastFrameRender + this.timeStep) {
-				
+
 				requestAnimationFrame(mainLoop);
 				return;
 			}
@@ -86,40 +149,27 @@ let game = {
 			//update game
 			let counter = 0;
 
-			while(delta > this.timeStep) {
+			while(delta	> this.timeStep) {
 
 				this.update();
-				//update delta time
-				delta -= this.timeStep;
-				counter++;
-
-				if(counter >= 240) {
-
-					delta = 0; //panic measurement
-				}
+				delta = ++counter >= 240 ? 0 : delta - this.timeStep;
 			}
-			
+
 			this.draw();
 			requestAnimationFrame(mainLoop);
 		};
-		
+
 		requestAnimationFrame(mainLoop);
 		this.state = "running";
-	},
-
-	stop() {
-
-		this.state = null;
 	},
 
 	update() {
 
 		this.manager.update(this.timeStep);
-		control.keyReleased = null;
 	},
 
 	draw() {
-		
+
 		this.manager.draw();
-	} 
+	}
 };

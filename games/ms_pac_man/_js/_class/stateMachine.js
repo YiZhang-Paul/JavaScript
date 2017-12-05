@@ -1,48 +1,56 @@
 /* jslint esversion: 6 */
 class StateMachine {
 
-	constructor(owner, defaultState) {
+	constructor(originator, defaultState) {
 
-		this.owner = owner;
-		this.tracker = [];
+		this.originator = originator;
 		this.defaultState = defaultState;
-		this.reset();
+		this.states = defaultState ? [defaultState] : [];
 	}
 
 	reset() {
 
-		this.tracker = this.defaultState ? [this.defaultState] : this.tracker;
+		this.states = this.defaultState ? [this.defaultState] : [];
+	}
+	/**
+	 * retrieve current active state
+	 */
+	peek() {
+
+		if(!this.states.length) {
+
+			return null;
+		}
+
+		return this.states[this.states.length - 1];
 	}
 
-	activeState() {
+	push(state) {
 
-		return this.tracker.length ? this.tracker[this.tracker.length - 1] : null;
-	}
+		if(this.peek() !== state) {
 
-	pushState(state) {
-
-		if(this.activeState() != state) {
-
-			this.tracker.push(state);
+			this.states.push(state);
 		}
 	}
 
-	popState() {
+	pop() {
 
-		return this.tracker.pop();
-	} 
-	
-	swapState(state) {
-
-		this.popState();
-		this.pushState(state);
+		return this.states.pop();
 	}
-	
+	/**
+	 * change current active state
+	 */
+	swap(state) {
+
+		this.pop();
+		this.push(state);
+	}
+
 	update(timeStep) {
 
-		if(this.activeState()) {
-			//execute corresponding function for current state
-			this.owner[this.activeState()](timeStep);
+		if(this.peek()) {
+			//execute corresponding method for current state
+			this.originator[this.peek()](timeStep);
 		}
 	}
 }

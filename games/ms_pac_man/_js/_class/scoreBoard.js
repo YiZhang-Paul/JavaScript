@@ -1,66 +1,68 @@
 /* jslint esversion: 6 */
 class ScoreBoard {
 
-	constructor(owner) {
+	constructor(originator) {
 
-		this.owner = owner;
+		this.originator = originator;
 		this.width = game.maze.width;
 		this.height = (game.monitor.height - game.maze.height) * 0.5;
 		this.fontSize = this.height * 0.45;
 		this.tick = 0;
-		this.intervalHandler = null;
-		this.ctx = game.maze.uiCtx;
+		this.interval = null;
+		this.ctx = game.canvas.ui;
 		this.draw();
 	}
 
 	reset() {
 
-		if(this.intervalHandler) {
-			
-			clearInterval(this.intervalHandler);
-			this.intervalHandler = null;
+		if(this.interval) {
+
+			clearInterval(this.interval);
+			this.interval = null;
 		}
 
 		this.tick = 0;
 		this.draw();
 	}
 
-	updateScore(score = 0) {
-
-		this.owner.score += score;
-		this.owner.highestScore = Math.max(this.owner.score, this.owner.highestScore);
-		this.draw();
-	}
-
-	changeTick() {
+	nextTick() {
 
 		this.tick = this.tick ? 0 : 1;
 	}
-
+	/** 
+	 * blink current active player number
+	 */
 	blink() {
 
-		if(!this.intervalHandler) {
+		if(!this.interval) {
 
-			this.intervalHandler = setInterval(() => {
+			this.interval = setInterval(() => {
 
-				this.changeTick();
+				this.nextTick();
 				this.draw();
 
 			}, 150);
 		}
 	}
 
-	drawText(texts) {
+	update(score = 0) {
 
-		for(let i = 0; i < texts.length; i++) {
+		this.originator.score += score;
+		this.originator.highScore = Math.max(this.originator.score, this.originator.highScore);
+		this.draw();
+	}
 
-			for(let j = 0; j < texts[i].length; j++) {
+	drawText(text) {
+
+		for(let i = 0; i < text.length; i++) {
+
+			for(let j = 0; j < text[i].length; j++) {
 
 				if(i || j || this.tick) {
 
-					const xCord = this.width * (0.2 + i * 0.4);
-					const yCord = this.height * (0.5 + j * 0.43);
-					this.ctx.fillText(texts[i][j], xCord, yCord);
+					const x = this.width * (0.2 + i * 0.4);
+					const y = this.height * (0.5 + j * 0.43);
+					this.ctx.fillText(text[i][j], x, y);
 				}
 			}
 		}
@@ -72,10 +74,11 @@ class ScoreBoard {
 		this.ctx.font = this.fontSize + "px 'Lucida Console'";
 		this.ctx.textAlign = "center";
 		this.ctx.fillStyle = "white";
+
 		this.drawText([
 
-			[`${this.owner.playerNumber}UP`, this.owner.score],
-			["HIGH SCORE", this.owner.highestScore]
+			[`${this.originator.number}UP`, this.originator.score],
+			["HIGH SCORE", this.originator.highScore]
 		]);
 	}
-} 
+}

@@ -1,23 +1,14 @@
 /* jslint esversion: 6 */
 class AIManager {
 
-	constructor(nameList) {
+	constructor() {
 
+		this.names = ["blinky", "pinky", "inky", "sue"];
 		this.ais = null;
 		this.shelter = null;
 		this.cooldown = 2000;
-		this.lastAIOut = 0; 
-		this.createAIs();
-	}
-
-	createAIs() {
-
-		this.blinky = new Blinky(this);
-		this.pinky = new Pinky(this);
-		this.inky = new Inky(this);
-		this.clyde = new Clyde(this);
-		this.ais = [this.blinky, this.pinky, this.inky, this.clyde];
-		this.shelter = new Set(this.ais.slice(1));
+		this.lastAIOut = 0;
+		this.loadAI();
 	}
 
 	reset() {
@@ -30,25 +21,40 @@ class AIManager {
 		this.shelter = new Set(this.ais.slice(1));
 	}
 
-	resetCooldown() {
+	loadAI() {
 
-		this.lastAIOut = new Date();
+		this.blinky = new Blinky(this);
+		this.pinky = new Pinky(this);
+		this.inky = new Inky(this);
+		this.sue = new Sue(this);
+		this.ais = [this.blinky, this.pinky, this.inky, this.sue];
+		this.shelter = new Set(this.ais.slice(1));
+	}
+	/**
+	 * set cooldown when AI leaves shelter
+	 */
+	setCooldown() {
+
+		this.lastAIOut = new Date().getTime();
 	}
 
 	onCooldown(cooldown = this.cooldown) {
 
-		return new Date() - this.lastAIOut < cooldown;
+		return this.lastAIOut + cooldown > new Date().getTime();
 	}
-
+	/**
+	 * initiate movement for all AIs on game start 
+	 */
 	initiateMove() {
 
 		this.ais.forEach(ai => {
 
-			setTimeout(() => {
+			let timeout = setTimeout(() => {
 
+				clearTimeout(timeout);
 				ai.moving = true;
 
-			}, ai.state.activeState() === "outShelter" ? 1000 : this.cooldown);
+			}, ai.state.peek() === "outShelter" ? 1000 : this.cooldown);
 		});
 	}
 
@@ -60,32 +66,30 @@ class AIManager {
 		});
 	}
 
-	startAnimate() {
+	startAnimation() {
 
 		this.ais.forEach(ai => {
 
 			ai.animationOn = true;
 		});
 	}
-
-	enterFlee() {
+	/**
+	 * trigger flee state for all AIs out of shelter
+	 */
+	triggerFlee() {
 
 		this.ais.forEach(ai => {
 
-			let activeState = ai.state.activeState();
+			const state = ai.state.peek();
 
-			if(activeState === "outShelter" || activeState === "flee") {
-				
-				ai.getCropXY = ai.fleeCropXY;
+			if(new Set(["outShelter", "flee", "transition"]).has(state)) {
+
+				ai.getCropLocation = ai.fleeCropLocation;
 				ai.stopAnimation(0);
-				ai.state.swapState("flee");
-
-				if(activeState === "flee" && ai.timeoutHandler) {
-					
-					clearTimeout(ai.timeoutHandler);
-					ai.timeoutHandler = null;
-				}
-			} 
+				//reset flee timer
+				ai.fleeTimestamp = new Date().getTime();
+				ai.state.swap("flee");
+			}
 		});
 	}
 
@@ -103,5 +107,5 @@ class AIManager {
 
 			ai.draw();
 		});
-	} 
+	}
 }

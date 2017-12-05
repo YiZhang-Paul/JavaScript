@@ -1,55 +1,54 @@
 /* jslint esversion: 6 */
 class ScorePopup {
 
-	constructor(xCord, yCord, value) {
+	constructor(x, y, value) {
 
-		this.xCord = xCord;
-		this.yCord = yCord;
+		this.x = x;
+		this.y = y;
 		this.value = value;
+		this.spawn = new Date().getTime();
+		this.lifespan = 1500;
 		this.cropX = null;
 		this.cropY = null;
 		this.cropWidth = 32;
 		this.tile = document.getElementById("player");
-		this.ctx = game.maze.popUpCtx;
-		this.timeoutHandler = null;
-		this.draw();
+		this.ctx = game.canvas.popup;
+		this.getCropPosition();
 	}
 
-	clear() {
+	isAlive() {
+
+		return this.spawn + this.lifespan > new Date().getTime();
+	}
+
+	erase() {
 
 		this.ctx.clearRect(
-		
-			this.xCord - game.maze.gridWidth * 0.9,
-			this.yCord - game.maze.gridWidth * 0.9,
-            game.maze.gridWidth * 1.8,
-			game.maze.gridWidth * 1.8
+
+			this.x - game.gridWidth * 0.9,
+			this.y - game.gridWidth * 0.9,
+			game.gridWidth * 1.8,
+			game.gridWidth * 1.8
 		);
 	}
 
-	autoClear() {
+	getCropPosition() {
 
-		if(!this.timeoutHandler) {
+		if(this.value === 500) {
 
-			this.timeoutHandler = setTimeout(() => {
-
-				clearTimeout(this.timeoutHandler);
-				this.timeoutHandler = null;
-				this.clear();
-
-			}, 1500);
+			[this.cropX, this.cropY] = [224, 192];
 		}
-	}
+		else {
 
-	getCropXY() {
-
-		const isFiveHundred = this.value === 500;
-		this.cropX = isFiveHundred ? 224 : (Math.log2(this.value / 100) - 1) * this.cropWidth;
-		this.cropY = isFiveHundred ? 192 : 224;
+			this.cropX = (Math.log2(this.value / 100) - 1) * this.cropWidth;
+			this.cropY = 224;
+		}
 	}
 
 	draw() {
 
-		this.getCropXY();
+		this.erase();
+
 		this.ctx.drawImage(
 
 			this.tile,
@@ -57,12 +56,10 @@ class ScorePopup {
 			this.cropY,
 			this.cropWidth,
 			this.cropWidth,
-			this.xCord - game.maze.gridWidth * 0.9,
-			this.yCord - game.maze.gridWidth * 0.9,
-            game.maze.gridWidth * 1.8,
-			game.maze.gridWidth * 1.8
+			this.x - game.gridWidth * 0.9,
+			this.y - game.gridWidth * 0.9,
+			game.gridWidth * 1.8,
+			game.gridWidth * 1.8
 		);
-
-		this.autoClear();
 	}
 }

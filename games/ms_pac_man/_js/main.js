@@ -4,7 +4,7 @@
 
 		game.initialize();
 
-		if(game.state == "initialized") {
+		if(game.state === "initialized") {
 
 			game.run();
 		}

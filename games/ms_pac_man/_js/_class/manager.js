@@ -8,72 +8,122 @@ class Manager {
 		this.scoreBoard = null;
 		this.totalFood = 0;
 		this.powerBeans = new Set();
-		this.activeFruit = null;
 		this.popUps = new WeakSet();
-		this.emptyCells = [];
-		this.timeoutHandler = null;
+		this.activeFruit = null;
+		this.emptyGrids = [];
+		this.timeout = null;
+		this.interval = null;
 		this.fruitTimeout = null;
 		this.fruitInterval = null;
-		this.intervalHandler = null;
 		this.beanInterval = null;
-		this.ctx = game.maze.playerCtx;
-		this.hudShown = false;
+		this.hudLoaded = false;
 		this.state = null;
-		this.createGame();
+		this.newGame();
 	}
 
 	reset() {
 
 		this.powerBeans = new Set();
 		this.popUps = new WeakSet();
-		this.emptyCells = [];
+		this.emptyGrids = [];
 
-		if(this.activeFruit) {
+		if(this.activeFruit !== null) {
 
-			this.activeFruit.clear();
+			this.activeFruit.dispose();
 		}
 	}
 
-	makeFood(row, column, type) {
+	newGame() {
 
-		let food = type === "s" ? new Bean(row, column) : new PowerBean(row, column);
+		this.reset();
+		this.setAllFood();
+		this.user = new User();
+		this.aiManager = new AIManager();
+
+		if(this.scoreBoard) {
+
+			this.scoreBoard.reset();
+		}
+
+		this.scoreBoard = new ScoreBoard(this.user);
+		this.hud = new HUD(this.user);
+		this.state = new StateMachine(this, "onCall");
+	}
+
+	resetGame() {
+
+		this.reset();
+		this.setAllFood();
+		this.user.reset();
+		this.aiManager.reset();
+		this.scoreBoard.reset();
+		this.hud.reset();
+		game.maze.reset();
+		this.state.reset();
+	}
+
+	resetRound() {
+		//retain current user score
+		const score = this.user.score;
+		this.user.reset();
+		this.user.score = score;
+		this.aiManager.reset();
+		this.scoreBoard.reset();
+		this.hud.draw();
+		game.maze.reset();
+		this.state.reset();
+		//clear current active fruit
+		if(this.activeFruit) {
+
+			this.activeFruit.dispose();
+		}
+	}
+	/**
+	 * set single food of given type on maze
+	 */
+	setFood(row, column, type) {
+
+		let food = type === "l" ? new PowerBean(row, column) : new Bean(row, column);
 
 		if(type === "l") {
 
 			this.powerBeans.add(food);
 		}
 
-		grid.setGrid(0, row, column, food);
+		gameGrid.setGrid(0, row, column, food);
 		this.totalFood++;
+		food.draw();
 	}
 
-	makeAllFood() {
+	setAllFood() {
 
-		game.maze.fruitCtx.clearRect(0, 0, game.maze.width, game.maze.height);
+		game.canvas.food.clearRect(0, 0, game.maze.width, game.maze.height);
 		this.totalFood = 0;
 
-		for(let i = 0; i < grid.row; i++) {
+		for(let i = 0; i < gameGrid.rows; i++) {
 
-			for(let j = 0; j < grid.column; j++) {
+			for(let j = 0; j < gameGrid.columns; j++) {
 
-				let currentGrid = grid.getGrid(1, i, j);
+				let position = gameGrid.getGrid(1, i, j);
 
-				if(currentGrid && currentGrid.hasOwnProperty("f")) {
+				if(position && position.hasOwnProperty("f")) {
 
-					this.makeFood(i, j, currentGrid.f);
+					this.setFood(i, j, position.f);
 				}
 			}
 		}
 	}
-
-	getFruitQueue() {
+	/**
+	 * generate next fruit types in queue
+	 */
+	fillFruitQueue() {
 
 		if(!this.fruitInterval) {
 
 			this.fruitInterval = setInterval(() => {
 
 				if(this.hud.fruitQueue.length < 5) {
-
+					//pick random fruit type
 					this.hud.enqueue(Math.floor(Math.random() * 7 + 1));
 				}
 
@@ -81,27 +131,27 @@ class Manager {
 		}
 	}
 
-	getFruit(type) {
+	createFruit(type) {
 
 		let row, column, direction;
 
 		if(Math.random() < 0.5) {
 
-			row = Math.random() < 0.5 ? 0 : grid.row - 1;
-			column = Math.floor(Math.random() * (grid.column - 10)) + 5;
+			row = Math.random() < 0.5 ? 0 : gameGrid.rows - 1;
+			column = Math.floor(Math.random() * (gameGrid.columns - 10)) + 5;
 			direction = row === 0 ? "down" : "up";
 		}
 		else {
 
-			row = Math.floor(Math.random() * (grid.row - 10)) + 5;
-			column = Math.random() < 0.5 ? 0 : grid.column - 1;
+			row = Math.floor(Math.random() * (gameGrid.rows - 10)) + 5;
+			column = Math.random() < 0.5 ? 0 : gameGrid.columns - 1;
 			direction = column === 0 ? "right" : "left";
 		}
 
 		return new Fruit(row, column, type, direction);
 	}
 
-	putFruit() {
+	setFruit() {
 
 		if(this.hud.fruitQueue.length && !this.activeFruit && !this.fruitTimeout) {
 
@@ -109,7 +159,7 @@ class Manager {
 
 			this.fruitTimeout = setTimeout(() => {
 
-				this.activeFruit = this.getFruit(this.hud.fruitQueue[0]);
+				this.activeFruit = this.createFruit(this.hud.fruitQueue[0]);
 				this.hud.dequeue();
 				clearTimeout(this.fruitTimeout);
 				this.fruitTimeout = null;
@@ -133,146 +183,81 @@ class Manager {
 		}
 	}
 
-	createGame() {
+	clearAllHandlers() {
 
-		this.reset();
-		this.makeAllFood();
-		this.user = new User();
-		this.aiManager = new AIManager(["blinky", "pinky", "inky", "clyde"]);
-
-		if(this.scoreBoard) {
-
-			this.scoreBoard.reset();
-		}
-
-		this.scoreBoard = new ScoreBoard(this.user);
-		this.hud = new HUD(this.user);
-		this.state = new StateMachine(this, "ready");
+		clearTimeout(this.timeout);
+		this.timeout = null;
+		clearTimeout(this.fruitTimeout);
+		this.fruitTimeout = null;
+		clearInterval(this.interval);
+		this.interval = null;
+		clearInterval(this.beanInterval);
+		this.beanInterval = null;
+		clearInterval(this.fruitInterval);
+		this.fruitInterval = null;
 	}
 
-	resetGame() {
+	bufferAnimation(callbacks, delay) {
 
-		this.reset();
-		this.makeAllFood();
-		this.user.reset();
-		this.aiManager.reset();
-		this.scoreBoard.reset(); 
-		this.hud.reset();
-		game.maze.reset();
-		this.state.reset();
-	}
+		if(!this.interval) {
 
-	resetRound() {
+			this.interval = setInterval(() => {
 
-		const score = this.user.score;
-		this.user.reset();
-		this.user.score = score;
-		this.aiManager.reset();
-		this.scoreBoard.reset();
-		this.hud.draw();
-		game.maze.reset();
-		this.state.reset();
-
-		if(this.activeFruit) {
-
-			this.activeFruit.clear();
-		}
-	}
-
-	clearHandlers() {
-
-		if(this.timeoutHandler) {
-
-			clearTimeout(this.timeoutHandler);
-			this.timeoutHandler = null;
-		}
-
-		if(this.fruitInterval) {
-
-			clearInterval(this.fruitInterval);
-			this.fruitInterval = null;
-		}
-
-		if(this.fruitTimeout) {
-
-			clearTimeout(this.fruitTimeout);
-			this.fruitTimeout = null;
-		}
-
-		if(this.intervalHandler) {
-
-			clearInterval(this.intervalHandler);
-			this.intervalHandler = null;
-		}
-
-		if(this.beanInterval) {
-
-			clearInterval(this.beanInterval);
-			this.beanInterval = null;
-		}
-	}
-
-	bufferAnimation(callBackList, interval) {
-
-		if(!this.intervalHandler) {
-
-			this.intervalHandler = setInterval(() => {
-
-				callBackList.forEach(set => {
+				callbacks.forEach(set => {
 
 					let caller = set[0];
 					caller[set[1]]();
 				});
 
-			}, interval);
+			}, delay);
 		}
 	}
 
-	bufferEnd(callBackList, timeout = 1500) {
+	bufferEnd(callbacks, delay = 1500) {
 
-		if(!this.timeoutHandler) {
+		if(!this.timeout) {
 
-			this.timeoutHandler = setTimeout(() => {
-				
-				this.clearHandlers();
+			this.timeout = setTimeout(() => {
 
-				callBackList.forEach(set => {
+				this.clearAllHandlers();
+
+				callbacks.forEach(set => {
 
 					let caller = set[0];
 					caller[set[1]]();
 				});
 
-			}, timeout);
+			}, delay);
 		}
-	} 
+	}
 	/**
 	 * game states
 	 */
-	ready() {
+	onCall() {
 
 		this.blinkPowerBeans();
 		this.scoreBoard.blink();
 
-		if(!this.hudShown && this.hud.tile.complete) {
+		if(!this.hudLoaded && this.hud.tile.complete) {
 
 			this.hud.draw();
-			this.hudShown = true;
+			this.hudLoaded = true;
 		}
 		//detect game start
 		if(control.getActiveKey() !== null) {
 
-			this.state.swapState("ongoing");
+			this.state.swap("ongoing");
 			this.aiManager.initiateMove();
-			this.aiManager.startAnimate();
+			this.aiManager.startAnimation();
 		}
 	}
-	
+
 	ongoing(timeStep) {
 
 		this.aiManager.update(timeStep);
 		this.user.update(timeStep);
-		this.getFruitQueue();
-		this.putFruit();
+		this.fillFruitQueue();
+		this.setFruit();
 
 		if(this.activeFruit) {
 
@@ -282,37 +267,37 @@ class Manager {
 
 	onGhostKill(timeStep) {
 
-		if(!this.timeoutHandler) {
+		if(!this.timeout) {
 
-			this.timeoutHandler = setTimeout(() => {
+			this.timeout = setTimeout(() => {
 
-				clearTimeout(this.timeoutHandler);
-				this.timeoutHandler = null;
-				this.state.swapState("ongoing");
+				clearTimeout(this.timeout);
+				this.timeout = null;
+				this.state.swap("ongoing");
 
 			}, 500);
 		}
 
 		this.aiManager.ais.forEach(ai => {
 
-			if(ai.state.activeState() === "retreat") {
+			if(ai.state.peek() === "retreat") {
 
 				ai.update(timeStep);
 			}
 		});
 	}
 
-	userDeathTransition() {
+	onUserKill() {
 
-		if(!this.timeoutHandler) {
+		if(!this.timeout) {
 
 			this.user.stopAnimation(2);
 
-			this.timeoutHandler = setTimeout(() => {
-
-				clearTimeout(this.timeoutHandler);
-				this.timeoutHandler = null;
-				this.state.swapState("onUserDeath");
+			this.timeout = setTimeout(() => {
+				
+				clearTimeout(this.timeout);
+				this.timeout = null;
+				this.state.swap("onUserDeath");
 
 			}, 1500);
 		}
@@ -322,8 +307,8 @@ class Manager {
 
 		this.user.playDeathAnimation();
 	}
-	
-	buffering() {
+
+	resetting() {
 
 		this.user.stopAnimation(2);
 
@@ -331,11 +316,11 @@ class Manager {
 
 			this.bufferAnimation([[game.maze, "blink"]], 225);
 			this.bufferEnd([[this, "resetGame"]], 3000);
-		} 
+		}
 		else if(!this.user.life) {
 
-			this.bufferEnd([[this, "createGame"]]);
-		} 
+			this.bufferEnd([[this, "newGame"]]);
+		}
 		else {
 
 			this.bufferEnd([[this, "resetRound"]]);
@@ -349,9 +334,9 @@ class Manager {
 
 	draw() {
 
-		this.ctx.clearRect(0, 0, game.maze.width, game.maze.height);
+		game.canvas.player.clearRect(0, 0, game.maze.width, game.maze.height);
 
-		if(this.state.activeState() !== "onGhostKill") {
+		if(this.state.peek() !== "onGhostKill") {
 
 			this.user.draw();
 		}
@@ -366,4 +351,4 @@ class Manager {
 			this.activeFruit.draw();
 		}
 	}
-} 
+}
