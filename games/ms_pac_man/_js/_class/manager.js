@@ -8,7 +8,7 @@ class Manager {
 		this.scoreBoard = null;
 		this.totalFood = 0;
 		this.powerBeans = new Set();
-		this.popUps = new WeakSet();
+		this.popUps = new Set();
 		this.activeFruit = null;
 		this.emptyGrids = [];
 		this.timeout = null;
@@ -24,7 +24,7 @@ class Manager {
 	reset() {
 
 		this.powerBeans = new Set();
-		this.popUps = new WeakSet();
+		this.popUps = new Set();
 		this.emptyGrids = [];
 
 		if(this.activeFruit !== null) {
@@ -332,9 +332,7 @@ class Manager {
 		this.state.update(timeStep);
 	}
 
-	draw() {
-
-		game.canvas.player.clearRect(0, 0, game.mazeWidth, game.mazeHeight);
+	drawPlayers() {
 
 		if(this.state.peek() !== "onGhostKill") {
 
@@ -345,6 +343,28 @@ class Manager {
 
 			this.aiManager.draw();
 		}
+	}
+
+	drawPopups() {
+
+		this.popUps.forEach(popup => {
+
+			if(popup.isAlive()) {
+
+				popup.draw();
+			}
+			else {
+
+				popup.dispose();
+			}
+		});
+	}
+
+	draw() {
+
+		game.canvas.player.clearRect(0, 0, game.mazeWidth, game.mazeHeight);
+		this.drawPlayers();
+		this.drawPopups();
 
 		if(this.activeFruit) {
 

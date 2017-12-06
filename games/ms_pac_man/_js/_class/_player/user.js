@@ -87,7 +87,7 @@ class User extends Player {
 
 			if(this.canKillGhost(ai)) {
 				//calculate score by total ghost kills during current visit 
-				const score = Math.pow(2, this.killCount++ - 1) * ai.score;
+				const score = Math.pow(2, ++this.killCount - 1) * ai.score;
 				//display scores
 				game.manager.scoreBoard.update(score);
 				game.manager.popUps.add(new ScorePopup(ai.x, ai.y, score));

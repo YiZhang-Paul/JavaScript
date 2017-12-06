@@ -32,6 +32,12 @@ class ScorePopup {
 		);
 	}
 
+	dispose() {
+
+		game.manager.popUps.delete(this);
+		this.erase();
+	}
+
 	getCropPosition() {
 
 		if(this.value === 500) {

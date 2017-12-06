@@ -6,7 +6,7 @@ class Fruit extends Food {
 		super(row, column);
 		this.type = type;
 		this.score = 500;
-		this.spawn = new Date();
+		this.spawn = new Date().getTime();
 		this.lifespan = 30000;
 		this.falling = false;
 		this.jumpHeight = 0;
@@ -24,7 +24,7 @@ class Fruit extends Food {
 
 	isActive() {
 
-		return this.spawn + this.lifespan > new Date();
+		return this.spawn + this.lifespan > new Date().getTime();
 	}
 
 	erase() {
