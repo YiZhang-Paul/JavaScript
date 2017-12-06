@@ -73,7 +73,9 @@ class User extends Player {
 
 	canKillGhost(ghost) {
 
-		if(ghost.state.peek() !== "flee") {
+		const state = ghost.state.peek();
+
+		if(state !== "flee" && state !== "transition") {
 
 			return false;
 		}
