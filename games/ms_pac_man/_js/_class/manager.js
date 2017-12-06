@@ -97,7 +97,7 @@ class Manager {
 
 	setAllFood() {
 
-		game.canvas.food.clearRect(0, 0, game.maze.width, game.maze.height);
+		game.canvas.food.clearRect(0, 0, game.mazeWidth, game.mazeHeight);
 		this.totalFood = 0;
 
 		for(let i = 0; i < gameGrid.rows; i++) {
@@ -334,7 +334,7 @@ class Manager {
 
 	draw() {
 
-		game.canvas.player.clearRect(0, 0, game.maze.width, game.maze.height);
+		game.canvas.player.clearRect(0, 0, game.mazeWidth, game.mazeHeight);
 
 		if(this.state.peek() !== "onGhostKill") {
 

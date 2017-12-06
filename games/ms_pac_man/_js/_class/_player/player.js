@@ -170,7 +170,7 @@ class Player {
 	 * @abstract
 	 * check if player can turn to given direction
 	 */
-	isValidDirection() {}
+	isValidDirection(direction) {}
 
 	setDirection(direction) {
 
@@ -198,7 +198,7 @@ class Player {
 	checkWormhole() {
 
 		const left = -game.gridWidth;
-		const right = game.maze.width + game.gridWidth;
+		const right = game.mazeWidth + game.gridWidth;
 
 		if(this.x < left || this.x > right) {
 

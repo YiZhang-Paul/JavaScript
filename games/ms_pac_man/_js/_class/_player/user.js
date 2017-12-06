@@ -9,7 +9,7 @@ class User extends Player {
 		this.highScore = 0;
 		this.killCount = 0;
 		this.totalTicks = 3;
-		this.speed = Math.round(game.maze.height * 0.025) / 100;
+		this.speed = Math.round(game.mazeHeight * 0.025) / 100;
 		this.dying = false;
 		this.deathTimeout = null;
 		this.deathInterval = null;
@@ -45,7 +45,7 @@ class User extends Player {
 	isValidDirection(direction) {
 
 		const isOpposite = direction === this.getOppositeWay();
-		const inMazeArea = this.x >= 0 && this.x <= game.maze.width;
+		const inMazeArea = this.x >= 0 && this.x <= game.mazeWidth;
 		const canMove = !this.hasWall(direction) && !this.hasDoor(direction);
 
 		return isOpposite || (this.onGridCenter() && inMazeArea && canMove);
@@ -91,8 +91,8 @@ class User extends Player {
 				//display scores
 				game.manager.scoreBoard.update(score);
 				game.manager.popUps.add(new ScorePopup(ai.x, ai.y, score));
-				game.manager.state.swap("ghostKilled");
-				ai.enterRetreat();
+				game.manager.state.swap("onGhostKill");
+				ai.triggerRetreat();
 			}
 		});
 	}

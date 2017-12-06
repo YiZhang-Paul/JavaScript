@@ -7,16 +7,16 @@ class AI extends Player {
 		this.manager = manager;
 		this.moving = false;
 		this.totalTicks = 2;
-		this.defaultSpeed = Math.round(game.maze.height * 0.02) / 100;
+		this.defaultSpeed = Math.round(game.mazeHeight * 0.02) / 100;
 		this.speed = this.defaultSpeed;
 		this.fleeTimestamp = null;
-		this.fleeTime = 10000;      //total flee time
+		this.fleeTime = 10000;
 		this.transitionTime = 3000; //transition time between flee and normal state
-		this.endPoint = null;
 		this.patrolPath = null;
 		this.retreatPath = null;
 		this.defaultState = null;
 		this.defaultCropLocation = this.getCropLocation;
+		this.pathfinder = new PathFinder(this);
 		this.state = null;
 	}
 
@@ -55,10 +55,10 @@ class AI extends Player {
 		}
 	}
 
-	isValidDirection() {
+	isValidDirection(direction) {
 
 		const isOpposite = direction === this.getOppositeWay();
-		const inMazeArea = this.x >= 0 && this.x <= game.maze.width;
+		const inMazeArea = this.x >= 0 && this.x <= game.mazeWidth;
 
 		return isOpposite || (inMazeArea && !this.hasWall(direction));
 	}
@@ -69,7 +69,7 @@ class AI extends Player {
 
 		if(position && position.hasOwnProperty("c")) {
 			//move left and right while entering shelter
-			this.setDirection(this.x < game.maze.width * 0.5 ? "left" : "right");
+			this.setDirection(this.x < game.mazeWidth * 0.5 ? "left" : "right");
 			//restore default tile set
 			this.getCropLocation = this.defaultCropLocation;
 			this.stopAnimation(0);
@@ -83,18 +83,18 @@ class AI extends Player {
 	/**
 	 * change moving direction inside of shelter
 	 */
-	setDirectionInShelter() {
+	setInShelterDirection() {
 
 		const doorWidth = game.gridWidth * 0.2;
-		const doorLeft = (game.maze.width - doorWidth) * 0.5;
-		const doorRight = (game.maze.width + doorWidth) * 0.5;
+		const doorLeft = (game.mazeWidth - doorWidth) * 0.5;
+		const doorRight = (game.mazeWidth + doorWidth) * 0.5;
 		const centerY = (gameGrid.door.row + 2) * game.gridWidth;
 		const inDoorRange = this.x > doorLeft && this.x < doorRight;
 		const inYRange = Math.round(Math.abs(this.y - centerY)) < game.gridWidth * 0.5;
 		//change directions to move out of shelter
 		if((this.direction === "up" || this.direction === "down") && !inDoorRange && inYRange) {
 
-			this.setDirection(this.x > game.maze.width * 0.5 ? "left" : "right");
+			this.setDirection(this.x > game.mazeWidth * 0.5 ? "left" : "right");
 		}
 		else if((this.direction === "left" || this.direction === "right") && inDoorRange) {
 
@@ -136,6 +136,67 @@ class AI extends Player {
 			game.manager.state.swap("onUserKill");
 		}
 	}
+
+	triggerRetreat() {
+
+		this.getCropLocation = this.retreatCropLocation;
+		this.stopAnimation(0);
+		this.state.swap("retreat");
+	}
+
+	getRetreatPath() {
+
+		let destination = new Node(14, this.x < game.mazeWidth * 0.5 ? 13 : 14);
+		this.retreatPath = this.pathfinder.getPath(destination);
+	}
+
+	updateRetreatPath() {
+
+		if(!this.retreatPath) {
+
+			this.getRetreatPath();
+			return;
+		}
+
+		let target = this.retreatPath[0];
+
+		if(this.onGridCenter(target.row, target.column)) {
+
+			this.retreatPath.shift();
+
+			if(!this.retreatPath.length) {
+
+				this.retreatPath = null;
+			}
+		}
+	}
+
+	setRetreatDirection() {
+
+		let direction;
+		let target = this.retreatPath[0];
+		const [centerX, centerY] = this.getGridCenter(target.row, target.column);
+
+		if(this.y === centerY) {
+
+			direction = this.x < centerX ? "right" : "left";
+		}
+		else if(this.x === centerX) {
+
+			direction = this.y < centerY ? "down" : "up";
+		}
+		else {
+
+			[this.x, this.y] = this.getGridCenter(this.row, this.column);
+			this.setRetreatDirection();
+			return;
+		}
+
+		if(direction && this.isValidDirection(direction)) {
+
+			this.setDirection(direction);
+		}
+	}
 	/**
 	 * determine AI tile image crop location
 	 */
@@ -172,7 +233,7 @@ class AI extends Player {
 
 		if(this.moving) {
 
-			this.setDirectionInShelter();
+			this.setInShelterDirection();
 			this.move(timeStep);
 			this.getOutShelter();
 		}
@@ -205,7 +266,9 @@ class AI extends Player {
 		this.playAnimation();
 		this.startTransition();
 	}
-
+	/**
+	 * transition state from flee to normal
+	 */
 	transition() {
 
 		if(!this.onTransition()) {
@@ -213,6 +276,20 @@ class AI extends Player {
 			this.getCropLocation = this.defaultCropLocation;
 			this.stopAnimation(0);
 			this.state.swap("outShelter");
+		}
+	}
+
+	retreat(timeStep) {
+
+		this.speed = this.defaultSpeed * 1.4;
+
+		if(this.moving) {
+			//move back to shelter
+			this.updateRetreatPath();
+			this.setRetreatDirection();
+			this.move(timeStep);
+			this.playAnimation();
+			this.getInShelter();
 		}
 	}
 

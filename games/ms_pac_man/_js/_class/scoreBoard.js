@@ -4,8 +4,8 @@ class ScoreBoard {
 	constructor(originator) {
 
 		this.originator = originator;
-		this.width = game.maze.width;
-		this.height = (game.monitor.height - game.maze.height) * 0.5;
+		this.width = game.mazeWidth;
+		this.height = (game.monitor.height - game.mazeHeight) * 0.5;
 		this.fontSize = this.height * 0.45;
 		this.tick = 0;
 		this.interval = null;

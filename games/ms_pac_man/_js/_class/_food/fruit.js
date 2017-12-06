@@ -13,7 +13,7 @@ class Fruit extends Food {
 		this.maxJumpHeight = game.gridWidth;
 		this.jumpSpeed = game.gridWidth * 0.1;
 		this.direction = direction;
-		this.moveSpeed = Math.round(game.maze.height * 0.1) / 100;
+		this.moveSpeed = Math.round(game.mazeHeight * 0.1) / 100;
 		this.toGridCenter = null;
 		this.tile = document.getElementById("player");
 		this.cropWidth = 32;
