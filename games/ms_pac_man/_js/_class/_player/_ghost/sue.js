@@ -8,7 +8,7 @@ class Sue extends AI {
 		this.reset();
 	}
 
-	setDirectionInShelter() {
+	setInShelterDirection() {
 
 		if(this.manager.shelter.size > 1 || this.manager.onCooldown()) {
 
@@ -16,7 +16,7 @@ class Sue extends AI {
 		} 
 		else {
 			
-			super.setDirectionInShelter();
+			super.setInShelterDirection();
 		}
 	}
 }

@@ -144,17 +144,16 @@ class AI extends Player {
 		this.state.swap("retreat");
 	}
 
-	getRetreatPath() {
+	getRetreatDestination() {
 
-		let destination = new Node(14, this.x < game.mazeWidth * 0.5 ? 13 : 14);
-		this.retreatPath = this.pathfinder.getPath(destination);
+		return new Node(14, this.x < game.mazeWidth * 0.5 ? 13 : 14);
 	}
 
 	updateRetreatPath() {
 
 		if(!this.retreatPath) {
 
-			this.getRetreatPath();
+			this.retreatPath = this.pathfinder.getPath(this.getRetreatDestination());
 			return;
 		}
 

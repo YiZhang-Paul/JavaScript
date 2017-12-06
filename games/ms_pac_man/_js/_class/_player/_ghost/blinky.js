@@ -7,4 +7,16 @@ class Blinky extends AI {
 		this.defaultState = "outShelter";
 		this.reset();
 	}
+
+	setInShelterDirection() {
+
+		if(this.manager.onCooldown()) {
+
+			this.turnAround();
+		}
+		else {
+
+			super.setInShelterDirection();
+		}
+	} 
 }

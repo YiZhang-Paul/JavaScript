@@ -8,7 +8,7 @@ class Pinky extends AI {
 		this.reset();
 	}
 
-	setDirectionInShelter() {
+	setInShelterDirection() {
 
 		if(this.manager.shelter.has(this.manager.blinky) || this.manager.onCooldown()) {
 
@@ -16,7 +16,7 @@ class Pinky extends AI {
 		} 
 		else {
 
-			super.setDirectionInShelter();
+			super.setInShelterDirection();
 		}
 	} 
 }

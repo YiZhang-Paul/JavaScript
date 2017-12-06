@@ -8,7 +8,7 @@ class Inky extends AI {
 		this.reset();
 	}
 
-	setDirectionInShelter() {
+	setInShelterDirection() {
 
 		if(this.manager.shelter.has(this.manager.blinky) ||
 		   this.manager.shelter.has(this.manager.pinky) ||
@@ -18,7 +18,7 @@ class Inky extends AI {
 		} 
 		else {
 			
-			super.setDirectionInShelter();
+			super.setInShelterDirection();
 		}
 	} 
 }

@@ -103,12 +103,15 @@ class Player {
 		if(this.onGridCenter()) {
 
 			this.toGridCenter = null;
+			return;
 		}
-		else {
 
-			let adjacent = this.getAdjacentGrid();
+		let adjacent = this.getAdjacentGrid();
+
+		if(adjacent) {
+
 			const toAdjacent = this.distanceToGridCenter(adjacent.row, adjacent.column);
-
+			
 			this.toGridCenter = toAdjacent > game.gridWidth ?
 				this.distanceToGridCenter(this.row, this.column) : toAdjacent;
 		}
@@ -118,24 +121,28 @@ class Player {
 
 		let adjacent = this.getAdjacentGrid(direction);
 
-		if(adjacent === null) {
+		if(!adjacent) {
 
 			return false;
 		}
 
-		return gameGrid.getGrid(1, adjacent.row, adjacent.column).hasOwnProperty("w");
+		let grid = gameGrid.getGrid(1, adjacent.row, adjacent.column);
+
+		return grid && grid.hasOwnProperty("w");
 	}
 
 	hasDoor(direction = this.direction) {
 
 		let adjacent = this.getAdjacentGrid(direction);
 
-		if(adjacent === null) {
+		if(!adjacent) {
 
 			return false;
 		}
 
-		return gameGrid.getGrid(1, adjacent.row, adjacent.column).hasOwnProperty("d");
+		let grid = gameGrid.getGrid(1, adjacent.row, adjacent.column);
+
+		return grid && grid.hasOwnProperty("d");
 	}
 
 	distanceToCollision() {
