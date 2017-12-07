@@ -6,86 +6,102 @@ class PathFinder {
 		this.originator = originator;
 	}
 
-	getPathLength(start, end) {
-
-		return Math.abs(start.row - end.row) + Math.abs(start.column - end.column);
-	}
-
-	getStraightLineDistance(start, end) {
-
-		return Math.hypot((start.row - end.row), (start.column - end.column));
-	}
-	/**
-	 * calculate weight of given node for A* algorithm
-	 * @param {Node} [current] - node to be tested
-	 * @param {Node} [start] - starting point of current path
-	 * @param {Node} [end] - destination node
-	 */
-	getWeight(current, start, end) {
-
-		const gScore = this.getPathLength(current, start);
-		const hScore = this.getPathLength(current, end);
-		const distanceToStart = this.getStraightLineDistance(current, start);
-		const distanceToEnd = this.getStraightLineDistance(current, end);
-
-		return gScore + hScore + distanceToEnd - distanceToStart;
-	}
-
 	isSamePosition(node1, node2) {
 
 		return node1.row === node2.row && node1.column === node2.column;
 	}
 
-	isVisited(target, visited) {
+	getKey(node) {
 
-		return visited.some(node => this.isSamePosition(node, target));
+		return `${node.row},${node.column}`;
+	}
+
+	getHeuristic(candidate, end) {
+
+		return Math.abs(candidate.row - end.row) + Math.abs(candidate.column - end.column);
+	}
+
+	getStartNode() {
+
+		return new Node(this.originator.row, this.originator.column);
+	}
+
+	getCandidates(node) {
+
+		let candidates = this.originator.getAllAdjacentGrids(node.row, node.column);
+
+		return candidates.filter(candidate => {
+
+			let grid = gameGrid.getGrid(1, candidate.row, candidate.column);
+			const isRetreat = this.originator.state.peek() === "retreat";
+
+			if(isRetreat && (grid.hasOwnProperty("d") || grid.b === "s")) {
+
+				return true;
+			}
+
+			return ["w", "d", "b"].every(key => !grid.hasOwnProperty(key)) || grid.b === "p";
+		});
 	}
 	/**
-	 * retrieve all unvisited and accessible neighbours
+	 * @param {Array} [candidates] - nodes to be visited
+	 * @param {Node} [current] - current node
+	 * @param {Node} [end] - end node
 	 */
-	getNeighbours(current, visited) {
+	evaluateCandidates(candidates, current, end, allCosts, queue) {
 
-		let neighbours = this.originator.getAllAdjacentGrids(current.row, current.column);
+		candidates.forEach(candidate => {
 
-		return neighbours.filter(node => {
-			//grid information on meta layer
-			let grid = gameGrid.getGrid(1, node.row, node.column);
+			const key = this.getKey(candidate);
+			const cost = allCosts.get(this.getKey(current)) + 1;
 
-			return !grid.w && !grid.b && !this.isVisited(node, visited);
+			if(!allCosts.has(key) || cost < allCosts.get(key)) {
+
+				allCosts.set(key, cost);
+				queue.put(cost + this.getHeuristic(candidate, end), candidate);
+				candidate.parent = current;
+			}
 		});
 	}
 
-	getLowestWeightedNode(nodes, end, start = this.originator) {
+	searchEndNode(end) {
 
-		nodes.sort((node1, node2) => {
+		let currentNode;
+		let start = this.getStartNode();
+		//nodes to be visited
+		let queue = new PriorityQueue();
+		queue.put(1, start);
+		//moving cost from starting point to other nodes
+		let costs = new Map();
+		costs.set(this.getKey(start), 0);
 
-			return this.getWeight(node1, start, end) - this.getWeight(node2, start, end);
-		});
+		while(queue.size) {
 
-		return nodes[0];
+			currentNode = queue.dequeue();
+
+			if(this.isSamePosition(currentNode, end)) {
+
+				break;
+			}
+
+			let candidates = this.getCandidates(currentNode);
+			this.evaluateCandidates(candidates, currentNode, end, costs, queue);
+		}
+
+		return currentNode;
 	}
 
 	getPath(end) {
 
-		let start = new Node(this.originator.row, this.originator.column);
 		let path = [];
-		let visited = [start];
-		let toVisit = this.getNeighbours(start, visited);
+		let node = this.searchEndNode(end);
 
-		while(toVisit.length) {
+		while(node.parent !== null) {
 
-			let nextNode = this.getLowestWeightedNode(toVisit, end, start);
-			path.push(nextNode);
-			visited = [...visited, ...toVisit];
-
-			if(nextNode.row === end.row && nextNode.column === end.column) {
-
-				break;
-			}
-			//update nodes to visit
-			toVisit = this.getNeighbours(path[path.length - 1], visited);
+			path.push(node);
+			node = node.parent;
 		}
 
-		return path;
+		return [...path, node].reverse();
 	}
 }

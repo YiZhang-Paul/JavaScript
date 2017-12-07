@@ -36,6 +36,12 @@ class Player {
 		this.getCropLocation();
 		//update current row and column
 		this.trackCurrentGrid();
+
+		if(this.interval) {
+
+			clearInterval(this.interval);
+			this.interval = null;
+		}
 	}
 
 	trackCurrentGrid() {

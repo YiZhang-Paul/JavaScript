@@ -219,11 +219,6 @@ class AI extends Player {
 		return accessible[Math.floor(Math.random() * accessible.length)];
 	}
 
-	getRetreatDestination() {
-
-		return new Node(14, this.x < game.mazeWidth * 0.5 ? 13 : 14);
-	}
-
 	getFleeDestination() {
 
 		if(game.manager.user.distanceToGhost(this) >= game.gridWidth * 3) {
@@ -279,7 +274,7 @@ class AI extends Player {
 
 	outShelter(timeStep) {
 
-		this.speed = this.defaultSpeed;
+		this.speed = this.defaultSpeed * 10;
 
 		if(this.moving) {
 
@@ -293,7 +288,7 @@ class AI extends Player {
 		}
 
 		this.playAnimation();
-		this.killUser();
+		//this.killUser();
 	}
 
 	flee(timeStep) {
@@ -341,9 +336,13 @@ class AI extends Player {
 
 		if(this.moving) {
 
-			this.updatePath(this.getRetreatDestination());
-			this.setDirection();
-			this.move(timeStep);
+			this.updatePath(new Node(14, 14));
+
+			if(this.movePath) {
+
+				this.setDirection();
+				this.move(timeStep);
+			}
 		}
 
 		this.playAnimation();

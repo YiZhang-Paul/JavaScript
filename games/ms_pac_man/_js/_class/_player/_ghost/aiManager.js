@@ -96,8 +96,6 @@ class AIManager {
 
 	update(timeStep) {
 
-		//this.blinky.update(timeStep);
-
 		this.ais.forEach(ai => {
 
 			ai.update(timeStep);

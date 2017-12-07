@@ -93,7 +93,7 @@ class Manager {
 
 				let grid = metaLayer[i][j];
 
-				if(grid.hasOwnProperty("f") || grid.hasOwnProperty("p")) {
+				if(grid.hasOwnProperty("f") || (grid.hasOwnProperty("b") && grid.b === "p")) {
 
 					accessible.push(new Node(i, j));
 				}
