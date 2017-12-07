@@ -49,7 +49,7 @@ class AI extends Player {
 
 		if(this.toCollision === 0) {
 
-			this.setDirection(this.getOppositeWay());
+			super.setDirection(this.getOppositeWay());
 		}
 	}
 
@@ -67,7 +67,7 @@ class AI extends Player {
 
 		if(position && position.hasOwnProperty("c")) {
 			//move left and right while entering shelter
-			this.setDirection(this.x < game.mazeWidth * 0.5 ? "left" : "right");
+			super.setDirection(this.x < game.mazeWidth * 0.5 ? "left" : "right");
 			//restore default tile set
 			this.getCropLocation = this.defaultCropLocation;
 			this.stopAnimation(0);
@@ -92,11 +92,11 @@ class AI extends Player {
 		//change directions to move out of shelter
 		if((this.direction === "up" || this.direction === "down") && !inDoorRange && inYRange) {
 
-			this.setDirection(this.x > game.mazeWidth * 0.5 ? "left" : "right");
+			super.setDirection(this.x > game.mazeWidth * 0.5 ? "left" : "right");
 		}
 		else if((this.direction === "left" || this.direction === "right") && inDoorRange) {
 
-			this.setDirection("up");
+			super.setDirection("up");
 		}
 		else {
 
@@ -144,6 +144,12 @@ class AI extends Player {
 				this.movePath = null;
 			}
 		}
+	}
+
+	updatePath(destination) {
+
+		this.setPath(destination);
+		this.checkPath();
 	}
 
 	setDirection() {
@@ -203,6 +209,11 @@ class AI extends Player {
 		this.stopAnimation(0);
 		this.state.swap("retreat");
 	}
+
+	getRetreatDestination() {
+
+		return new Node(14, this.x < game.mazeWidth * 0.5 ? 13 : 14);
+	}
 	/**
 	 * determine AI tile image crop location
 	 */
@@ -258,6 +269,26 @@ class AI extends Player {
 		}
 
 		this.playAnimation();
+	}
+
+	flee(timeStep) {
+
+
+	}
+
+	retreat(timeStep) {
+
+		this.speed = this.defaultSpeed * 1.4;
+
+		if(this.moving) {
+
+			this.updatePath(this.getRetreatDestination());
+			this.setDirection();
+			this.move(timeStep);
+		}
+
+		this.playAnimation();
+		this.getInShelter();
 	}
 	
 	update(timeStep) {
