@@ -49,9 +49,9 @@ class PathFinder {
 
 		return neighbours.filter(node => {
 			//grid information on meta layer
-			let gridStats = gameGrid.getGrid(1, node.row, node.column);
+			let grid = gameGrid.getGrid(1, node.row, node.column);
 
-			return !gridStats.w && !gridStats.b && !this.isVisited(node, visited);
+			return !grid.w && !grid.b && !this.isVisited(node, visited);
 		});
 	}
 

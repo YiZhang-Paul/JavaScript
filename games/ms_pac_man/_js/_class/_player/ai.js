@@ -199,6 +199,7 @@ class AI extends Player {
 
 			this.getCropLocation = this.defaultCropLocation;
 			this.stopAnimation(0);
+			this.movePath = null;
 			this.state.swap("outShelter");
 		}
 	}
@@ -207,12 +208,30 @@ class AI extends Player {
 
 		this.getCropLocation = this.retreatCropLocation;
 		this.stopAnimation(0);
+		this.movePath = null;
 		this.state.swap("retreat");
+	}
+
+	getRandomDestination() {
+
+		let accessible = game.manager.accessibleGrids;
+
+		return accessible[Math.floor(Math.random() * accessible.length)];
 	}
 
 	getRetreatDestination() {
 
 		return new Node(14, this.x < game.mazeWidth * 0.5 ? 13 : 14);
+	}
+
+	getFleeDestination() {
+
+		if(game.manager.user.distanceToGhost(this) >= game.gridWidth * 3) {
+
+			return this.getRandomDestination();
+		}
+
+		return this.getRandomDestination();
 	}
 	/**
 	 * determine AI tile image crop location
@@ -264,16 +283,56 @@ class AI extends Player {
 
 		if(this.moving) {
 
-			this.move(timeStep);
-			this.killUser();
+			this.updatePath(this.getRandomDestination());
+
+			if(this.movePath) {
+
+				this.setDirection();
+				this.move(timeStep);
+			}
 		}
 
 		this.playAnimation();
+		this.killUser();
 	}
 
 	flee(timeStep) {
 
+		this.speed = this.defaultSpeed * 0.8;
 
+		if(this.moving) {
+
+			this.updatePath(this.getFleeDestination());
+
+			if(this.movePath) {
+
+				this.setDirection();
+				this.move(timeStep);
+			}
+		}
+
+		this.playAnimation();
+		this.startTransition();
+	}
+	/**
+	 * transition state from flee to normal
+	 */
+	transition(timeStep) {
+
+		this.speed = this.defaultSpeed * 0.8;
+
+		if(this.moving) {
+
+			this.updatePath(this.getFleeDestination());
+
+			if(this.movePath) {
+
+				this.setDirection();
+				this.move(timeStep);
+			}
+		}
+
+		this.endTransition();
 	}
 
 	retreat(timeStep) {

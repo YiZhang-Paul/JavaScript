@@ -83,7 +83,7 @@ class Player {
 
 			return this.getAdjacentGrid(direction, row, column);
 		
-		}).filter(grid => grid !== null);
+		}).filter(grid => grid && gameGrid.exist(grid.row, grid.column));
 	}
 	/**
 	 * calculate distance to center of given grid

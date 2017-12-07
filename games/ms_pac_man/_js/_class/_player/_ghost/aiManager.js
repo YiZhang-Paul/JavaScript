@@ -86,6 +86,7 @@ class AIManager {
 
 				ai.getCropLocation = ai.fleeCropLocation;
 				ai.stopAnimation(0);
+				ai.movePath = null;
 				//reset flee timer
 				ai.fleeTimestamp = new Date().getTime();
 				ai.state.swap("flee");
@@ -94,6 +95,8 @@ class AIManager {
 	}
 
 	update(timeStep) {
+
+		//this.blinky.update(timeStep);
 
 		this.ais.forEach(ai => {
 
