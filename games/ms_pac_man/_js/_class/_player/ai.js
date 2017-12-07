@@ -12,8 +12,7 @@ class AI extends Player {
 		this.fleeTimestamp = null;
 		this.fleeTime = 10000;
 		this.transitionTime = 3000; //transition time between flee and normal state
-		this.patrolPath = null;
-		this.retreatPath = null;
+		this.movePath = null;
 		this.defaultState = null;
 		this.defaultCropLocation = this.getCropLocation;
 		this.pathfinder = new PathFinder(this);
@@ -26,8 +25,7 @@ class AI extends Player {
 		this.score = 200;
 		this.tick = 0;
 		this.getCropLocation = this.defaultCropLocation;
-		this.patrolPath = null;
-		this.retreatPath = null;
+		this.movePath = null;
 		this.state = new StateMachine(this, this.defaultState);
 		super.reset();
 	}
@@ -73,7 +71,7 @@ class AI extends Player {
 			//restore default tile set
 			this.getCropLocation = this.defaultCropLocation;
 			this.stopAnimation(0);
-			this.retreatPath = null;
+			this.movePath = null;
 			//inform AI manager
 			this.manager.shelter.add(this);
 			this.manager.setCooldown();
@@ -115,6 +113,38 @@ class AI extends Player {
 			this.state.swap("outShelter");
 		}
 	}
+
+	killUser() {
+
+		if(game.manager.user.distanceToGhost(this) < game.gridWidth) {
+
+			game.manager.user.life--;
+			game.manager.state.swap("onUserKill");
+		}
+	}
+
+	setPath(destination) {
+
+		if(!this.movePath) {
+
+			this.movePath = this.pathfinder.getPath(destination);
+		}
+	}
+
+	checkPath() {
+
+		let target = this.movePath[0];
+
+		if(this.onGridCenter(target.row, target.column)) {
+
+			this.movePath.shift();
+
+			if(!this.movePath.length) {
+
+				this.movePath = null;
+			}
+		}
+	}
 	/**
 	 * start transition from flee state back to normal state
 	 */
@@ -127,13 +157,16 @@ class AI extends Player {
 			this.state.swap("transition");
 		}
 	}
+	/**
+	 * finish transition from flee state back to normal state
+	 */
+	endTransition() {
 
-	killUser() {
+		if(!this.onTransition()) {
 
-		if(game.manager.user.distanceToGhost(this) < game.gridWidth) {
-
-			game.manager.user.life--;
-			game.manager.state.swap("onUserKill");
+			this.getCropLocation = this.defaultCropLocation;
+			this.stopAnimation(0);
+			this.state.swap("outShelter");
 		}
 	}
 
@@ -142,59 +175,6 @@ class AI extends Player {
 		this.getCropLocation = this.retreatCropLocation;
 		this.stopAnimation(0);
 		this.state.swap("retreat");
-	}
-
-	getRetreatDestination() {
-
-		return new Node(14, this.x < game.mazeWidth * 0.5 ? 13 : 14);
-	}
-
-	updateRetreatPath() {
-
-		if(!this.retreatPath) {
-
-			this.retreatPath = this.pathfinder.getPath(this.getRetreatDestination());
-			return;
-		}
-
-		let target = this.retreatPath[0];
-
-		if(this.onGridCenter(target.row, target.column)) {
-
-			this.retreatPath.shift();
-
-			if(!this.retreatPath.length) {
-
-				this.retreatPath = null;
-			}
-		}
-	}
-
-	setRetreatDirection() {
-
-		let direction;
-		let target = this.retreatPath[0];
-		const [centerX, centerY] = this.getGridCenter(target.row, target.column);
-
-		if(this.y === centerY) {
-
-			direction = this.x < centerX ? "right" : "left";
-		}
-		else if(this.x === centerX) {
-
-			direction = this.y < centerY ? "down" : "up";
-		}
-		else {
-
-			[this.x, this.y] = this.getGridCenter(this.row, this.column);
-			this.setRetreatDirection();
-			return;
-		}
-
-		if(direction && this.isValidDirection(direction)) {
-
-			this.setDirection(direction);
-		}
 	}
 	/**
 	 * determine AI tile image crop location
@@ -252,46 +232,7 @@ class AI extends Player {
 
 		this.playAnimation();
 	}
-
-	flee(timeStep) {
-
-		this.speed = this.defaultSpeed * 0.8;
-
-		if(this.moving) {
-
-			this.move(timeStep);
-		}
-
-		this.playAnimation();
-		this.startTransition();
-	}
-	/**
-	 * transition state from flee to normal
-	 */
-	transition() {
-
-		if(!this.onTransition()) {
-
-			this.getCropLocation = this.defaultCropLocation;
-			this.stopAnimation(0);
-			this.state.swap("outShelter");
-		}
-	}
-
-	retreat(timeStep) {
-
-		this.speed = this.defaultSpeed * 1.4;
-
-		if(this.moving) {
-			//move back to shelter
-			this.updateRetreatPath();
-			this.setRetreatDirection();
-			this.move(timeStep);
-			this.playAnimation();
-			this.getInShelter();
-		}
-	}
-
+	
 	update(timeStep) {
 
 		this.state.update(timeStep);
