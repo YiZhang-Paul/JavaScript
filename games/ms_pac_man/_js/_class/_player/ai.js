@@ -145,6 +145,33 @@ class AI extends Player {
 			}
 		}
 	}
+
+	setDirection() {
+
+		let direction;
+		let target = this.movePath[0];
+		const [centerX, centerY] = this.getGridCenter(target.row, target.column);
+
+		if(this.y === centerY) {
+
+			direction = this.x < centerX ? "right" : "left";
+		}
+		else if(this.x === centerX) {
+
+			direction = this.y < centerY ? "down" : "up";
+		}
+		else {
+
+			[this.x, this.y] = this.getGridCenter(this.row, this.column);
+			this.setDirection();
+			return;
+		}
+
+		if(direction && this.isValidDirection(direction)) {
+
+			super.setDirection(direction);
+		}
+	}
 	/**
 	 * start transition from flee state back to normal state
 	 */
