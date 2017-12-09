@@ -18,7 +18,7 @@ class PriorityQueue {
 		return total;
 	}
 
-	put(priority, node) {
+	enqueue(priority, node) {
 
 		if(!this.queue.has(priority)) {
 

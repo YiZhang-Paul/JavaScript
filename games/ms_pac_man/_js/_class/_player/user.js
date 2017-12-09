@@ -45,10 +45,9 @@ class User extends Player {
 	isValidDirection(direction) {
 
 		const isOpposite = direction === this.getOppositeWay();
-		const inMazeArea = this.x >= 0 && this.x <= game.mazeWidth;
 		const canMove = !this.hasWall(direction) && !this.hasDoor(direction);
 
-		return isOpposite || (this.onGridCenter() && inMazeArea && canMove);
+		return isOpposite || (this.onGridCenter() && this.inMazeArea() && canMove);
 	}
 
 	checkMoveKey() {

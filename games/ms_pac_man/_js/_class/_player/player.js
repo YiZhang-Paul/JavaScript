@@ -44,6 +44,11 @@ class Player {
 		}
 	}
 
+	inMazeArea() {
+
+		return this.x >= 0 && this.x <= game.mazeWidth;
+	}
+
 	trackCurrentGrid() {
 
 		this.row = Math.floor(this.y / game.gridWidth);

@@ -58,7 +58,7 @@ class PathFinder {
 			if(!allCosts.has(key) || cost < allCosts.get(key)) {
 
 				allCosts.set(key, cost);
-				toVisit.put(cost + this.getHeuristic(candidate, end), candidate);
+				toVisit.enqueue(cost + this.getHeuristic(candidate, end), candidate);
 				candidate.parent = current;
 			}
 		});
@@ -70,7 +70,7 @@ class PathFinder {
 		let start = this.getStartNode();
 		//nodes to be visited
 		let toVisit = new PriorityQueue();
-		toVisit.put(1, start);
+		toVisit.enqueue(1, start);
 		//moving cost from starting point to other nodes
 		let costs = new Map();
 		costs.set(this.getKey(start), 0);

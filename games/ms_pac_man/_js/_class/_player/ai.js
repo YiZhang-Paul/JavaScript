@@ -45,6 +45,18 @@ class AI extends Player {
 		return this.fleeTimestamp + this.fleeTime + this.transitionTime > new Date().getTime();
 	}
 
+	atWormhole() {
+
+		let grid = gameGrid.getGrid(1, this.row, this.column);
+
+		if(grid === null || grid.b !== "p") {
+
+			return false;
+		}
+
+		return this.column < 3 || this.column > gameGrid.columns - 4;
+	}
+
 	turnAround() {
 
 		if(this.toCollision === 0) {
@@ -56,9 +68,8 @@ class AI extends Player {
 	isValidDirection(direction) {
 
 		const isOpposite = direction === this.getOppositeWay();
-		const inMazeArea = this.x >= 0 && this.x <= game.mazeWidth;
 
-		return isOpposite || (inMazeArea && !this.hasWall(direction));
+		return isOpposite || (this.inMazeArea() && !this.hasWall(direction));
 	}
 
 	getInShelter() {
@@ -148,15 +159,22 @@ class AI extends Player {
 
 	updatePath(destination) {
 
-		this.setPath(destination);
-		this.checkPath();
+		if(this.inMazeArea() && !this.atWormhole()) {
+
+			this.setPath(destination);
+			this.checkPath();
+		}
+		else {
+
+			this.movePath = null;
+		}
 	}
 
 	setDirection() {
 
 		let direction;
 		let target = this.movePath[0];
-		let [centerX, centerY] = this.getGridCenter(target.row, target.column);
+		const [centerX, centerY] = this.getGridCenter(target.row, target.column);
 
 		if(this.y === centerY) {
 
@@ -295,8 +313,9 @@ class AI extends Player {
 			if(this.movePath) {
 
 				this.setDirection();
-				this.move(timeStep);
 			}
+
+			this.move(timeStep);
 		}
 
 		this.playAnimation();
@@ -314,8 +333,9 @@ class AI extends Player {
 			if(this.movePath) {
 
 				this.setDirection();
-				this.move(timeStep);
 			}
+
+			this.move(timeStep);
 		}
 
 		this.playAnimation();
@@ -335,8 +355,9 @@ class AI extends Player {
 			if(this.movePath) {
 
 				this.setDirection();
-				this.move(timeStep);
 			}
+
+			this.move(timeStep);
 		}
 
 		this.endTransition();
