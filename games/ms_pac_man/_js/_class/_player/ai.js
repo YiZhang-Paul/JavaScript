@@ -156,7 +156,7 @@ class AI extends Player {
 
 		let direction;
 		let target = this.movePath[0];
-		const [centerX, centerY] = this.getGridCenter(target.row, target.column);
+		let [centerX, centerY] = this.getGridCenter(target.row, target.column);
 
 		if(this.y === centerY) {
 
@@ -166,7 +166,7 @@ class AI extends Player {
 
 			direction = this.y < centerY ? "down" : "up";
 		}
-		else {
+		else if(this.direction !== "up" || !this.hasDoor("down")) {
 
 			[this.x, this.y] = this.getGridCenter(this.row, this.column);
 			this.setDirection();
@@ -286,7 +286,7 @@ class AI extends Player {
 
 	outShelter(timeStep) {
 
-		this.speed = this.defaultSpeed * 10;
+		this.speed = this.defaultSpeed;
 
 		if(this.moving) {
 
