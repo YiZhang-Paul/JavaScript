@@ -67,6 +67,7 @@ let game = {
 
 	loadAsset() {
 
+		gameGrid.getAccessibleGrids();
 		this.getMazeSize();
 		this.loadCanvas();
 		this.maze = new Maze(this.mazeWidth, this.mazeHeight);

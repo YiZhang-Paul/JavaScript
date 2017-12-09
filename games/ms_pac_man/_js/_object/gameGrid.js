@@ -3,6 +3,15 @@ let gameGrid = {
 
 	rows    : 31, 
 	columns : 28,
+
+	accessible : {
+
+		all         : [],
+		topLeft     : [],
+		topRight    : [],
+		bottomLeft  : [],
+		bottomRight : []
+	},
 	/**
 	 * game object default locations
 	 */
@@ -114,6 +123,39 @@ let gameGrid = {
 	[{w:"w"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{w:"w"}],
 	[{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"}]
 	]],
+
+	categorizeGrids(node) {
+
+		const onLeft = node.column < (this.columns + this.columns % 2) * 0.5;
+
+		if(node.row < (this.rows + this.rows % 2) * 0.5) {
+
+			return onLeft ? "topLeft" : "topRight";
+		}
+		else {
+
+			return onLeft ? "bottomLeft" : "bottomRight";
+		}
+	},
+
+	getAccessibleGrids() {
+
+		for(let i = 0; i < this.layout[1].length; i++) {
+
+			for(let j = 0; j < this.layout[1][i].length; j++) {
+
+				let grid = this.getGrid(1, i, j);
+
+				if(grid.hasOwnProperty("f") || grid.b === "p") {
+
+					let node = new Node(i, j);
+					this.accessible.all.push(node);
+					this.accessible[this.categorizeGrids(node)].push(node);
+				}
+			}
+		}
+	},
+
 	/**
 	 * check if given grid exists
 	 */

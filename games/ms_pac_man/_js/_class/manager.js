@@ -7,7 +7,6 @@ class Manager {
 		this.aiManager = null;
 		this.scoreBoard = null;
 		this.totalFood = 0;
-		this.accessibleGrids = this.getAccessibleGrids();
 		this.powerBeans = new Set();
 		this.popUps = new Set();
 		this.activeFruit = null;
@@ -78,29 +77,6 @@ class Manager {
 
 			this.activeFruit.dispose();
 		}
-	}
-	/**
-	 * record all grids that are accessible to players
-	 */
-	getAccessibleGrids() {
-
-		let accessible = [];
-		let metaLayer = gameGrid.layout[1];
-
-		for(let i = 0; i < metaLayer.length; i++) {
-
-			for(let j = 0; j < metaLayer[i].length; j++) {
-
-				let grid = metaLayer[i][j];
-
-				if(grid.hasOwnProperty("f") || (grid.hasOwnProperty("b") && grid.b === "p")) {
-
-					accessible.push(new Node(i, j));
-				}
-			}
-		}
-
-		return accessible;
 	}
 	/**
 	 * set single food of given type on maze

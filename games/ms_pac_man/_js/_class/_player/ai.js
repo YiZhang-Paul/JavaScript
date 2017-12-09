@@ -232,7 +232,7 @@ class AI extends Player {
 
 	getRandomDestination() {
 
-		let accessible = game.manager.accessibleGrids;
+		let accessible = gameGrid.accessible.all;
 
 		return accessible[Math.floor(Math.random() * accessible.length)];
 	}
@@ -319,7 +319,7 @@ class AI extends Player {
 		}
 
 		this.playAnimation();
-		//this.killUser();
+		this.killUser();
 	}
 
 	flee(timeStep) {
