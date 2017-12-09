@@ -48,7 +48,7 @@ class PathFinder {
 	 * @param {Node} [current] - current node
 	 * @param {Node} [end] - end node
 	 */
-	evaluateCandidates(candidates, current, end, allCosts, queue) {
+	evaluateCandidates(candidates, current, end, allCosts, toVisit) {
 
 		candidates.forEach(candidate => {
 
@@ -58,7 +58,7 @@ class PathFinder {
 			if(!allCosts.has(key) || cost < allCosts.get(key)) {
 
 				allCosts.set(key, cost);
-				queue.put(cost + this.getHeuristic(candidate, end), candidate);
+				toVisit.put(cost + this.getHeuristic(candidate, end), candidate);
 				candidate.parent = current;
 			}
 		});
@@ -69,15 +69,15 @@ class PathFinder {
 		let currentNode;
 		let start = this.getStartNode();
 		//nodes to be visited
-		let queue = new PriorityQueue();
-		queue.put(1, start);
+		let toVisit = new PriorityQueue();
+		toVisit.put(1, start);
 		//moving cost from starting point to other nodes
 		let costs = new Map();
 		costs.set(this.getKey(start), 0);
 
-		while(queue.size) {
+		while(toVisit.size) {
 
-			currentNode = queue.dequeue();
+			currentNode = toVisit.dequeue();
 
 			if(this.isSamePosition(currentNode, end)) {
 
@@ -85,7 +85,7 @@ class PathFinder {
 			}
 
 			let candidates = this.getCandidates(currentNode);
-			this.evaluateCandidates(candidates, currentNode, end, costs, queue);
+			this.evaluateCandidates(candidates, currentNode, end, costs, toVisit);
 		}
 
 		return currentNode;

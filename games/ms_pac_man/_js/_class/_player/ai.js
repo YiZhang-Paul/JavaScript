@@ -96,7 +96,7 @@ class AI extends Player {
 		}
 		else if((this.direction === "left" || this.direction === "right") && inDoorRange) {
 
-			super.setDirection("up");
+			this.state.swap("exitingShelter");
 		}
 		else {
 
@@ -265,6 +265,18 @@ class AI extends Player {
 		if(this.moving) {
 
 			this.setInShelterDirection();
+			this.move(timeStep);
+			this.getOutShelter();
+		}
+
+		this.playAnimation();
+	}
+
+	exitingShelter(timeStep) {
+
+		if(this.moving) {
+
+			super.setDirection("up");
 			this.move(timeStep);
 			this.getOutShelter();
 		}
