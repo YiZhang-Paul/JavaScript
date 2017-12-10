@@ -10,13 +10,19 @@ class AI extends Player {
 		this.defaultSpeed = Math.round(game.mazeHeight * 0.02) / 100;
 		this.speed = this.defaultSpeed;
 		this.fleeTimestamp = null;
-		this.fleeTime = 10000;
+		this.fleeTime = 100000;
+		this.dodged = false;
 		this.transitionTime = 3000; //transition time between flee and normal state
 		this.movePath = null;
 		this.defaultState = null;
 		this.defaultCropLocation = this.getCropLocation;
 		this.pathfinder = new PathFinder(this);
 		this.state = null;
+	}
+
+	get destination() {
+
+		return this.movePath ? this.movePath[this.movePath.length - 1] : null;
 	}
 
 	reset() {
@@ -239,53 +245,43 @@ class AI extends Player {
 
 		return this.pickRandom(gameGrid.accessible.all);
 	}
-	/**
-	 * dodge users when they get too close
-	 */
-	getDodgeDestination() {
-
-		let directionToUser;
-
-		if(this.x === game.manager.user.x) {
-
-			directionToUser = this.y < game.manager.user.y ? "down" : "up";
-		}
-		else {
-
-			directionToUser = this.x < game.manager.user.x ? "right" : "left";
-		}
-		//find all directions can dodge to
-		let directions = game.directions.filter(direction => {
-
-			return direction !== directionToUser && !this.hasWall(direction) && !this.hasDoor(direction);
-		});
-
-		return this.getAdjacentGrid(this.pickRandom(directions));
-	}
 
 	getFleeDestination() {
 
-		if(game.manager.user.canChase(this)) {
+		const userBlock = gameGrid.categorizeGrids(game.manager.user);
+		//pick random destination far from user
+		let validBlocks = Object.keys(gameGrid.accessible)
+		                        .filter(block => block !== "all" && block !== userBlock);
+        let destination = this.pickRandom(gameGrid.accessible[this.pickRandom(validBlocks)]);
+		
+		if(!game.manager.user.inChaseRange(this)) {
 
-			let newDestination = this.getDodgeDestination();
-			let oldDestination = this.movePath ? this.movePath[this.movePath.length - 1] : null;
+			this.dodged = false;
 
-			if(this.movePath && !this.pathfinder.isSamePosition(newDestination, oldDestination)) {
-
-				this.movePath = null;
-			}
-			//emergency dodge
-			return newDestination;
+			return destination;
 		}
 
-		const userBlock = gameGrid.categorizeGrids(game.manager.user);
+		let path;
+		const isAlive = !this.pathfinder.isSamePosition(this, game.manager.user);
+        //try avoid running into user
+        while(!this.atWormhole()) {
 
-		let validBlocks = Object.keys(gameGrid.accessible).filter(block => {
+			destination = this.pickRandom(gameGrid.accessible[this.pickRandom(validBlocks)]);
+			path = this.pathfinder.getPath(destination);
 
-			return block !== "all" && block !== userBlock;
-		});
-		
-		return this.pickRandom(gameGrid.accessible[this.pickRandom(validBlocks)]);
+			if(!isAlive || !this.pathfinder.containsNode(path, game.manager.user)) {
+
+				break;
+			}
+        }
+
+		if(!this.dodged && this.movePath) {
+
+			this.movePath = path;
+			this.dodged = true;
+		}
+
+		return destination;
 	}
 	/**
 	 * determine AI tile image crop location
@@ -410,7 +406,7 @@ class AI extends Player {
 
 		if(this.moving) {
 
-			this.updatePath(new Node(14, 14));
+			this.updatePath(new Node(gameGrid.retreat.row, gameGrid.retreat.column));
 
 			if(this.movePath) {
 

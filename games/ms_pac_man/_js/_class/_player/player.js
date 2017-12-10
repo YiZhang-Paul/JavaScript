@@ -51,36 +51,7 @@ class Player {
 
 	inChaseRange(chased) {
 
-		return this.distanceToPlayer(chased) < game.gridWidth * 3;
-	}
-	/**
-	 * check if chaser and chased are on same vertical/horizontal line
-	 * and there is no obstacle between chaser and chased
-	 */
-	canChase(chased) {
-
-		if(!this.inChaseRange(chased) || (this.x !== chased.x && this.y !== chased.y)) {
-
-			return false;
-		}
-
-		const difference = this.y === chased.y ? "column" : "row";
-		const start = Math.min(this[difference], chased[difference]) + 1;
-		const end = Math.max(this[difference], chased[difference]);
-
-		for(let i = start; i < end; i++) {
-
-			const checkRow = difference === "row";
-			const row = checkRow ? i : this.row;
-			const column = checkRow ? this.column : i;
-
-			if(!gameGrid.isAccessible(row, column)) {
-
-				return false;
-			}
-		}
-
-		return true;
+		return this.distanceToPlayer(chased) < game.gridWidth * 5;
 	}
 
 	trackCurrentGrid() {

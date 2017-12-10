@@ -11,6 +11,11 @@ class PathFinder {
 		return node1.row === node2.row && node1.column === node2.column;
 	}
 
+	containsNode(path, node) {
+
+		return path.some(pathNode => this.isSamePosition(pathNode, node));
+	}
+
 	getKey(node) {
 
 		return `${node.row},${node.column}`;

@@ -56,6 +56,12 @@ let gameGrid = {
 		direction : "up"
 	},
 
+	retreat : {
+
+		row    : 14,
+		column : 14
+	},
+
 	layout : [[
 	//logic layer
 	[   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null,   null],
