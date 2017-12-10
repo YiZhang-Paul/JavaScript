@@ -48,6 +48,35 @@ class Player {
 
 		return this.x >= 0 && this.x <= game.mazeWidth;
 	}
+	/**
+	 * check if chaser and chased are on same vertical/horizontal line
+	 * and there is no obstacle between chaser and chased
+	 */
+	canChase(chaser, chased) {
+
+		if(chaser.row !== chased.row && chaser.column !== chased.column) {
+
+			return false;
+		}
+
+		const difference = chaser.row === chased.row ? "column" : "row";
+		const start = Math.min(chaser[difference], chased[difference]) + 1;
+		const end = Math.max(chaser[difference], chased[difference]);
+
+		for(let i = start; i < end; i++) {
+
+			const checkRow = difference === "row";
+			const row = checkRow ? i : chaser.row;
+			const column = checkRow ? chaser.column : i;
+
+			if(!gameGrid.isAccessible(row, column)) {
+
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	trackCurrentGrid() {
 

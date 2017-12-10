@@ -242,7 +242,8 @@ class AI extends Player {
 
 	getFleeDestination() {
 
-		const userBlock = gameGrid.categorizeGrids(game.manager.user);
+		let user = game.manager.user;
+		const userBlock = gameGrid.categorizeGrids(user);
 
 		let validBlocks = Object.keys(gameGrid.accessible).filter(block => {
 

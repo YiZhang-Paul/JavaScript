@@ -124,6 +124,18 @@ let gameGrid = {
 	[{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"}]
 	]],
 
+	isAccessible(row, column) {
+
+		if(!this.exist(row, column)) {
+
+			return false;
+		}
+
+		let node = this.getGrid(1, row, column);
+
+		return node.hasOwnProperty("f") || node.b === "p";
+	},
+
 	categorizeGrids(node) {
 		//watch for letter casing
 		const leftRight = node.column < (this.columns + this.columns % 2) * 0.5 ? "Left" : "Right";
@@ -138,9 +150,7 @@ let gameGrid = {
 
 			for(let j = 0; j < this.layout[1][i].length; j++) {
 
-				let grid = this.getGrid(1, i, j);
-
-				if(grid.hasOwnProperty("f") || grid.b === "p") {
+				if(this.isAccessible(i, j)) {
 
 					let node = new Node(i, j);
 					this.accessible.all.push(node);
