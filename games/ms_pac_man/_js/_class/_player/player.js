@@ -48,26 +48,31 @@ class Player {
 
 		return this.x >= 0 && this.x <= game.mazeWidth;
 	}
+
+	inChaseRange(chased) {
+
+		return this.distanceToPlayer(chased) < game.gridWidth * 3;
+	}
 	/**
 	 * check if chaser and chased are on same vertical/horizontal line
 	 * and there is no obstacle between chaser and chased
 	 */
-	canChase(chaser, chased) {
+	canChase(chased) {
 
-		if(chaser.row !== chased.row && chaser.column !== chased.column) {
+		if(!this.inChaseRange(chased) || (this.x !== chased.x && this.y !== chased.y)) {
 
 			return false;
 		}
 
-		const difference = chaser.row === chased.row ? "column" : "row";
-		const start = Math.min(chaser[difference], chased[difference]) + 1;
-		const end = Math.max(chaser[difference], chased[difference]);
+		const difference = this.y === chased.y ? "column" : "row";
+		const start = Math.min(this[difference], chased[difference]) + 1;
+		const end = Math.max(this[difference], chased[difference]);
 
 		for(let i = start; i < end; i++) {
 
 			const checkRow = difference === "row";
-			const row = checkRow ? i : chaser.row;
-			const column = checkRow ? chaser.column : i;
+			const row = checkRow ? i : this.row;
+			const column = checkRow ? this.column : i;
 
 			if(!gameGrid.isAccessible(row, column)) {
 
@@ -124,6 +129,11 @@ class Player {
 			return this.getAdjacentGrid(direction, row, column);
 		
 		}).filter(grid => grid && gameGrid.exist(grid.row, grid.column));
+	}
+
+	distanceToPlayer(player) {
+
+		return Math.hypot((this.x - player.x), (this.y - player.y));
 	}
 	/**
 	 * calculate distance to center of given grid

@@ -132,7 +132,7 @@ class AI extends Player {
 
 	killUser() {
 
-		if(game.manager.user.distanceToGhost(this) < game.gridWidth) {
+		if(this.distanceToPlayer(game.manager.user) < game.gridWidth) {
 
 			game.manager.user.life--;
 			game.manager.state.swap("onUserKill");
@@ -243,6 +243,12 @@ class AI extends Player {
 	getFleeDestination() {
 
 		let user = game.manager.user;
+
+		if(user.canChase(this)) {
+
+			console.log("chase");
+		}
+
 		const userBlock = gameGrid.categorizeGrids(user);
 
 		let validBlocks = Object.keys(gameGrid.accessible).filter(block => {

@@ -65,11 +65,6 @@ class User extends Player {
 		}
 	}
 
-	distanceToGhost(ghost) {
-
-		return Math.hypot((this.x - ghost.x), (this.y - ghost.y));
-	}
-
 	canKillGhost(ghost) {
 
 		const state = ghost.state.peek();
@@ -79,7 +74,7 @@ class User extends Player {
 			return false;
 		}
 
-		return this.distanceToGhost(ghost) < game.gridWidth * 0.5;
+		return this.distanceToPlayer(ghost) < game.gridWidth * 0.5;
 	}
 
 	killGhost() {
