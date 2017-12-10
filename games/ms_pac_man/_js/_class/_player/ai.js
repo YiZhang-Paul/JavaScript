@@ -239,23 +239,52 @@ class AI extends Player {
 
 		return this.pickRandom(gameGrid.accessible.all);
 	}
+	/**
+	 * dodge users when they get too close
+	 */
+	getDodgeDestination() {
+
+		let directionToUser;
+
+		if(this.x === game.manager.user.x) {
+
+			directionToUser = this.y < game.manager.user.y ? "down" : "up";
+		}
+		else {
+
+			directionToUser = this.x < game.manager.user.x ? "right" : "left";
+		}
+		//find all directions can dodge to
+		let directions = game.directions.filter(direction => {
+
+			return direction !== directionToUser && !this.hasWall(direction) && !this.hasDoor(direction);
+		});
+
+		return this.getAdjacentGrid(this.pickRandom(directions));
+	}
 
 	getFleeDestination() {
 
-		let user = game.manager.user;
+		if(game.manager.user.canChase(this)) {
 
-		if(user.canChase(this)) {
+			let newDestination = this.getDodgeDestination();
+			let oldDestination = this.movePath ? this.movePath[this.movePath.length - 1] : null;
 
-			console.log("chase");
+			if(this.movePath && !this.pathfinder.isSamePosition(newDestination, oldDestination)) {
+
+				this.movePath = null;
+			}
+			//emergency dodge
+			return newDestination;
 		}
 
-		const userBlock = gameGrid.categorizeGrids(user);
+		const userBlock = gameGrid.categorizeGrids(game.manager.user);
 
 		let validBlocks = Object.keys(gameGrid.accessible).filter(block => {
 
 			return block !== "all" && block !== userBlock;
 		});
-
+		
 		return this.pickRandom(gameGrid.accessible[this.pickRandom(validBlocks)]);
 	}
 	/**
