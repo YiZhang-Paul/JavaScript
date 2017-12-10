@@ -4,7 +4,7 @@ class Blinky extends AI {
 	constructor(manager) {
 
 		super("blinky", manager);
-		this.defaultState = "outShelter";
+		this.defaultState = "chasing";
 		this.reset();
 	}
 

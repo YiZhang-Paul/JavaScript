@@ -125,17 +125,11 @@ let gameGrid = {
 	]],
 
 	categorizeGrids(node) {
+		//watch for letter casing
+		const leftRight = node.column < (this.columns + this.columns % 2) * 0.5 ? "Left" : "Right";
+		const topBottom = node.row < (this.rows + this.rows % 2) * 0.5 ? "top" : "bottom";
 
-		const onLeft = node.column < (this.columns + this.columns % 2) * 0.5;
-
-		if(node.row < (this.rows + this.rows % 2) * 0.5) {
-
-			return onLeft ? "topLeft" : "topRight";
-		}
-		else {
-
-			return onLeft ? "bottomLeft" : "bottomRight";
-		}
+		return topBottom + leftRight;
 	},
 
 	getAccessibleGrids() {

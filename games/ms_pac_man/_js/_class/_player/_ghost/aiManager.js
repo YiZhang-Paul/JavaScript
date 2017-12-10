@@ -54,7 +54,7 @@ class AIManager {
 				clearTimeout(timeout);
 				ai.moving = true;
 
-			}, ai.state.peek() === "outShelter" ? 1000 : this.cooldown);
+			}, ai.state.peek() === "chasing" ? 1000 : this.cooldown);
 		});
 	}
 
@@ -82,7 +82,7 @@ class AIManager {
 
 			const state = ai.state.peek();
 
-			if(new Set(["outShelter", "flee", "transition"]).has(state)) {
+			if(new Set(["chasing", "flee", "transition"]).has(state)) {
 
 				ai.getCropLocation = ai.fleeCropLocation;
 				ai.stopAnimation(0);

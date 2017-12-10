@@ -57,6 +57,11 @@ class AI extends Player {
 		return this.column < 3 || this.column > gameGrid.columns - 4;
 	}
 
+	pickRandom(enumerable) {
+
+		return enumerable[Math.floor(Math.random() * enumerable.length)];
+	}
+
 	turnAround() {
 
 		if(this.toCollision === 0) {
@@ -121,7 +126,7 @@ class AI extends Player {
 
 			this.manager.shelter.delete(this);
 			this.manager.setCooldown();
-			this.state.swap("outShelter");
+			this.state.swap("chasing");
 		}
 	}
 
@@ -218,7 +223,7 @@ class AI extends Player {
 			this.getCropLocation = this.defaultCropLocation;
 			this.stopAnimation(0);
 			this.movePath = null;
-			this.state.swap("outShelter");
+			this.state.swap("chasing");
 		}
 	}
 
@@ -232,19 +237,19 @@ class AI extends Player {
 
 	getRandomDestination() {
 
-		let accessible = gameGrid.accessible.all;
-
-		return accessible[Math.floor(Math.random() * accessible.length)];
+		return this.pickRandom(gameGrid.accessible.all);
 	}
 
 	getFleeDestination() {
 
-		if(game.manager.user.distanceToGhost(this) >= game.gridWidth * 3) {
+		const userBlock = gameGrid.categorizeGrids(game.manager.user);
 
-			return this.getRandomDestination();
-		}
+		let validBlocks = Object.keys(gameGrid.accessible).filter(block => {
 
-		return this.getRandomDestination();
+			return block !== "all" && block !== userBlock;
+		});
+
+		return this.pickRandom(gameGrid.accessible[this.pickRandom(validBlocks)]);
 	}
 	/**
 	 * determine AI tile image crop location
@@ -302,7 +307,7 @@ class AI extends Player {
 		this.playAnimation();
 	}
 
-	outShelter(timeStep) {
+	chasing(timeStep) {
 
 		this.speed = this.defaultSpeed;
 
