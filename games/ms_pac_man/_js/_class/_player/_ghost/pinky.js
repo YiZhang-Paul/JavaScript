@@ -21,7 +21,17 @@ class Pinky extends AI {
 	}
 
 	getChaseDestination() {
+		//two grids ahead of user
+		let gridAhead = this.getGridAheadOfUser(game.manager.user.direction);
 
-		return new Node(1, 1);
+		if(gridAhead) {
+
+			return gridAhead;
+		}
+		//find other alternative grids of same distance to user
+		let otherGrids = game.directions.map(direction => this.getGridAheadOfUser(direction))
+		                                .filter(grid => grid !== null);
+		
+		return otherGrids.length ? this.pickRandom(otherGrids) : this.getRandomDestination();
 	}
 }

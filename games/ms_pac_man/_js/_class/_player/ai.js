@@ -82,6 +82,30 @@ class AI extends Player {
 
 		return isOpposite || (this.inMazeArea() && !this.hasWall(direction));
 	}
+	/**
+	 * retrieve grid that is given number of grids ahead of user on given direction 
+	 */
+	getGridAheadOfUser(direction, total = 2) {
+
+		let grid = new Node(game.manager.user.row, game.manager.user.column);
+
+		if(!gameGrid.exist(grid.row, grid.column)) {
+
+			return null;
+		}
+
+		for(let i = 0; i < 2; i++) {
+
+			grid = this.getAdjacentGrid(direction, grid.row, grid.column);
+
+			if(!grid || !gameGrid.isAccessible(grid.row, grid.column)) {
+
+				return null;
+			}
+		}
+
+		return grid;
+	}
 
 	getInShelter() {
 
@@ -232,6 +256,11 @@ class AI extends Player {
 			this.state.swap("chasing");
 		}
 	}
+
+	getRandomDestination() {
+
+		return this.pickRandom(gameGrid.accessible.all);
+	}
 	/**
 	 * @abstract
 	 */
@@ -286,7 +315,7 @@ class AI extends Player {
 
 			this.dodged = false;
 
-			return this.pickRandom(gameGrid.accessible.all);
+			return this.getRandomDestination();
 		}
 
 		let destination;
@@ -297,7 +326,7 @@ class AI extends Player {
 
 			for(let i = 0; i < 50; i++) {
 
-				destination = this.pickRandom(gameGrid.accessible.all);
+				destination = this.getRandomDestination();
 				fleePath = this.pathfinder.getPath(destination);
 
 				if(!this.pathfinder.coincides(fleePath, userPath) || this.isValidFleePath(fleePath, userPath)) {
@@ -388,7 +417,7 @@ class AI extends Player {
 		}
 
 		this.playAnimation();
-		this.killUser();
+		//this.killUser();
 	}
 
 	flee(timeStep) {
