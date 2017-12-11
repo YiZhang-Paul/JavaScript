@@ -18,5 +18,10 @@ class Blinky extends AI {
 
 			super.setInShelterDirection();
 		}
-	} 
+	}
+
+	getChaseDestination() {
+
+		return new Node(game.manager.user.row, game.manager.user.column);
+	}
 }

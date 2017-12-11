@@ -232,6 +232,10 @@ class AI extends Player {
 			this.state.swap("chasing");
 		}
 	}
+	/**
+	 * @abstract
+	 */
+	getChaseDestination() {}
 
 	triggerRetreat() {
 
@@ -239,11 +243,6 @@ class AI extends Player {
 		this.stopAnimation(0);
 		this.movePath = null;
 		this.state.swap("retreat");
-	}
-
-	getRandomDestination() {
-
-		return this.pickRandom(gameGrid.accessible.all);
 	}
 
 	getUserPath() {
@@ -378,7 +377,7 @@ class AI extends Player {
 
 		if(this.moving) {
 
-			this.updatePath(this.getRandomDestination());
+			this.updatePath(this.getChaseDestination());
 
 			if(this.movePath) {
 

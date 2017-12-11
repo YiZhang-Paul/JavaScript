@@ -18,5 +18,10 @@ class Pinky extends AI {
 
 			super.setInShelterDirection();
 		}
-	} 
+	}
+
+	getChaseDestination() {
+
+		return new Node(1, 1);
+	}
 }
