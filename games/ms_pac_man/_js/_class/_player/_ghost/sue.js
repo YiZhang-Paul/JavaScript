@@ -24,7 +24,7 @@ class Sue extends AI {
 	getChaseDestination() {
 
 		if(this.distanceToPlayer(game.manager.user) < game.gridWidth * 8) {
-
+			//ignore user when getting too close
 			if(!this.ignored && this.movePath) {
 
 				this.movePath = null;
