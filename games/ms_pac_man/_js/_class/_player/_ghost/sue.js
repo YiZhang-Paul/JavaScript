@@ -5,6 +5,7 @@ class Sue extends AI {
 
 		super("sue", manager);
 		this.defaultState = "inShelter";
+		this.ignored = false;
 		this.reset();
 	}
 
@@ -22,6 +23,19 @@ class Sue extends AI {
 
 	getChaseDestination() {
 
-		return new Node(1, 1);
+		if(this.distanceToPlayer(game.manager.user) < game.gridWidth * 8) {
+
+			if(!this.ignored && this.movePath) {
+
+				this.movePath = null;
+				this.ignored = true;
+			}
+
+			return this.getRandomDestination();
+		}
+
+		this.ignored = false;
+
+		return new Node(game.manager.user.row, game.manager.user.column);
 	}
 }
