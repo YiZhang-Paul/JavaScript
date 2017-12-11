@@ -11,6 +11,13 @@ class PathFinder {
 		return node1.row === node2.row && node1.column === node2.column;
 	}
 
+	coincides(path1, path2) {
+
+		let nodes = new Set(path1.map(node => this.getKey(node)));
+
+		return path2.some(node => nodes.has(this.getKey(node)));
+	}
+
 	containsNode(path, node) {
 
 		return path.some(pathNode => this.isSamePosition(pathNode, node));

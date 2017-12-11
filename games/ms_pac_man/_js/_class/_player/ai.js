@@ -246,38 +246,71 @@ class AI extends Player {
 		return this.pickRandom(gameGrid.accessible.all);
 	}
 
+	getUserPath() {
+
+		let user = game.manager.user;
+		let path = [new Node(user.row, user.column)];
+		let nextNode = user.getAdjacentGrid();
+
+		while(nextNode && gameGrid.isAccessible(nextNode.row, nextNode.column)) {
+
+			path.push(nextNode);
+			nextNode = this.getAdjacentGrid(user.direction, nextNode.row, nextNode.column);
+		}
+
+		return path;
+	}
+
+	isValidFleePath(fleePath, userPath) {
+
+		if(fleePath.length < 2 || this.pathfinder.containsNode(fleePath, userPath[0])) {
+
+			return false;
+		}
+
+		if(this.pathfinder.containsNode(userPath, this)) {
+
+			const nextDirection = game.directions.find(direction => {
+
+				return this.pathfinder.isSamePosition(fleePath[1], this.getAdjacentGrid(direction));
+			});
+
+			return nextDirection !== game.manager.user.getOppositeWay();
+		}
+
+		return true;
+	}
+
 	getFleeDestination() {
 
-		const userBlock = gameGrid.categorizeGrids(game.manager.user);
-		//pick random destination far from user
-		let validBlocks = Object.keys(gameGrid.accessible)
-		                        .filter(block => block !== "all" && block !== userBlock);
-        let destination = this.pickRandom(gameGrid.accessible[this.pickRandom(validBlocks)]);
-		
-		if(!game.manager.user.inChaseRange(this)) {
+		if(!game.manager.user.inChaseRange(this) || !this.movePath) {
 
 			this.dodged = false;
 
-			return destination;
+			return this.pickRandom(gameGrid.accessible.all);
 		}
 
-		let path;
-		const isAlive = !this.pathfinder.isSamePosition(this, game.manager.user);
-        //try avoid running into user
-        while(!this.atWormhole()) {
+		let destination;
+		let fleePath;
+		let userPath = this.getUserPath();
+		//try avoid running into user
+		if(!this.pathfinder.isSamePosition(this, game.manager.user) && !this.atWormhole()) {
 
-			destination = this.pickRandom(gameGrid.accessible[this.pickRandom(validBlocks)]);
-			path = this.pathfinder.getPath(destination);
+			for(let i = 0; i < 50; i++) {
 
-			if(!isAlive || !this.pathfinder.containsNode(path, game.manager.user)) {
+				destination = this.pickRandom(gameGrid.accessible.all);
+				fleePath = this.pathfinder.getPath(destination);
 
-				break;
+				if(!this.pathfinder.coincides(fleePath, userPath) || this.isValidFleePath(fleePath, userPath)) {
+
+					break;
+				}
 			}
-        }
-
+		}
+		//update new destination
 		if(!this.dodged && this.movePath) {
 
-			this.movePath = path;
+			this.movePath = fleePath;
 			this.dodged = true;
 		}
 

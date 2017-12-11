@@ -51,7 +51,7 @@ class Player {
 
 	inChaseRange(chased) {
 
-		return this.distanceToPlayer(chased) < game.gridWidth * 5;
+		return this.distanceToPlayer(chased) < game.gridWidth * 8;
 	}
 
 	trackCurrentGrid() {
