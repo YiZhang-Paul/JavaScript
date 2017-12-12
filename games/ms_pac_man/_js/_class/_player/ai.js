@@ -10,7 +10,7 @@ class AI extends Player {
 		this.defaultSpeed = Math.round(game.mazeHeight * 0.02) / 100;
 		this.speed = this.defaultSpeed;
 		this.fleeTimestamp = null;
-		this.fleeTime = 100000;
+		this.fleeTime = 5000;
 		this.dodged = false;
 		this.transitionTime = 3000; //transition time between flee and normal state
 		this.movePath = null;

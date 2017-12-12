@@ -269,13 +269,23 @@ class Manager {
 
 		if(!this.timeout) {
 
+			const delay = 5000;
+
 			this.timeout = setTimeout(() => {
 
 				clearTimeout(this.timeout);
 				this.timeout = null;
 				this.state.swap("ongoing");
 
-			}, 500);
+				this.aiManager.ais.forEach(ai => {
+					//add back lost time on flee state
+					if(ai.state.peek() === "flee" || ai.state.peek() === "transition") {
+
+						ai.fleeTimestamp += delay;
+					}
+				});
+
+			}, delay);
 		}
 
 		this.aiManager.ais.forEach(ai => {
