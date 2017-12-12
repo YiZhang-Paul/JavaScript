@@ -417,7 +417,7 @@ class AI extends Player {
 		}
 
 		this.playAnimation();
-		//this.killUser();
+		this.killUser();
 	}
 
 	flee(timeStep) {

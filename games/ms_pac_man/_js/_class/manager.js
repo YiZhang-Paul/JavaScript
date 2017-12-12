@@ -280,7 +280,7 @@ class Manager {
 
 		this.aiManager.ais.forEach(ai => {
 
-			if(ai.state.peek() === "retreat") {
+			if(ai.state.peek() === "retreat" && ai.name !== this.user.lastGhostKilled) {
 
 				ai.update(timeStep);
 			}

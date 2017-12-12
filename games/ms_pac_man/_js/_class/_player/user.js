@@ -11,6 +11,7 @@ class User extends Player {
 		this.totalTicks = 3;
 		this.speed = Math.round(game.mazeHeight * 0.025) / 100;
 		this.dying = false;
+		this.lastGhostKilled = null;
 		this.deathTimeout = null;
 		this.deathInterval = null;
 		this.reset();
@@ -82,6 +83,8 @@ class User extends Player {
 		game.manager.aiManager.ais.forEach(ai => {
 
 			if(this.canKillGhost(ai)) {
+
+				this.lastGhostKilled = ai.name;
 				//calculate score by total ghost kills during current visit 
 				const score = Math.pow(2, ++this.killCount - 1) * ai.score;
 				//display scores
