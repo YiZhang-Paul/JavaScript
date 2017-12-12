@@ -472,8 +472,9 @@ class AI extends Player {
 			if(this.movePath) {
 
 				this.setDirection();
-				this.move(timeStep);
 			}
+			
+			this.move(timeStep);
 		}
 
 		this.playAnimation();
