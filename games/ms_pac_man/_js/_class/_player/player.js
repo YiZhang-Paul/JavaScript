@@ -4,76 +4,53 @@ class Player extends Movable {
 	constructor(name) {
 
 		this.name = name;
-		this.score = 0;
 		this.tick = 0;
 		this.totalTicks = 0;
-		this.animationOn = false;
 		this.interval = null;
 		this.ctx = game.canvas.player;
 	}
 
+	initialize() {
+
+		let stats = grid[this.name];
+		const x = grid.nodeSize * stats.column;
+		const y = grid.nodeSize * (stats.row + 0.5);
+		this.coordinate = new Point(x, y);
+		this.direction = stats.direction;
+	}
+
 	reset() {
 
-		let stats = gameGrid[this.name];
-		this.x = game.gridWidth * stats.column;
-		this.y = game.gridWidth * (stats.row + 0.5);
-		this.direction = stats.direction;
-		this.animationOn = false;
+		this.initialize();
 
-		if(this.interval) {
+		if(this.interval !== null) {
 
 			clearInterval(this.interval);
 			this.interval = null;
 		}
 	}
 
-	inChaseRange(chased) {
-
-		return this.distanceToPlayer(chased) < game.gridWidth * 8;
-	}
-
-	canTurn() {
-
-		if(this.onGridCenter()) {
-
-			return true;
-		}
-
-		if(this.toCollision !== 0) {
-
-			return false; 
-		}
-
-		const [x, y] = this.getGridCenter(this.row, this.column);
-
-		return this.direction === "left" || this.direction === "right" ? this.x === x : this.y === y;
-	}
-	/**
-	 * adjust speed to ensure player can reach grid center
-	 */
 	adjustSpeed(speed) {
 
-		this.distanceToCollision();
-		this.distanceToFacingGridCenter();
+		const toCollision = this.toCollision;
+		const toNodeCenter = this.toFacingNodeCenter;
 
-		if(this.toCollision !== null) {
+		if(toCollision !== null) {
 
-			return Math.min(speed, this.toCollision);
+			return Math.min(speed, toCollision);
 		}
 
-		return this.toGridCenter ? Math.min(speed, this.toGridCenter) : speed;
+		return toNodeCenter ? Math.min(speed, toNodeCenter) : speed;
 	}
-	/**
-	 * check for wormholes on both side of maze
-	 */
-	checkWormhole() {
 
-		const left = -game.gridWidth;
-		const right = game.mazeWidth + game.gridWidth;
+	crossWormhole() {
 
-		if(this.x < left || this.x > right) {
+		const left = -grid.nodeSize;
+		const right = grid.width + grid.nodeSize;
 
-			this.x = this.x < left ? right : left;
+		if(this.coordinate.x < left || this.coordinate.x > right) {
+
+			this.coordinate.x = this.coordinate.x < left ? right : left;
 		}
 	}
 
@@ -83,26 +60,26 @@ class Player extends Movable {
 
 		if(this.direction === "up" || this.direction === "down") {
 
-			this.y -= speed * (this.direction === "up" ? 1 : -1);
+			this.coordinate.y -= speed * (this.direction === "up" ? 1 : -1);
 		}
 		else {
 
-			this.x -= speed * (this.direction === "left" ? 1 : -1);
+			this.coordinate.x -= speed * (this.direction === "left" ? 1 : -1);
 		}
 
-		this.checkWormhole();
-		this.trackCurrentGrid();
+		this.crossWormhole();
+		this.getCurrentNode();
 	}
 
 	nextTick(totalTicks = this.totalTicks) {
 
 		this.tick = (this.tick + 1) % totalTicks;
-		this.getCropLocation();
+		this.getCropXY();
 	}
 
 	playAnimation(totalTicks, speed = 100, endTick = this.tick) {
 
-		if(this.animationOn && !this.interval) {
+		if(!this.interval && this.onAnimation) {
 
 			this.interval = setInterval(() => {
 
@@ -110,37 +87,40 @@ class Player extends Movable {
 
 			}, speed);
 		}
-		else if(!this.animationOn) {
+		else if(!this.onAnimation) {
 
 			this.stopAnimation(endTick);
 		}
 	}
 
-	stopAnimation(tick) {
+	stopAnimation(endTick) {
 
 		if(this.interval) {
 
 			clearInterval(this.interval);
 			this.interval = null;
-			this.tick = tick;
-			this.getCropLocation();
+			this.tick = endTick;
+			this.getCropXY();
 		}
 	}
-	
+	/**
+	 * @abstract
+	 */
+	update(timeStep) {}
 
 	draw() {
 
 		this.ctx.drawImage(
 
 			this.tile,
-			this.cropX,
-			this.cropY,
+			this.cropXY.x,
+			this.cropXY.y,
 			this.cropWidth,
 			this.cropWidth,
-			this.x - game.gridWidth * 0.8,
-			this.y - game.gridWidth * 0.8,
-			game.gridWidth * 1.6,
-			game.gridWidth * 1.6
+			this.coordinate.x - grid.nodeSize * 0.8,
+			this.coordinate.y - grid.nodeSize * 0.8,
+			grid.nodeSize * 1.6,
+			grid.nodeSize * 1.6
 		);
 	}
 }
