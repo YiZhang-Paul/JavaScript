@@ -3,13 +3,14 @@ class ScoreBoard {
 
 	constructor(originator) {
 
+
 		this.originator = originator;
-		this.width = game.mazeWidth;
-		this.height = (game.monitor.height - game.mazeHeight) * 0.5;
+		this.width = grid.width;
+		this.height = (game.monitor.height - grid.height) * 0.5;
 		this.fontSize = this.height * 0.45;
 		this.tick = 0;
 		this.interval = null;
-		this.ctx = game.canvas.ui;
+		this.ctx = game.canvas.userInterface;
 		this.draw();
 	}
 
@@ -29,10 +30,8 @@ class ScoreBoard {
 
 		this.tick = this.tick ? 0 : 1;
 	}
-	/** 
-	 * blink current active player number
-	 */
-	blink() {
+
+	blinkPlayerNumber() {
 
 		if(!this.interval) {
 
@@ -45,7 +44,7 @@ class ScoreBoard {
 		}
 	}
 
-	update(score = 0) {
+	update(score) {
 
 		this.originator.score += score;
 		this.originator.highScore = Math.max(this.originator.score, this.originator.highScore);

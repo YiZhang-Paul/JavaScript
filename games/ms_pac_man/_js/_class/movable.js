@@ -126,6 +126,11 @@ class Movable {
 		return grid.getNode(1, adjacent.row, adjacent.column).hasOwnProperty("d");
 	}
 
+	/**
+	 * @abstract
+	 */
+	isValidDirection() {}
+
 	setDirection(direction) {
 
 		this.direction = direction;

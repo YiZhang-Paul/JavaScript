@@ -5,7 +5,7 @@ class Player extends Movable {
 
 		this.name = name;
 		this.tick = 0;
-		this.totalTicks = 0;
+		this.totalTicks = null;
 		this.interval = null;
 		this.ctx = game.canvas.player;
 	}
@@ -103,10 +103,6 @@ class Player extends Movable {
 			this.getCropXY();
 		}
 	}
-	/**
-	 * @abstract
-	 */
-	update(timeStep) {}
 
 	draw() {
 
