@@ -12,6 +12,7 @@ class ScoreBoard {
 		this.interval = null;
 		this.ctx = game.canvas.userInterface;
 		this.draw();
+		this.blinkPlayerNumber();
 	}
 
 	reset() {

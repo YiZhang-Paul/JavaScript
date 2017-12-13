@@ -50,7 +50,6 @@ let game = {
 
 		grid.initialize(this.monitor);
 		this.loadCanvas();
-		this.maze = new Maze(grid.width, grid.height);
 		this.manager = new Manager();
 	},
 

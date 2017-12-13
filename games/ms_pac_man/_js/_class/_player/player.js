@@ -3,6 +3,7 @@ class Player extends Movable {
 
 	constructor(name) {
 
+		super();
 		this.name = name;
 		this.tick = 0;
 		this.totalTicks = null;

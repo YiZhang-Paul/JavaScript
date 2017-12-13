@@ -4,6 +4,7 @@ class Fruit extends Movable {
 	constructor(row, column, type, direction) {
 
 		super(row, column);
+		this.coordinate = grid.getNodeCenter(this.row, this.column);
 		this.type = type;
 		this.score = 500;
 		this.spawnTime = new Date().getTime();
@@ -13,7 +14,7 @@ class Fruit extends Movable {
 		this.maxJumpHeight = grid.nodeSize;
 		this.jumpSpeed = grid.nodeSize * 0.1;
 		this.direction = direction;
-		this.speed = Math.round(grid.height * 0.1) / 100;
+		this.speed = Math.round(grid.height * 0.01) / 100;
 		this.cropXY = null;	
 		this.cropWidth = 32;
 		this.ctx = game.canvas.fruit;
@@ -126,8 +127,10 @@ class Fruit extends Movable {
 
 				this.direction = direction;
 			}
-			//retry finding moving direction
-			this.setDirection();
+			else {
+				//retry finding moving direction
+				this.setDirection();
+			}
 		}
 	}
 
@@ -154,11 +157,11 @@ class Fruit extends Movable {
 		this.getCurrentNode();
 	}
 
-	update() {
+	update(timeStep) {
 
 		this.jump();
 		this.setDirection();
-		this.move();
+		this.move(timeStep);
 	}
 
 	draw() {

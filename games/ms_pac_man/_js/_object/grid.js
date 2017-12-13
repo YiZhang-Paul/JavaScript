@@ -30,7 +30,7 @@ let grid = {
 		column : [14, 15],
 	},
 
-	user : {
+	pacman : {
 
 		row       : 23,
 		column    : 14,

@@ -6,6 +6,7 @@ class HUD {
 		this.originator = originator;
 		this.width = grid.width;
 		this.height = (game.monitor.height - grid.height) * 0.5;
+		this.loaded = false;
 		this.fruitQueue = [];
 		this.iconWidth = grid.nodeSize * 2;
 		this.margin = this.height * 0.05;
@@ -19,6 +20,15 @@ class HUD {
 
 		this.fruitQueue = [];
 		this.draw();
+	}
+
+	load() {
+
+		if(!this.loaded && this.tile.complete) {
+
+			this.draw();
+			this.loaded = true;
+		}
 	}
 	/**
 	 * add new fruit type to fruit queue
