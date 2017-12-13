@@ -10,7 +10,7 @@ class AI extends Player {
 		this.defaultSpeed = Math.round(game.mazeHeight * 0.02) / 100;
 		this.speed = this.defaultSpeed;
 		this.fleeTimestamp = null;
-		this.fleeTime = 5000;
+		this.fleeTime = 10000;
 		this.dodged = false;
 		this.transitionTime = 3000; //transition time between flee and normal state
 		this.movePath = null;
@@ -169,15 +169,13 @@ class AI extends Player {
 		}
 	}
 
-	setPath(destination) {
+	setPath(destination, completePath) {
 
-		if(!this.movePath) {
-
-			this.movePath = this.pathfinder.getPath(destination);
-		}
+		let path = this.pathfinder.getPath(destination);
+		this.movePath = completePath ? path : [path[1]];
 	}
 
-	checkPath() {
+	checkPath(destination, completePath) {
 
 		let target = this.movePath[0];
 
@@ -187,17 +185,21 @@ class AI extends Player {
 
 			if(!this.movePath.length) {
 
-				this.movePath = null;
+				this.setPath(destination, completePath);
 			}
 		}
 	}
 
-	updatePath(destination) {
+	updatePath(destination, completePath = false) {
 
 		if(this.inMazeArea() && !this.atWormhole()) {
 
-			this.setPath(destination);
-			this.checkPath();
+			if(!this.movePath) {
+
+				this.setPath(destination, completePath);
+			}
+
+			this.checkPath(destination, completePath);
 		}
 		else {
 
@@ -406,7 +408,10 @@ class AI extends Player {
 
 		if(this.moving) {
 
-			this.updatePath(this.getChaseDestination());
+			if(this.canTurn()) {
+
+				this.updatePath(this.getChaseDestination());
+			}
 
 			if(this.movePath) {
 
@@ -426,7 +431,10 @@ class AI extends Player {
 
 		if(this.moving) {
 
-			this.updatePath(this.getFleeDestination());
+			if(this.canTurn()) {
+
+				this.updatePath(this.getFleeDestination(), true);
+			}
 
 			if(this.movePath) {
 
@@ -448,7 +456,10 @@ class AI extends Player {
 
 		if(this.moving) {
 
-			this.updatePath(this.getFleeDestination());
+			if(this.canTurn()) {
+
+				this.updatePath(this.getFleeDestination(), true);
+			}
 
 			if(this.movePath) {
 
@@ -467,7 +478,10 @@ class AI extends Player {
 
 		if(this.moving) {
 
-			this.updatePath(new Node(gameGrid.retreat.row, gameGrid.retreat.column));
+			if(this.canTurn()) {
+
+				this.updatePath(new Node(gameGrid.retreat.row, gameGrid.retreat.column), true);
+			}
 
 			if(this.movePath) {
 

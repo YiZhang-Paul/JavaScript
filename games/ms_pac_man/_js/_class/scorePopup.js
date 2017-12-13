@@ -1,34 +1,32 @@
 /* jslint esversion: 6 */
-class ScorePopup {
+class ScorePopUp {
 
 	constructor(x, y, value) {
 
-		this.x = x;
-		this.y = y;
+		this.coordinate = new Point(x, y);
 		this.value = value;
-		this.spawn = new Date().getTime();
-		this.lifespan = 1500;
-		this.cropX = null;
-		this.cropY = null;
+		this.spawnTime = new Date().getTime();
+		this.duration = 1500;
+		this.cropXY = null;
 		this.cropWidth = 32;
-		this.tile = document.getElementById("player");
-		this.ctx = game.canvas.popup;
-		this.getCropPosition();
+		this.tile = document.getElementById("tile");
+		this.ctx = game.canvas.scorePopUp;
+		this.getCropXY();
 	}
 
-	isAlive() {
+	get inDuration() {
 
-		return this.spawn + this.lifespan > new Date().getTime();
+		return this.spawnTime + this.duration > new Date().getTime();
 	}
 
 	erase() {
 
 		this.ctx.clearRect(
 
-			this.x - game.gridWidth * 0.9,
-			this.y - game.gridWidth * 0.9,
-			game.gridWidth * 1.8,
-			game.gridWidth * 1.8
+			this.coordinate.x - grid.nodeSize * 0.9,
+			this.coordinate.y - grid.nodeSize * 0.9,
+			grid.nodeSize * 1.8,
+			grid.nodeSize * 1.8
 		);
 	}
 
@@ -38,16 +36,16 @@ class ScorePopup {
 		this.erase();
 	}
 
-	getCropPosition() {
+	getCropXY() {
 
 		if(this.value === 500) {
 
-			[this.cropX, this.cropY] = [224, 192];
+			this.cropXY = new Point(224, 192);
 		}
 		else {
 
-			this.cropX = (Math.log2(this.value / 100) - 1) * this.cropWidth;
-			this.cropY = 224;
+			const x = (Math.log2(this.value / 100) - 1) * this.cropWidth;
+			this.cropXY = new Point(x, 224);
 		}
 	}
 
@@ -58,14 +56,14 @@ class ScorePopup {
 		this.ctx.drawImage(
 
 			this.tile,
-			this.cropX,
-			this.cropY,
+			this.cropXY.x,
+			this.cropXY.y,
 			this.cropWidth,
 			this.cropWidth,
-			this.x - game.gridWidth * 0.9,
-			this.y - game.gridWidth * 0.9,
-			game.gridWidth * 1.8,
-			game.gridWidth * 1.8
+			this.coordinate.x - grid.nodeSize * 0.9,
+			this.coordinate.y - grid.nodeSize * 0.9,
+			grid.nodeSize * 1.8,
+			grid.nodeSize * 1.8
 		);
 	}
 }

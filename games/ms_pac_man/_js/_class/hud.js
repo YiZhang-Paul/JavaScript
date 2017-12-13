@@ -9,7 +9,7 @@ class HUD {
 		this.fruitQueue = [];
 		this.iconWidth = game.gridWidth * 2;
 		this.margin = this.height * 0.05;
-		this.tile = document.getElementById("player");
+		this.tile = document.getElementById("tile");
 		this.ctx = game.canvas.ui;
 		this.draw();
 	}

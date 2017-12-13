@@ -15,7 +15,7 @@ class Fruit extends Food {
 		this.direction = direction;
 		this.moveSpeed = Math.round(game.mazeHeight * 0.1) / 100;
 		this.toGridCenter = null;
-		this.tile = document.getElementById("player");
+		this.tile = document.getElementById("tile");
 		this.cropWidth = 32;
 		this.cropX = this.cropWidth * (this.type - 1);
 		this.cropY = this.cropWidth * 6;

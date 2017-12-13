@@ -1,106 +1,96 @@
 /* jslint esversion: 6 */
-class PathFinder {
+class Pathfinder {
 
 	constructor(originator) {
 
 		this.originator = originator;
 	}
-
-	isSamePosition(node1, node2) {
-
-		return node1.row === node2.row && node1.column === node2.column;
-	}
-
+	/**
+	 * check if two paths will collide with each other
+	 */
 	coincides(path1, path2) {
 
-		let nodes = new Set(path1.map(node => this.getKey(node)));
+		let nodes = new Set(path1.map(node => node.key));
 
-		return path2.some(node => nodes.has(this.getKey(node)));
+		return path2.some(node => nodes.has(node.key));
 	}
 
-	containsNode(path, node) {
+	contains(path, node) {
 
-		return path.some(pathNode => this.isSamePosition(pathNode, node));
-	}
-
-	getKey(node) {
-
-		return `${node.row},${node.column}`;
+		return path.some(pathNode => pathNode.isSame(node));
 	}
 
 	getHeuristic(candidate, end) {
 
 		return Math.abs(candidate.row - end.row) + Math.abs(candidate.column - end.column);
 	}
+	/**
+	 * retrieve accessible neighbours on all four directions
+	 */
+	getNodesToVisit(current) {
 
-	getStartNode() {
+		let nodes = grid.getAdjacentNodes(current.row, current.column);
 
-		return new Node(this.originator.row, this.originator.column);
-	}
+		return nodes.filter(node => {
 
-	getCandidates(node) {
+			node = grid.getNode(1, node.row, node.column);
+			//allow entering shelter when AI is retreating
+			const retreating = this.originator.state.activeState === "retreat";
 
-		let candidates = this.originator.getAllAdjacentGrids(node.row, node.column);
-
-		return candidates.filter(candidate => {
-
-			let grid = gameGrid.getGrid(1, candidate.row, candidate.column);
-			const isRetreat = this.originator.state.peek() === "retreat";
-
-			if(isRetreat && (grid.hasOwnProperty("d") || grid.b === "s")) {
+			if(retreating && (node.hasOwnProperty("d") || node.b === "s")) {
 
 				return true;
 			}
 
-			return ["w", "d", "b"].every(key => !grid.hasOwnProperty(key)) || grid.b === "p";
+			return ["w", "d", "b"].every(key => !node.hasOwnProperty(key)) || node.b === "p";
 		});
 	}
 	/**
-	 * @param {Array} [candidates] - nodes to be visited
-	 * @param {Node} [current] - current node
-	 * @param {Node} [end] - end node
+	 * @param {Array} [nodes] - nodes to be visited
+	 * @param {Map} [costs] - travel distance from nodes to start point
+	 * @param {PriorityQueue} [toVisit] - node priorities
 	 */
-	evaluateCandidates(candidates, current, end, allCosts, toVisit) {
+	evaluateNodes(nodes, current, end, costs, toVisit) {
 
-		candidates.forEach(candidate => {
+		nodes.forEach(node => {
 
-			const key = this.getKey(candidate);
-			const cost = allCosts.get(this.getKey(current)) + 1;
+			const key = node.key;
+			const cost = costs.get(current.key) + 1;
+			//record or update travel cost when better route is found
+			if(!costs.has(key) || cost < costs.get(key)) {
 
-			if(!allCosts.has(key) || cost < allCosts.get(key)) {
-
-				allCosts.set(key, cost);
-				toVisit.enqueue(cost + this.getHeuristic(candidate, end), candidate);
-				candidate.parent = current;
+				costs.set(key, cost);
+				toVisit.enqueue(cost + this.getHeuristic(node, end), node);
+				node.parent = current;
 			}
 		});
 	}
 
 	searchEndNode(end) {
 
-		let currentNode;
-		let start = this.getStartNode();
-		//nodes to be visited
+		let current;
+		let start = new Node(this.originator.row, this.originator.column);
+		//nodes to visit
 		let toVisit = new PriorityQueue();
-		toVisit.enqueue(1, start);
-		//moving cost from starting point to other nodes
+		toVisit.enqueue(0, start);
+		//travel cost from start point to other nodes
 		let costs = new Map();
-		costs.set(this.getKey(start), 0);
+		costs.set(start.key, 0);
 
 		while(toVisit.size) {
 
-			currentNode = toVisit.dequeue();
-
-			if(this.isSamePosition(currentNode, end)) {
+			current = toVisit.dequeue();
+			//a path is found
+			if(current.isSame(end)) {
 
 				break;
 			}
 
-			let candidates = this.getCandidates(currentNode);
-			this.evaluateCandidates(candidates, currentNode, end, costs, toVisit);
+			let otherNodes = this.getNodesToVisit(current);
+			this.evaluateNodes(otherNodes, current, end, costs, toVisit);
 		}
 
-		return currentNode;
+		return current;
 	}
 
 	getPath(end) {

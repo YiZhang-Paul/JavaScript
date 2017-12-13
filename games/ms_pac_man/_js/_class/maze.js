@@ -7,7 +7,7 @@ class Maze {
 		this.height = height;
 		this.tick = 0;
 		this.tile = null;
-		this.ctx = game.canvas.back;
+		this.ctx = game.canvas.background;
 		this.draw();
 	}
 

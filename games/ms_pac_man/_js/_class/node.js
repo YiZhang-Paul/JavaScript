@@ -7,4 +7,14 @@ class Node {
 		this.column = column;
 		this.parent = parent;
 	}
+
+	get key() {
+
+		return `${this.row},${this.column}`;
+	}
+
+	isSame(node) {
+
+		return this.row === node.row && this.column === node.column;
+	}
 }

@@ -1,5 +1,5 @@
 /* jslint esversion: 6 */
-class StateMachine {
+class State {
 
 	constructor(originator, defaultState) {
 
@@ -7,14 +7,27 @@ class StateMachine {
 		this.defaultState = defaultState;
 		this.states = defaultState ? [defaultState] : [];
 	}
+	/**
+	 * current active state
+	 */
+	get activeState() {
+
+		return this.peek();
+	}
+	/**
+	 * change current active state
+	 */
+	set activeState(state) {
+
+		this.pop();
+		this.push(state);
+	}
 
 	reset() {
 
 		this.states = this.defaultState ? [this.defaultState] : [];
 	}
-	/**
-	 * retrieve current active state
-	 */
+
 	peek() {
 
 		if(!this.states.length) {
@@ -22,12 +35,12 @@ class StateMachine {
 			return null;
 		}
 
-		return this.states[this.states.length - 1];
+		return this.states.slice(-1)[0];
 	}
 
 	push(state) {
 
-		if(this.peek() !== state) {
+		if(this.activeState !== state) {
 
 			this.states.push(state);
 		}
@@ -37,20 +50,12 @@ class StateMachine {
 
 		return this.states.pop();
 	}
-	/**
-	 * change current active state
-	 */
-	swap(state) {
-
-		this.pop();
-		this.push(state);
-	}
 
 	update(timeStep) {
 
-		if(this.peek()) {
+		if(this.activeState) {
 			//execute corresponding method for current state
-			this.originator[this.peek()](timeStep);
+			this.originator[this.activeState](timeStep);
 		}
 	}
 }

@@ -3,14 +3,14 @@ class PriorityQueue {
 
 	constructor() {
 
-		this.queue = new Map();
+		this.heaps = new Map();
 	}
 
 	get size() {
 
 		let total = 0;
 
-		this.queue.forEach(heap => {
+		this.heaps.forEach(heap => {
 
 			total += heap.length;
 		});
@@ -20,23 +20,23 @@ class PriorityQueue {
 
 	enqueue(priority, node) {
 
-		if(!this.queue.has(priority)) {
+		if(!this.heaps.has(priority)) {
 
-			this.queue.set(priority, []);
+			this.heaps.set(priority, []);
 		}
 
-		this.queue.get(priority).push(node);
+		this.heaps.get(priority).push(node);
 	}
 
 	dequeue() {
 
-		const topPriority = Math.min(...this.queue.keys());
-		let heap = this.queue.get(topPriority);
+		const maxHeap = Math.min(...this.heaps.keys());
+		let heap = this.heaps.get(maxHeap);
 		let node = heap.shift();
 
 		if(!heap.length) {
 
-			this.queue.delete(topPriority);
+			this.heaps.delete(maxHeap);
 		}
 
 		return node;

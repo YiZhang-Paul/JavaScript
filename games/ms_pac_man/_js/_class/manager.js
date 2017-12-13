@@ -269,7 +269,7 @@ class Manager {
 
 		if(!this.timeout) {
 
-			const delay = 5000;
+			const delay = 370;
 
 			this.timeout = setTimeout(() => {
 

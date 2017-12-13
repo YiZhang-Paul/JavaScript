@@ -17,21 +17,38 @@ let control = {
 	//move right
 	D     : 68,
 	RIGHT : 39,
-
-	isPressed(keyCode) {
-
-		return this.keyPressed.includes(keyCode);
-	},
 	/**
-	 * retrieve key code of last key pressed
+	 * key code of last key pressed
 	 */
-	getActiveKey() {
+	get activeKey() {
 
 		if(!this.keyPressed.length) {
 
 			return null;
 		}
 
-		return this.keyPressed[this.keyPressed.length - 1]; 
+		return this.keyPressed.slice(-1)[0];
+	},
+
+	isPressed(keyCode) {
+
+		return this.keyPressed.includes(keyCode);
+	},
+
+	push(keyCode) {
+
+		if(!this.isPressed(keyCode)) {
+
+			this.keyPressed.push(keyCode);
+		}
+	},
+
+	remove(keyCode) {
+
+		if(this.isPressed(keyCode)) {
+
+			const index = this.keyPressed.indexOf(keyCode);
+			this.keyPressed.splice(index, 1);
+		}
 	}
 };

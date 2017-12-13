@@ -1,16 +1,25 @@
 /* jslint esversion: 6 */
-let gameGrid = {
+let grid = {
 
-	rows    : 31, 
-	columns : 28,
+	rows     : 31,
+	columns  : 28,
+	nodeSize : null,
+	width    : null,
+	height   : null,
 
 	accessible : {
 
 		all         : [],
-		topLeft     : [],
-		topRight    : [],
-		bottomLeft  : [],
-		bottomRight : []
+		topleft     : [],
+		topright    : [],
+		bottomleft  : [],
+		bottomright : []
+	},
+
+	retreatPoint : {
+
+		row    : 14,
+		column : 14
 	},
 	/**
 	 * game object default locations
@@ -54,12 +63,6 @@ let gameGrid = {
 		row  	  : 14,
 		column    : 16,
 		direction : "up"
-	},
-
-	retreat : {
-
-		row    : 14,
-		column : 14
 	},
 
 	layout : [[
@@ -129,28 +132,36 @@ let gameGrid = {
 	[{w:"w"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{f:"s"},{w:"w"}],
 	[{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"},{w:"w"}]
 	]],
+	/**
+	 * calculate size of each node
+	 * @param {Object} [monitor] - monitor dimension
+	 */
+	getNodeSize(monitor) {
 
-	isAccessible(row, column) {
-
-		if(!this.exist(row, column)) {
-
-			return false;
-		}
-
-		let node = this.getGrid(1, row, column);
-
-		return node.hasOwnProperty("f") || node.b === "p";
+		this.nodeSize = monitor.width > monitor.height ? 
+			Math.floor(monitor.height * 0.8 / this.rows) :
+			Math.floor(monitor.width * 0.8 / this.columns);
 	},
 
-	categorizeGrids(node) {
-		//watch for letter casing
-		const leftRight = node.column < (this.columns + this.columns % 2) * 0.5 ? "Left" : "Right";
-		const topBottom = node.row < (this.rows + this.rows % 2) * 0.5 ? "top" : "bottom";
+	getDimension() {
 
-		return topBottom + leftRight;
+		this.width = this.nodeSize * this.columns;
+		this.height = this.nodeSize * this.rows;
+	},
+	/**
+	 * retrieve location of given node relative to entire grid
+	 */
+	getLocation(node) {
+
+		const centerColumn = (this.columns + this.columns % 2) * 0.5;
+		const centerRow = (this.rows + this.rows % 2) * 0.5;
+		const verticalLocation = node.row < centerRow ? "top" : "bottom";
+		const horizontalLocation = node.column < centerColumn ? "left" : "right";
+
+		return verticalLocation + horizontalLocation;
 	},
 
-	getAccessibleGrids() {
+	getAccessibleNodes() {
 
 		for(let i = 0; i < this.layout[1].length; i++) {
 
@@ -160,15 +171,19 @@ let gameGrid = {
 
 					let node = new Node(i, j);
 					this.accessible.all.push(node);
-					this.accessible[this.categorizeGrids(node)].push(node);
+					this.accessible[this.getLocation(node)].push(node);
 				}
 			}
 		}
 	},
 
-	/**
-	 * check if given grid exists
-	 */
+	initialize(monitor) {
+
+		this.getNodeSize(monitor);
+		this.getDimension();
+		this.getAccessibleNodes();
+	},
+
 	exist(row, column) {
 
 		if(this.layout[0][row] === undefined) {
@@ -179,7 +194,7 @@ let gameGrid = {
 		return this.layout[0][row][column] !== undefined;
 	},
 
-	getGrid(layer, row, column) {
+	getNode(layer, row, column) {
 
 		if(!this.exist(row, column)) {
 
@@ -189,11 +204,65 @@ let gameGrid = {
 		return this.layout[layer][row][column];
 	},
 
-	setGrid(layer, row, column, content) {
+	setNode(layer, row, column, information) {
 
 		if(this.exist(row, column)) {
 
-			this.layout[layer][row][column] = content;
+			this.layout[layer][row][column] = information;
 		}
+	},
+
+	isAccessible(row, column) {
+
+		let node = this.getNode(1, row, column);
+
+		if(node === null) {
+
+			return false;
+		}
+
+		return node.hasOwnProperty("f") || node.b === "p";
+	},
+	
+	locateNode(point) {
+
+		const row = Math.floor(point.y / this.nodeSize);
+		const column = Math.floor(point.x / this.nodeSize);
+
+		return new Node(row, column);
+	},
+	/**
+	 * calculate center coordinate of a given node
+	 */
+	getNodeCenter(row, column) {
+
+		const x = (column + 0.5) * this.nodeSize;
+		const y = (row + 0.5) * this.nodeSize;
+
+		return new Point(x, y);
+	},
+	/**
+	 * retrieve adjacent node on given direction for given node
+	 */
+	getAdjacentNode(direction, row, column) {
+
+		if(direction === "up" && row > 0) row--;
+		else if(direction === "down" && row < this.rows - 1) row++;
+		else if(direction === "left" && column > 0) column--;
+		else if(direction === "right" && column < this.columns - 1) column++;
+		else return null;
+
+		return new Node(row, column);
+	},
+	/**
+	 * retrieve adjacent nodes on all four directions for given node
+	 */
+	getAdjacentNodes(row, column) {
+
+		return game.directions.map(direction => {
+
+			return this.getAdjacentNode(direction, row, column);
+
+		}).filter(node => node !== null && this.exist(node.row, node.column));
 	}
 };
