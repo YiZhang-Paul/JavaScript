@@ -1,17 +1,37 @@
 /* jslint esversion: 6 */
-class PowerBean extends Food {
+class PowerBean extends Bean {
 
 	constructor(row, column) {
 
 		super(row, column);
+		this.tick = 0;
 		this.score = 50;
-		this.radius = game.gridWidth * 0.45;
+		this.radius = grid.nodeSize * 0.45;
 	}
 
 	dispose() {
 
-		game.manager.powerBeans.delete(this);
-		game.manager.aiManager.triggerFlee();
+		game.manager.foodManager.powerBeans.delete(this);
+		game.manager.aiManager.fleeModeOn();
 		super.dispose();
+	}
+
+	nextTick() {
+
+		this.tick = this.tick ? 0 : 1;
+	}
+
+	blink() {
+
+		this.nextTick();
+
+		if(this.tick) {
+
+			this.draw();
+		}
+		else {
+
+			this.erase();
+		}
 	}
 }
