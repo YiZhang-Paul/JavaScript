@@ -27,7 +27,7 @@ let control = {
 			return null;
 		}
 
-		return this.keyPressed.slice(-1)[0];
+		return utility.getLast(this.keyPressed);
 	},
 
 	isPressed(keyCode) {

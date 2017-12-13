@@ -1,99 +1,65 @@
 /* jslint esversion: 6 */
-class Fruit extends Food {
+class Fruit extends Movable {
 
 	constructor(row, column, type, direction) {
 
 		super(row, column);
 		this.type = type;
 		this.score = 500;
-		this.spawn = new Date().getTime();
-		this.lifespan = 30000;
+		this.spawnTime = new Date().getTime();
+		this.duration = 30000;
 		this.falling = false;
 		this.jumpHeight = 0;
-		this.maxJumpHeight = game.gridWidth;
-		this.jumpSpeed = game.gridWidth * 0.1;
+		this.maxJumpHeight = grid.nodeSize;
+		this.jumpSpeed = grid.nodeSize * 0.1;
 		this.direction = direction;
-		this.moveSpeed = Math.round(game.mazeHeight * 0.1) / 100;
-		this.toGridCenter = null;
-		this.tile = document.getElementById("tile");
+		this.speed = Math.round(grid.height * 0.1) / 100;
+		this.cropXY = null;	
 		this.cropWidth = 32;
-		this.cropX = this.cropWidth * (this.type - 1);
-		this.cropY = this.cropWidth * 6;
 		this.ctx = game.canvas.fruit;
+		this.getCropXY();
 	}
 
-	isActive() {
+	get inDuration() {
 
-		return this.spawn + this.lifespan > new Date().getTime();
+		return this.spawnTime + this.duration > new Date().getTime();
 	}
 
 	erase() {
 
 		this.ctx.clearRect(
 
-			this.x - game.gridWidth * 2,
-			this.y - game.gridWidth * 2,
-			game.gridWidth * 4,
-			game.gridWidth * 4
+			this.coordinate.x - grid.nodeSize * 2,
+			this.coordinate.y - grid.nodeSize * 2,
+			grid.nodeSize * 4,
+			grid.nodeSize * 4
 		);
 	}
 
 	dispose() {
 
-		game.manager.activeFruit = null;
+		game.manager.foodManager.fruit = null;
 		this.erase();
 	}
 
-	trackCurrentGrid() {
+	getCurrentNode() {
 
-		Player.prototype.trackCurrentGrid.call(this);
-
-		if(!gameGrid.exist(this.row, this.column)) {
+		super.getCurrentNode();
+		//self-dispose when going out of maze area
+		if(!grid.exist(this.row, this.column)) {
 
 			this.dispose();
 		}
 	}
-	/**
-	 * get center coordinate of a given grid
-	 */
-	getGridCenter(row = this.row, column = this.column) {
 
-		return Player.prototype.getGridCenter.call(this, row, column);
+	getCropXY() {
+
+		const x = this.cropWidth * (this.type - 1);
+		const y = this.cropWidth * 6;
+
+		this.cropXY = new Point(x, y);
 	}
 
-	onGridCenter(row = this.row, column = this.column) {
-
-		return Player.prototype.onGridCenter.call(this, row, column);
-	}
-	/**
-	 * retrieve row and column of adjacent grid on given direction
-	 */
-	getAdjacentGrid(direction = this.direction, row = this.row, column = this.column) {
-
-		return Player.prototype.getAdjacentGrid.call(this, direction, row, column);
-	}
-	/**
-	 * calculate distance to center of given grid
-	 */
-	distanceToGridCenter(row, column) {
-
-		return Player.prototype.distanceToGridCenter.call(this, row, column);
-	}
-	/**
-	 * calculate distance to center of nearest facing grid
-	 */
-	distanceToFacingGridCenter() {
-
-		Player.prototype.distanceToFacingGridCenter.call(this);
-	}
-
-	getOppositeWay(direction = this.direction) {
-
-		return Player.prototype.getOppositeWay.call(this, direction);
-	}
-	/**
-	 * jump up and down
-	 */
 	jump() {
 
 		if(this.jumpHeight >= this.maxJumpHeight) {
@@ -107,22 +73,15 @@ class Fruit extends Food {
 
 		this.jumpHeight += this.jumpSpeed * (this.falling ? -1 : 1);
 	}
-	/**
-	 * find all directions other than opposite direction
-	 */
+
 	filterOppositeWay() {
 
-		const opposite = this.getOppositeWay(this.direction);
+		const opposite = this.getOppositeWay();
 
 		return game.directions.filter(direction => direction !== opposite);
 	}
-
-	isValidGrid(target) {
-
-		return target && (target.hasOwnProperty("f") || target.hasOwnProperty("p"));
-	}
 	/**
-	 * check if the obstacle is less than 2 grids thick to be able to pass
+	 * check if the obstacle is less than 2 nodes thick
 	 */
 	canPass(direction) {
 
@@ -139,72 +98,66 @@ class Fruit extends Food {
 				column += direction === "left" ? -1 : 1;
 			}
 
-			if(!gameGrid.exist(row, column)) {
+			if(!grid.exist(row, column)) {
 
 				return false;
 			}
 		}
 
-		return this.isValidGrid(gameGrid.getGrid(1, row, column));
-	}
-	/**
-	 * adjust speed to ensure fruit can reach grid center
-	 */
-	adjustSpeed() {
-
-		this.distanceToFacingGridCenter();
-
-		return this.toGridCenter ? Math.min(this.moveSpeed, this.toGridCenter) : this.moveSpeed;
+		return grid.isAccessible(row, column);
 	}
 
-	getDirection() {
+	setDirection() {
 
-		let position = gameGrid.getGrid(1, this.row, this.column);
+		if(this.onNodeCenter && this.inDuration && grid.isAccessible(this.row, this.column)) {
 
-		if(this.onGridCenter() && this.isActive() && this.isValidGrid(position)) {
-
-			let adjacent = this.getAdjacentGrid();
+			let adjacent = grid.getAdjacentNode(this.direction, this.row, this.column);
 			//70% chance to keep going in current direction if possible
-			if(this.isValidGrid(gameGrid.getGrid(1, adjacent.row, adjacent.column)) && Math.random() < 0.7) {
+			if(grid.isAccessible(adjacent.row, adjacent.column) && Math.random() < 0.7) {
 
-				return this.direction;
+				return;
 			}
 
-			let directions = this.filterOppositeWay();
-			const direction = directions[Math.floor(Math.random() * directions.length)];
-			let target = this.getAdjacentGrid(direction);
+			const direction = utility.getRandom(this.filterOppositeWay());
+			adjacent = grid.getAdjacentNode(direction, this.row, this.column);
 			//20% chance to pass through obstacles if possible
-			if(this.isValidGrid(gameGrid.getGrid(1, target.row, target.column)) || (Math.random() < 0.2 && this.canPass(direction))) {
+			if((adjacent && grid.isAccessible(adjacent.row, adjacent.column)) || 
+			   (Math.random() < 0.2 && this.canPass(direction))) {
 
-				return direction;
+				this.direction = direction;
 			}
 			//retry finding moving direction
-			return this.getDirection();
+			this.setDirection();
 		}
-
-		return this.direction;
 	}
 
-	move() {
+	adjustSpeed(speed) {
 
-		const speed = this.adjustSpeed();
-		this.direction = this.getDirection();
+		const toNodeCenter = this.toFacingNodeCenter;
+
+		return toNodeCenter ? Math.min(speed, toNodeCenter) : speed;
+	}
+
+	move(timeStep) {
+
+		const speed = this.adjustSpeed(this.speed * timeStep);
 
 		if(this.direction === "up" || this.direction === "down") {
 
-			this.y += speed * (this.direction === "up" ? -1 : 1);
+			this.coordinate.y += speed * (this.direction === "up" ? -1 : 1);
 		}
 		else {
 
-			this.x += speed * (this.direction === "left" ? -1 : 1);
+			this.coordinate.x += speed * (this.direction === "left" ? -1 : 1);
 		}
 
-		this.trackCurrentGrid();
+		this.getCurrentNode();
 	}
 
 	update() {
 
 		this.jump();
+		this.setDirection();
 		this.move();
 	}
 
@@ -215,14 +168,14 @@ class Fruit extends Food {
 		this.ctx.drawImage(
 
 			this.tile,
-			this.cropX,
-			this.cropY,
+			this.cropXY.x,
+			this.cropXY.y,
 			this.cropWidth,
 			this.cropWidth,
-			this.x - game.gridWidth * 0.8,
-			this.y - game.gridWidth * 0.8 - this.jumpHeight,
-			game.gridWidth * 1.6,
-			game.gridWidth * 1.6
+			this.coordinate.x - grid.nodeSize * 0.8,
+			this.coordinate.y - grid.nodeSize * 0.8 - this.jumpHeight,
+			grid.nodeSize * 1.6,
+			grid.nodeSize * 1.6
 		);
 	}
 }

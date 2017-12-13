@@ -1,16 +1,17 @@
 /* jslint esversion: 6 */
 class Movable {
 
-	constructor() {
+	constructor(row, column) {
 
 		this.coordinate = new Point();
-		this.row = null;
-		this.column = null;
+		this.row = row;
+		this.column = column;
 		this.speed = 0;
 		this.direction = null;
 		this.cropXY = null;	
 		this.cropWidth = 32;
 		this.tile = document.getElementById("tile");
+		this.ctx = null;
 	}
 
 	get onNodeCenter() {
@@ -132,6 +133,7 @@ class Movable {
 	}
 	/**
 	 * @abstract
+	 * adjust speed to ensure object can reach grid center
 	 */
 	adjustSpeed(speed) {}
 	/**
