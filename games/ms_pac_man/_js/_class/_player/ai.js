@@ -18,6 +18,7 @@ class AI extends Player {
 		this.defaultCropLocation = this.getCropLocation;
 		this.pathfinder = new PathFinder(this);
 		this.state = null;
+		this.test = false;
 	}
 
 	get destination() {
