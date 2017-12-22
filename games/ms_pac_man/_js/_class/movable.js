@@ -113,7 +113,7 @@ class Movable {
 
 		return grid.getNode(1, adjacent.row, adjacent.column).hasOwnProperty("w");
 	}
-
+	
 	hasDoor(direction = this.direction) {
 
 		let adjacent = grid.getAdjacentNode(direction, this.row, this.column);

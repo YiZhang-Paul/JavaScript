@@ -43,7 +43,7 @@ class Player extends Movable {
 
 		return toNodeCenter ? Math.min(speed, toNodeCenter) : speed;
 	}
-
+	
 	crossWormhole() {
 
 		const left = -grid.nodeSize;
@@ -54,7 +54,7 @@ class Player extends Movable {
 			this.coordinate.x = this.coordinate.x < left ? right : left;
 		}
 	}
-
+	
 	move(timeStep) {
 
 		const speed = this.adjustSpeed(this.speed * timeStep);
